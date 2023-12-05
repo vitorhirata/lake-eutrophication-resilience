@@ -32,6 +32,24 @@ function run_entropy(
     return s_final
 end
 
+function number_possible_a(
+    x::Float64,
+    x_threshold::Float64 = 0.75,
+    possibilities_threshold::Int64 = 10,
+    max_possibilities::Int64 = 10,
+    final_x::Float64 = 3.0
+)::Int64
+
+    if x < x_threshold
+        result = max_possibilities + ((possibilities_threshold - max_possibilities) / x_threshold) * x
+    elseif x < final_x
+        result = possibilities_threshold + ((1 - possibilities_threshold) / (final_x - x_threshold)) * (x - x_threshold)
+    else
+        result = 1
+    end
+
+    return round(Int64, result)
+end
 
 function entropy(x0::Float64, a::Float64, step::Float64, time_limit::Int64, prob::Float64 = 1.0)::Float64
     possible_a_vec = _possible_a(x0)
@@ -115,19 +133,7 @@ end
 
 function _possible_a(
     x::Float64,
-    x_limits::Tuple{Vararg{Float64}} = (1.5, 1.0, 0.5, -0.1),
-    total_possible_a::Tuple{Vararg{Float64}} = (0.0, 0.1, 0.2, 0.3),
-)::Tuple{Vararg{Float64}}
-
-    number_a = _first_bigger_element_index(x, x_limits)
-    return total_possible_a[1:number_a]
+    total_possible_a::StepRangeLen = 0.0:0.04:0.36,
+)::Vector{Float64}
+    return collect(total_possible_a[1:number_possible_a(x)])
 end
-
-function _first_bigger_element_index(x::Float64, x_limits::Tuple{Vararg{Float64}})::Int64
-    for (index, limit) in enumerate(x_limits)
-        if x >= limit
-            return index
-        end
-    end
-end
-

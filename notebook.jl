@@ -55,12 +55,22 @@ begin
 	plot!(influx_options_root[lim1:end], roots[3, lim1:end], label="root2")
 
 	plot!(legend=:bottomright)
-	ylabel!("root")
+	ylabel!("x*")
 	xlabel!("influx")
 end
 
 # ╔═╡ 3965fdff-83c2-45b0-9146-f86f1fc48353
 md"## Pathway diversity implementation"
+
+# ╔═╡ 8935e90f-548e-41fd-a0d1-4e9be83e0de7
+begin
+	x = 0.0:0.05:4.0
+	number_possible_influx = number_possible_a.(x)
+
+	plot(collect(x), number_possible_influx)
+	ylabel!("number of possible influx")
+	xlabel!("x")
+end
 
 # ╔═╡ 7476d4d1-275d-4a11-a299-500566f32f0b
 begin
@@ -70,7 +80,7 @@ begin
 	# time_limit0 = 4
 
 	step_options0 = [5.0, 10.0, 20.0]
-	time_limit_options0 = [1, 3, 6, 10]
+	time_limit_options0 = [1, 3, 5, 7]
 
 	s_final0 = run_entropy(x_init0, influx0, step_options0, time_limit_options0)
 end
@@ -95,7 +105,7 @@ begin
 	# time_limit1 = 4
 
 	x_init_options1 = [0, 0.1, 0.2, 0.3, 0.4]
-	time_limit_options1 = [1, 3, 6, 10]
+	time_limit_options1 = [1, 3, 5, 7]
 
 	s_final1 = run_entropy(x_init_options1, influx1, step1, time_limit_options1)
 end
@@ -119,8 +129,8 @@ begin
 	step2 = 10.0
 	# time_limit2 = 4
 
-	x_init_options2 = [0, 0.25, 0.5, 0.75, 1.0, 1.5, 1.75]
-	time_limit_options2 = [1, 3, 6, 10]
+	x_init_options2 = collect(0:0.4:3)
+	time_limit_options2 = [1, 3, 5, 7]
 
 	s_final2 = run_entropy(x_init_options2, influx2, step2, time_limit_options2)
 end
@@ -2122,8 +2132,9 @@ version = "1.4.1+1"
 # ╠═c29a6b3a-1949-4e49-9ee1-519cb240dab6
 # ╟─88437506-a585-43a6-9df3-5b979ef0313f
 # ╟─1d3b8409-24a6-4dbe-809e-3b9d4bcdf355
-# ╟─218d8442-a241-4f99-a79f-3f16e5f8a177
+# ╠═218d8442-a241-4f99-a79f-3f16e5f8a177
 # ╟─3965fdff-83c2-45b0-9146-f86f1fc48353
+# ╠═8935e90f-548e-41fd-a0d1-4e9be83e0de7
 # ╠═7476d4d1-275d-4a11-a299-500566f32f0b
 # ╠═910287c9-ac70-4907-9c31-e54363eeeecd
 # ╠═33886715-037f-407a-9f7b-ebd8b6562296

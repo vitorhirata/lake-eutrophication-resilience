@@ -17,6 +17,18 @@ include("pathway_diversity.jl")
 # ╔═╡ b705c4e2-fa73-4021-899a-a52b4ff094bb
 md"# Using pathway diversity in a Lake Eutrophication problem"
 
+# ╔═╡ 20f665f2-474f-4d55-9cc9-167373d35f17
+md"
+We will model the following lake eutrophication problem.
+Where I is the influx of phosphorus (P), s the rate of P loss, r the maximum rate of recycling of P, and h is the recycling half-saturation rate.
+
+
+```math
+\frac{dP}{dt} = I - s P + r\frac{P^2}{P^2 + h^2}
+```
+"
+
+
 # ╔═╡ 3b16630b-7053-4d2d-8ed8-e1bd95160302
 md"## Setup"
 
@@ -50,13 +62,13 @@ end
 begin
 	lim1 = 19
 	lim2 = 174
-	plot(influx_options_root[1:lim2], roots[1, 1:lim2], label="root0")
-	plot!(influx_options_root[lim1:lim2], roots[2, lim1:lim2], label="root1")
-	plot!(influx_options_root[lim1:end], roots[3, lim1:end], label="root2")
+	plot(influx_options_root[lim1:end], roots[3, lim1:end], label="Eutrophicated stable state")
+	plot!(influx_options_root[lim1:lim2], roots[2, lim1:lim2], label="Instable state")
+	plot!(influx_options_root[1:lim2], roots[1, 1:lim2], label="Clean stable state")
 
 	plot!(legend=:bottomright)
-	ylabel!("x*")
-	xlabel!("influx")
+	ylabel!("Fixed points (P*)")
+	xlabel!("Influx (I)")
 end
 
 # ╔═╡ 3965fdff-83c2-45b0-9146-f86f1fc48353
@@ -64,17 +76,17 @@ md"## Pathway diversity implementation"
 
 # ╔═╡ 8935e90f-548e-41fd-a0d1-4e9be83e0de7
 begin
-	x = 0.0:0.05:4.0
-	number_possible_influx = number_possible_a.(x)
+	P = 0.0:0.05:4.0
+	number_possible_influx = number_possible_a.(P)
 
-	plot(collect(x), number_possible_influx)
-	ylabel!("number of possible influx")
-	xlabel!("x")
+	plot(collect(P), number_possible_influx, legend = false)
+	ylabel!("Number of possible influx")
+	xlabel!("Amount of phosphorus (P)")
 end
 
 # ╔═╡ 7476d4d1-275d-4a11-a299-500566f32f0b
 begin
-	x_init0 = 0.1
+	P_init0 = 0.1
 	influx0 = 0.1
 	# step0 = 10
 	# time_limit0 = 4
@@ -82,7 +94,7 @@ begin
 	step_options0 = [5.0, 10.0, 20.0]
 	time_limit_options0 = [1, 3, 5, 7]
 
-	s_final0 = run_entropy(x_init0, influx0, step_options0, time_limit_options0)
+	s_final0 = run_entropy(P_init0, influx0, step_options0, time_limit_options0)
 end
 
 # ╔═╡ 910287c9-ac70-4907-9c31-e54363eeeecd
@@ -93,58 +105,58 @@ begin
 	end
 
     plot!(legend=:bottomright)
-	ylabel!("causal entroy")
-	xlabel!("number of decisions (time limit)")
+	ylabel!("Causal entroy (S)")
+	xlabel!("Number of decisions")
 end
 
 # ╔═╡ 33886715-037f-407a-9f7b-ebd8b6562296
 begin
-	# x_init1 = 0.1
+	# P_init1 = 0.1
 	influx1 = 0.1
 	step1 = 10.0
 	# time_limit1 = 4
 
-	x_init_options1 = [0, 0.1, 0.2, 0.3, 0.4]
+	P_init_options1 = [0, 0.1, 0.2, 0.3, 0.4]
 	time_limit_options1 = [1, 3, 5, 7]
 
-	s_final1 = run_entropy(x_init_options1, influx1, step1, time_limit_options1)
+	s_final1 = run_entropy(P_init_options1, influx1, step1, time_limit_options1)
 end
 
 # ╔═╡ 62431e99-2ecc-46fb-aa7f-f3cfa08d654b
 begin
-	plot(time_limit_options1, s_final1[1, :], label="initial state = $(x_init_options1[1])")
-	for i in 2:length(x_init_options1)
-    	plot!(time_limit_options1, s_final1[i, :], label="initial state = $(x_init_options1[i])")
+	plot(time_limit_options1, s_final1[1, :], label="Initial state (P0) = $(P_init_options1[1])")
+	for i in 2:length(P_init_options1)
+    	plot!(time_limit_options1, s_final1[i, :], label="Initial state (P0) = $(P_init_options1[i])")
 	end
 
 	plot!(legend=:bottomright)
-	ylabel!("causal entroy")
-	xlabel!("number of decisions (time limit)")
+	ylabel!("Causal entroy (S)")
+	xlabel!("Number of decisions")
 end
 
 # ╔═╡ 460f46b9-c998-4eee-adce-e25dc78b58a3
 begin
-	# x_init2 = 0.1
+	# P_init2 = 0.1
 	influx2 = 0.1
 	step2 = 10.0
 	# time_limit2 = 4
 
-	x_init_options2 = collect(0:0.4:3)
+	P_init_options2 = collect(0:0.4:3)
 	time_limit_options2 = [1, 3, 5, 7]
 
-	s_final2 = run_entropy(x_init_options2, influx2, step2, time_limit_options2)
+	s_final2 = run_entropy(P_init_options2, influx2, step2, time_limit_options2)
 end
 
 # ╔═╡ 391d4d68-8a98-4965-91be-ed6b4af23f75
 begin
-	plot(time_limit_options2, s_final2[1, :], label="initial state = $(x_init_options2[1])")
-	for i in 2:length(x_init_options2)
-    	plot!(time_limit_options2, s_final2[i, :], label="initial state = $(x_init_options2[i])")
+	plot(time_limit_options2, s_final2[1, :], label="Initial state (P0) = $(P_init_options2[1])")
+	for i in 2:length(P_init_options2)
+    	plot!(time_limit_options2, s_final2[i, :], label="Initial state (P0) = $(P_init_options2[i])")
 	end
 
 	plot!(legend=:bottomright)
-	ylabel!("causal entroy")
-	xlabel!("number of decisions (time limit)")
+	ylabel!("Causal entroy (S)")
+	xlabel!("Number of decisions")
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -2126,6 +2138,7 @@ version = "1.4.1+1"
 
 # ╔═╡ Cell order:
 # ╟─b705c4e2-fa73-4021-899a-a52b4ff094bb
+# ╠═20f665f2-474f-4d55-9cc9-167373d35f17
 # ╟─3b16630b-7053-4d2d-8ed8-e1bd95160302
 # ╠═96a65056-2bd2-4f2a-b6c8-78e63144db3f
 # ╠═16aa3bff-a8bc-4e62-8c16-0e8048ddee57

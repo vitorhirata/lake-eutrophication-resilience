@@ -51,7 +51,7 @@ function number_possible_influx(
     return round(Int64, result)
 end
 
-function _entropy(P0::Float64, a::Float64, step::Float64, time_limit::Int64, prob::Float64 = 1.0)::Float64
+function _entropy(P0::Float64, I::Float64, step::Float64, time_limit::Int64, prob::Float64 = 1.0)::Float64
     possible_a_vec = _possible_influx(P0)
     step_prob = 1.0 / length(possible_a_vec)
 
@@ -61,15 +61,15 @@ function _entropy(P0::Float64, a::Float64, step::Float64, time_limit::Int64, pro
     end
 
     final_prob = prob * step_prob
-    P_final = map(a -> _evolve_step(P0, a, step), possible_a_vec)
+    P_final = map(a -> _evolve_step(P0, I, step), possible_a_vec)
     results = map(input -> _entropy(input[1], input[2], step, time_limit-1, final_prob), zip(P_final, possible_a_vec))
 
     return sum(results)
 end
 
-function _evolve_step(P0::Float64, a::Float64, step::Float64)::Float64
+function _evolve_step(P0::Float64, I::Float64, step::Float64)::Float64
     tspan = (0.0, step)
-    prob = ODEProblem(_f, P0, tspan, a)
+    prob = ODEProblem(_f, P0, tspan, I)
     sol = solve(prob, Tsit5())
     return sol.u[end]
 end
@@ -94,7 +94,7 @@ end
 
 # Function not being used
 function run_scenarios(
-        P0::Float64, a::Float64, t_max::Float64, step::Float64, time_limit::Int64, n_scenarious::Int64
+        P0::Float64, I::Float64, t_max::Float64, step::Float64, time_limit::Int64, n_scenarious::Int64
 )::Tuple{Vector{Float64}, Vector{Float64}}
 
     times = StepRange(1, step, t_max)
@@ -102,7 +102,7 @@ function run_scenarios(
     P_final = zeros(length(times))
 
     for _ in 1:n_scenarious
-        s, P = _run_scenario(P0, a, t_max, step, time_limit)
+        s, P = _run_scenario(P0, I, t_max, step, time_limit)
         s_final += s
         P_final += P
     end
@@ -110,12 +110,12 @@ function run_scenarios(
     s_final /= n_scenarious
     P_final /= n_scenarious
 
-    return s_final, y_final
+    return s_final, P_final
 end
 
 # Function not being used
 function _run_scenario(
-        P0::Float64, a::Float64, t_max::Float64, step::Float64, time_limit::Int64
+        P0::Float64, I::Float64, t_max::Float64, step::Float64, time_limit::Int64
 )::Tuple{Vector{Float64}, Vector{Float64}}
 
     times = StepRange(1, step, t_max)
@@ -124,7 +124,7 @@ function _run_scenario(
 
     for (index, t0) in enumerate(times)
         P_final[index] = P0
-        s_final[index] = _entropy(P0, a, step, time_limit)
+        s_final[index] = _entropy(P0, I, step, time_limit)
 
         if t0 != 1
             a = rand(_possible_influx(P0))
@@ -133,5 +133,5 @@ function _run_scenario(
         P0 = _evolve_step(P0, a, step)
     end
 
-    return s_final, y_final
+    return s_final, P_final
 end

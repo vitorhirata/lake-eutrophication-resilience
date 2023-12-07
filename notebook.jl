@@ -9,6 +9,8 @@ begin
 	using DifferentialEquations
 	using Plots
 	using Roots
+	using Statistics
+	using StatsBase
 end
 
 # ╔═╡ c29a6b3a-1949-4e49-9ee1-519cb240dab6
@@ -40,7 +42,7 @@ md"## Bifurcation analysis of the differential equation"
 
 # ╔═╡ 1d3b8409-24a6-4dbe-809e-3b9d4bcdf355
 begin
-	f_root(x, p) = _f(x, p, 0.0)
+	f_root(P, I) = _f(P, I, 0.0)
 
 	function get_root(func, root, parameter)
 		Z = ZeroProblem(func, root)
@@ -77,9 +79,9 @@ md"## Pathway diversity implementation"
 # ╔═╡ 8935e90f-548e-41fd-a0d1-4e9be83e0de7
 begin
 	P = 0.0:0.05:4.0
-	number_possible_influx = number_possible_a.(P)
+	n_possible_influx = number_possible_influx.(P)
 
-	plot(collect(P), number_possible_influx, legend = false)
+	plot(collect(P), n_possible_influx, legend = false)
 	ylabel!("Number of possible influx")
 	xlabel!("Amount of phosphorus (P)")
 end
@@ -159,17 +161,123 @@ begin
 	xlabel!("Number of decisions")
 end
 
+# ╔═╡ 78821ef8-2960-44ba-b6d3-533f22b7b853
+md"## Early-warning signals comparison"
+
+# ╔═╡ f2454075-8ea9-4c86-8eca-59280f7d2d39
+begin
+	P_init3 = 0.02
+	# influx3 = 0.1
+	t_max3 = 100
+	step3 = 0.5
+	time_limit3 = 4
+	n_scenarious3 = 1
+
+	influx3_options = [0.02, 0.1, 0.15, 0.17, 0.18, 0.19, 0.2, 0.225, 0.25]
+	
+	s3 = []
+	p3 = []
+	
+	for (index, influx3) in enumerate(influx3_options)
+		s3_temp, p3_temp = run_scenarios(P_init3, influx3, t_max3, step3, time_limit3, n_scenarious3)
+
+		push!(s3, s3_temp)
+		push!(p3, p3_temp)
+	end
+end
+
+# ╔═╡ 9ad3fc84-de80-4893-beb5-7a6e2d59f532
+begin
+	plot(collect(1:step3:t_max3), p3[1], label="Influx (I) = $(influx3_options[1])")
+	for i in 2:length(influx3_options)
+    	plot!(collect(1:step3:t_max3), p3[i], label="Influx (I) = $(influx3_options[i])")
+	end
+
+	plot!(legend=:right)
+	ylabel!("Amount of Phosphorus (P)")
+	xlabel!("Time (t)")
+end
+
+# ╔═╡ 3952565b-733a-48bf-ac4d-017d6e2e26c5
+begin
+	plot(collect(1:step3:t_max3), s3[1], label="Influx (I) = $(influx3_options[1])")
+	for i in 2:length(influx3_options)
+    	plot!(collect(1:step3:t_max3), s3[i], label="Influx (I) = $(influx3_options[i])")
+	end
+
+	plot!(legend=:right)
+	ylabel!("Entropy (S)")
+	xlabel!("Time (t)")
+end
+
+# ╔═╡ f3d693b2-91a8-4c22-b8e3-bc254991b526
+begin
+	threshold = get_root(f_root, 1.3, influx3_options[1])
+	plot(collect(1:step3:t_max3), threshold .- p3[1], label="Influx (I) = $(influx3_options[1])")
+
+	for i in 2:length(influx3_options)
+		threshold = get_root(f_root, 1.7, influx3_options[i])
+    	plot!(collect(1:step3:t_max3), threshold .- p3[i], label="Influx (I) = $(influx3_options[i])")
+	end
+
+	plot!(legend=:right)
+	ylabel!("Distance to threshold")
+	xlabel!("Time (t)")
+end
+
+# ╔═╡ eb2f315e-63d2-47e7-a691-a69e2a773be5
+begin
+	variance_time_step3 = 5
+	variance_time_range = (variance_time_step3):variance_time_step3:(t_max3-1)
+	variance_idx_step::Int64 = variance_time_step3 ÷ step3
+	
+	variance_time_series = zeros(length(influx3_options), length(variance_time_range))
+
+	for (index_I, influx3) in enumerate(influx3_options)
+		for (index_t, time) in enumerate(variance_time_range)
+			time_idx::Int64 = time ÷ step3 + 1
+			variance_time_series[index_I, index_t] = var(p3[index_I][(time_idx-variance_idx_step):time_idx])
+		end
+	end
+end
+
+# ╔═╡ c383ab30-22ff-43c6-a3ce-33e58b7d5685
+begin
+	plot(collect(variance_time_range), variance_time_series[1, :], label="Influx (I) = $(influx3_options[1])")
+	for i in 2:length(influx3_options)
+    	plot!(collect(variance_time_range), variance_time_series[i, :], label="Influx (I) = $(influx3_options[i])")
+	end
+
+	plot!(legend=:topright)
+	xlims!(0, 100)
+	ylabel!("Variance")
+	xlabel!("Time (t)")
+end
+
+# ╔═╡ 5cc62bc7-542a-4265-9d2f-c20a493b4e9a
+begin
+	autocorrelation = [autocor(time_serie, [2])[1] for time_serie in p3]
+	#autocorrelation
+	plot(collect(influx3_options), autocorrelation, label=false)
+
+	ylabel!("Autocorrelation")
+	xlabel!("Influx (I)")
+end
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 Roots = "f2b01f46-fcfa-551c-844a-d8ac1e96c665"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [compat]
 DifferentialEquations = "~7.9.1"
 Plots = "~1.39.0"
 Roots = "~2.0.19"
+StatsBase = "~0.34.2"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -178,7 +286,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.3"
 manifest_format = "2.0"
-project_hash = "a770e64120362e95fe24d9b5c4379aa8b5314fed"
+project_hash = "efbc6ab751013d6f5292ed0c8552f234f30d9b72"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "5d2e21d7b0d8c22f67483ef95ebdc39c0e6b6003"
@@ -1649,9 +1757,9 @@ version = "1.7.0"
 
 [[deps.StatsBase]]
 deps = ["DataAPI", "DataStructures", "LinearAlgebra", "LogExpFunctions", "Missings", "Printf", "Random", "SortingAlgorithms", "SparseArrays", "Statistics", "StatsAPI"]
-git-tree-sha1 = "75ebe04c5bed70b91614d684259b661c9e6274a4"
+git-tree-sha1 = "1d77abd07f617c4868c33d4f5b9e1dbb2643c9cf"
 uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
-version = "0.34.0"
+version = "0.34.2"
 
 [[deps.StatsFuns]]
 deps = ["HypergeometricFunctions", "IrrationalConstants", "LogExpFunctions", "Reexport", "Rmath", "SpecialFunctions"]
@@ -2138,13 +2246,13 @@ version = "1.4.1+1"
 
 # ╔═╡ Cell order:
 # ╟─b705c4e2-fa73-4021-899a-a52b4ff094bb
-# ╠═20f665f2-474f-4d55-9cc9-167373d35f17
+# ╟─20f665f2-474f-4d55-9cc9-167373d35f17
 # ╟─3b16630b-7053-4d2d-8ed8-e1bd95160302
 # ╠═96a65056-2bd2-4f2a-b6c8-78e63144db3f
 # ╠═16aa3bff-a8bc-4e62-8c16-0e8048ddee57
 # ╠═c29a6b3a-1949-4e49-9ee1-519cb240dab6
 # ╟─88437506-a585-43a6-9df3-5b979ef0313f
-# ╟─1d3b8409-24a6-4dbe-809e-3b9d4bcdf355
+# ╠═1d3b8409-24a6-4dbe-809e-3b9d4bcdf355
 # ╠═218d8442-a241-4f99-a79f-3f16e5f8a177
 # ╟─3965fdff-83c2-45b0-9146-f86f1fc48353
 # ╠═8935e90f-548e-41fd-a0d1-4e9be83e0de7
@@ -2154,5 +2262,13 @@ version = "1.4.1+1"
 # ╠═62431e99-2ecc-46fb-aa7f-f3cfa08d654b
 # ╠═460f46b9-c998-4eee-adce-e25dc78b58a3
 # ╠═391d4d68-8a98-4965-91be-ed6b4af23f75
+# ╟─78821ef8-2960-44ba-b6d3-533f22b7b853
+# ╠═f2454075-8ea9-4c86-8eca-59280f7d2d39
+# ╠═9ad3fc84-de80-4893-beb5-7a6e2d59f532
+# ╠═3952565b-733a-48bf-ac4d-017d6e2e26c5
+# ╠═eb2f315e-63d2-47e7-a691-a69e2a773be5
+# ╠═c383ab30-22ff-43c6-a3ce-33e58b7d5685
+# ╠═5cc62bc7-542a-4265-9d2f-c20a493b4e9a
+# ╠═f3d693b2-91a8-4c22-b8e3-bc254991b526
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

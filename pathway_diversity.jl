@@ -34,7 +34,7 @@ end
 
 function number_possible_influx(
     P::Float64,
-    P_threshold::Float64 = 0.75,
+    P_threshold::Float64 = 0.6,
     possibilities_threshold::Int64 = 10,
     max_possibilities::Int64 = 10,
     final_P::Float64 = 3.0
@@ -49,6 +49,26 @@ function number_possible_influx(
     end
 
     return round(Int64, result)
+end
+
+function run_scenarios(
+        P0::Float64, I::Float64, t_max::Int64, step::Float64, time_limit::Int64, n_scenarious::Int64
+)::Tuple{Vector{Float64}, Vector{Float64}}
+
+    times = 1:step:t_max
+    s_final = zeros(length(times))
+    P_final = zeros(length(times))
+
+    for _ in 1:n_scenarious
+        s, P = _run_scenario(P0, I, t_max, step, time_limit)
+        s_final += s
+        P_final += P
+    end
+
+    s_final /= n_scenarious
+    P_final /= n_scenarious
+
+    return s_final, P_final
 end
 
 function _entropy(P0::Float64, I::Float64, step::Float64, time_limit::Int64, prob::Float64 = 1.0)::Float64
@@ -92,33 +112,11 @@ function _possible_influx(
     return collect(total_possible_influx[1:number_possible_influx(P)])
 end
 
-# Function not being used
-function run_scenarios(
-        P0::Float64, I::Float64, t_max::Float64, step::Float64, time_limit::Int64, n_scenarious::Int64
-)::Tuple{Vector{Float64}, Vector{Float64}}
-
-    times = StepRange(1, step, t_max)
-    s_final = zeros(length(times))
-    P_final = zeros(length(times))
-
-    for _ in 1:n_scenarious
-        s, P = _run_scenario(P0, I, t_max, step, time_limit)
-        s_final += s
-        P_final += P
-    end
-
-    s_final /= n_scenarious
-    P_final /= n_scenarious
-
-    return s_final, P_final
-end
-
-# Function not being used
 function _run_scenario(
-        P0::Float64, I::Float64, t_max::Float64, step::Float64, time_limit::Int64
+        P0::Float64, I::Float64, t_max::Int64, step::Float64, time_limit::Int64
 )::Tuple{Vector{Float64}, Vector{Float64}}
 
-    times = StepRange(1, step, t_max)
+    times = 1:step:t_max
     s_final = zeros(length(times))
     P_final = zeros(length(times))
 
@@ -130,7 +128,7 @@ function _run_scenario(
             a = rand(_possible_influx(P0))
         end
 
-        P0 = _evolve_step(P0, a, step)
+        P0 = _evolve_step(P0, I, step)
     end
 
     return s_final, P_final

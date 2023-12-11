@@ -210,21 +210,6 @@ begin
 	xlabel!("Time (t)")
 end
 
-# ╔═╡ f3d693b2-91a8-4c22-b8e3-bc254991b526
-begin
-	threshold = get_root(f_root, 1.3, influx3_options[1])
-	plot(collect(1:step3:t_max3), threshold .- p3[1], label="Influx (I) = $(influx3_options[1])")
-
-	for i in 2:length(influx3_options)
-		threshold = get_root(f_root, 1.7, influx3_options[i])
-    	plot!(collect(1:step3:t_max3), threshold .- p3[i], label="Influx (I) = $(influx3_options[i])")
-	end
-
-	plot!(legend=:right)
-	ylabel!("Distance to threshold")
-	xlabel!("Time (t)")
-end
-
 # ╔═╡ eb2f315e-63d2-47e7-a691-a69e2a773be5
 begin
 	variance_time_step3 = 5
@@ -262,6 +247,21 @@ begin
 
 	ylabel!("Autocorrelation")
 	xlabel!("Influx (I)")
+end
+
+# ╔═╡ f3d693b2-91a8-4c22-b8e3-bc254991b526
+begin
+	threshold = get_root(f_root, 1.3, influx3_options[1])
+	plot(collect(1:step3:t_max3), threshold .- p3[1], label="Influx (I) = $(influx3_options[1])")
+
+	for i in 2:length(influx3_options)
+		threshold = get_root(f_root, 1.7, influx3_options[i])
+    	plot!(collect(1:step3:t_max3), threshold .- p3[i], label="Influx (I) = $(influx3_options[i])")
+	end
+
+	plot!(legend=:right)
+	ylabel!("Distance to threshold")
+	xlabel!("Time (t)")
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001

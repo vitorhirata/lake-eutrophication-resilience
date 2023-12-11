@@ -240,14 +240,34 @@ begin
 	xlabel!("Time (t)")
 end
 
+# ╔═╡ a0a78733-c6d6-4add-b7c3-6b485cdeefe9
+begin
+	autocorrelation_time_step3 = 5
+	autocorrelation_time_range = autocorrelation_time_step3:autocorrelation_time_step3:(t_max3-1)
+	
+	autocorrelation_idx_step::Int64 = autocorrelation_time_step3 ÷ step3
+	
+	autocorrelation_time_series = zeros(length(influx3_options), length(autocorrelation_time_range))
+
+	for (index_I, influx3) in enumerate(influx3_options)
+		for (index_t, time) in enumerate(autocorrelation_time_range)
+			time_idx::Int64 = time ÷ step3 + 1
+			autocorrelation_time_series[index_I, index_t] = autocor(p3[index_I][(time_idx-autocorrelation_idx_step):time_idx], [1])[1]
+		end
+	end
+end
+
 # ╔═╡ 5cc62bc7-542a-4265-9d2f-c20a493b4e9a
 begin
-	autocorrelation = [autocor(time_serie, [2])[1] for time_serie in p3]
-	#autocorrelation
-	plot(collect(influx3_options), autocorrelation, label=false)
+	plot(collect(autocorrelation_time_range), autocorrelation_time_series[1, :], label="Influx (I) = $(influx3_options[1])", left_margin = 5Plots.mm)
+	for i in 2:length(influx3_options)
+    	plot!(collect(autocorrelation_time_range), autocorrelation_time_series[i, :], label="Influx (I) = $(influx3_options[i])", left_margin = 5Plots.mm)
+	end
 
-	ylabel!("Autocorrelation")
-	xlabel!("Influx (I)")
+	plot!(legend=:outerbottomright, size=(680,400))
+	xlims!(0, t_max3)
+	ylabel!("Aucorrelation lag 1")
+	xlabel!("Time (t)")
 end
 
 # ╔═╡ f3d693b2-91a8-4c22-b8e3-bc254991b526
@@ -2269,6 +2289,7 @@ version = "1.4.1+1"
 # ╟─3952565b-733a-48bf-ac4d-017d6e2e26c5
 # ╠═eb2f315e-63d2-47e7-a691-a69e2a773be5
 # ╟─c383ab30-22ff-43c6-a3ce-33e58b7d5685
+# ╠═a0a78733-c6d6-4add-b7c3-6b485cdeefe9
 # ╠═5cc62bc7-542a-4265-9d2f-c20a493b4e9a
 # ╠═f3d693b2-91a8-4c22-b8e3-bc254991b526
 # ╟─00000000-0000-0000-0000-000000000001

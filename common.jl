@@ -35,18 +35,18 @@ function _evolve_step(P0::Float64, I::Float64, step::Float64)::Float64
     return sol.u[end]
 end
 
-function _entropy(P0::Float64, I::Float64, step::Float64, time_limit::Int64, prob::Float64 = 1.0)::Float64
+function _entropy(P0::Float64, I::Float64, decision_step::Float64, number_decision::Int64, prob::Float64 = 1.0)::Float64
     possible_a_vec = _possible_influx(P0)
     step_prob = 1.0 / length(possible_a_vec)
 
-    if time_limit == 1
+    if number_decision == 1
         final_prob = prob * step_prob
         return length(possible_a_vec) * ( - final_prob * log(final_prob))
     end
 
     final_prob = prob * step_prob
-    P_final = map(a -> _evolve_step(P0, I, step), possible_a_vec)
-    results = map(input -> _entropy(input[1], input[2], step, time_limit-1, final_prob), zip(P_final, possible_a_vec))
+    P_final = map(a -> _evolve_step(P0, I, decision_step), possible_a_vec)
+    results = map(input -> _entropy(input[1], input[2], decision_step, number_decision-1, final_prob), zip(P_final, possible_a_vec))
 
     return sum(results)
 end

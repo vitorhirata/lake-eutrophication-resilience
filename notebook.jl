@@ -90,20 +90,20 @@ end
 begin
 	P_init0 = 0.1
 	influx0 = 0.1
-	# step0 = 10
-	# time_limit0 = 4
+	# decision_step0 = 10
+	# number_decision0 = 4
 
-	step_options0 = [5.0, 10.0, 20.0]
-	time_limit_options0 = [1, 3, 5, 7]
+	decision_steps0 = [5.0, 10.0, 20.0]
+	number_decisions0 = [1, 3, 5, 7]
 
-	s_final0 = run_entropy(P_init0, influx0, step_options0, time_limit_options0)
+	s_final0 = run_entropy(P_init0, influx0, decision_steps0, number_decisions0)
 end
 
 # ╔═╡ 910287c9-ac70-4907-9c31-e54363eeeecd
 begin
-	plot(time_limit_options0, s_final0[1, :], label="decision_recurrency = $(step_options0[1])")
-	for i in 2:length(step_options0)
-    	plot!(time_limit_options0, s_final0[i, :], label="decision_recurrency = $(step_options0[i])")
+	plot(number_decisions0, s_final0[1, :], label="decision_step = $(decision_steps0[1])")
+	for i in 2:length(decision_steps0)
+    	plot!(number_decisions0, s_final0[i, :], label="decision_step = $(decision_steps0[i])")
 	end
 
     plot!(legend=:bottomright)
@@ -115,20 +115,20 @@ end
 begin
 	# P_init1 = 0.1
 	influx1 = 0.1
-	step1 = 10.0
-	# time_limit1 = 4
+	decision_step1 = 10.0
+	# number_decision1 = 4
 
 	P_init_options1 = [0, 0.1, 0.2, 0.3, 0.4]
-	time_limit_options1 = [1, 3, 5, 7]
+	number_decisions1 = [1, 3, 5, 7]
 
-	s_final1 = run_entropy(P_init_options1, influx1, step1, time_limit_options1)
+	s_final1 = run_entropy(P_init_options1, influx1, decision_step1, number_decisions1)
 end
 
 # ╔═╡ 62431e99-2ecc-46fb-aa7f-f3cfa08d654b
 begin
-	plot(time_limit_options1, s_final1[1, :], label="Initial state (P0) = $(P_init_options1[1])")
+	plot(number_decisions1, s_final1[1, :], label="Initial state (P0) = $(P_init_options1[1])")
 	for i in 2:length(P_init_options1)
-    	plot!(time_limit_options1, s_final1[i, :], label="Initial state (P0) = $(P_init_options1[i])")
+    	plot!(number_decisions1, s_final1[i, :], label="Initial state (P0) = $(P_init_options1[i])")
 	end
 
 	plot!(legend=:bottomright)
@@ -140,20 +140,20 @@ end
 begin
 	# P_init2 = 0.1
 	influx2 = 0.1
-	step2 = 10.0
-	# time_limit2 = 4
+	decision_step2 = 10.0
+	# number_decision1 = 4
 
 	P_init_options2 = collect(0:0.4:3)
-	time_limit_options2 = [1, 3, 5, 7]
+	number_decisions2 = [1, 3, 5, 7]
 
-	s_final2 = run_entropy(P_init_options2, influx2, step2, time_limit_options2)
+	s_final2 = run_entropy(P_init_options2, influx2, decision_step2, number_decisions2)
 end
 
 # ╔═╡ 391d4d68-8a98-4965-91be-ed6b4af23f75
 begin
-	plot(time_limit_options2, s_final2[1, :], label="Initial state (P0) = $(P_init_options2[1])")
+	plot(number_decisions2, s_final2[1, :], label="Initial state (P0) = $(P_init_options2[1])")
 	for i in 2:length(P_init_options2)
-    	plot!(time_limit_options2, s_final2[i, :], label="Initial state (P0) = $(P_init_options2[i])")
+    	plot!(number_decisions2, s_final2[i, :], label="Initial state (P0) = $(P_init_options2[i])")
 	end
 
 	plot!(legend=:bottomright)
@@ -168,9 +168,10 @@ md"## Early-warning signals comparison"
 begin
 	P_init3 = 0.02
 	# influx3 = 0.1
-	t_max3 = 100
+	t_max3 = 150
 	step3 = 0.5
-	time_limit3 = 4
+	decision_step3 = 1.0
+	number_decision3 = 4
 	n_scenarious3 = 1
 
 	influx3_options = [0.02, 0.1, 0.15, 0.17, 0.18, 0.19, 0.2, 0.225, 0.25]
@@ -179,7 +180,7 @@ begin
 	p3 = []
 	
 	for (index, influx3) in enumerate(influx3_options)
-		s3_temp, p3_temp = run_scenarios(P_init3, influx3, t_max3, step3, time_limit3, n_scenarious3)
+		s3_temp, p3_temp = run_scenarios(P_init3, influx3, t_max3, step3, decision_step3, number_decision3, n_scenarious3)
 
 		push!(s3, s3_temp)
 		push!(p3, p3_temp)
@@ -234,7 +235,7 @@ begin
 	end
 
 	plot!(legend=:topright)
-	xlims!(0, 100)
+	xlims!(0, t_max3)
 	ylabel!("Variance")
 	xlabel!("Time (t)")
 end
@@ -2255,19 +2256,19 @@ version = "1.4.1+1"
 # ╠═1d3b8409-24a6-4dbe-809e-3b9d4bcdf355
 # ╠═218d8442-a241-4f99-a79f-3f16e5f8a177
 # ╟─3965fdff-83c2-45b0-9146-f86f1fc48353
-# ╠═8935e90f-548e-41fd-a0d1-4e9be83e0de7
+# ╟─8935e90f-548e-41fd-a0d1-4e9be83e0de7
 # ╠═7476d4d1-275d-4a11-a299-500566f32f0b
-# ╠═910287c9-ac70-4907-9c31-e54363eeeecd
+# ╟─910287c9-ac70-4907-9c31-e54363eeeecd
 # ╠═33886715-037f-407a-9f7b-ebd8b6562296
-# ╠═62431e99-2ecc-46fb-aa7f-f3cfa08d654b
+# ╟─62431e99-2ecc-46fb-aa7f-f3cfa08d654b
 # ╠═460f46b9-c998-4eee-adce-e25dc78b58a3
-# ╠═391d4d68-8a98-4965-91be-ed6b4af23f75
+# ╟─391d4d68-8a98-4965-91be-ed6b4af23f75
 # ╟─78821ef8-2960-44ba-b6d3-533f22b7b853
 # ╠═f2454075-8ea9-4c86-8eca-59280f7d2d39
-# ╠═9ad3fc84-de80-4893-beb5-7a6e2d59f532
-# ╠═3952565b-733a-48bf-ac4d-017d6e2e26c5
+# ╟─9ad3fc84-de80-4893-beb5-7a6e2d59f532
+# ╟─3952565b-733a-48bf-ac4d-017d6e2e26c5
 # ╠═eb2f315e-63d2-47e7-a691-a69e2a773be5
-# ╠═c383ab30-22ff-43c6-a3ce-33e58b7d5685
+# ╟─c383ab30-22ff-43c6-a3ce-33e58b7d5685
 # ╠═5cc62bc7-542a-4265-9d2f-c20a493b4e9a
 # ╠═f3d693b2-91a8-4c22-b8e3-bc254991b526
 # ╟─00000000-0000-0000-0000-000000000001

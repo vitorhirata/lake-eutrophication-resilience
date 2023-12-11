@@ -161,6 +161,22 @@ begin
 	xlabel!("Number of decisions")
 end
 
+# ╔═╡ 07dae1b0-6f88-42e9-986a-f02f868e3f51
+begin
+	threshold2 = get_root(f_root, 1.3, influx2)
+	distance_threshold2 = threshold2 .- P_init_options2
+	println(P_init_options2, ' ', distance_threshold2)
+	
+	plot(distance_threshold2, s_final2[:, 1], label="Number of decisions = $(number_decisions2[1])")
+	for i in 2:length(number_decisions2)
+    	plot!(distance_threshold2, s_final2[:, i], label="Number of decisions = $(number_decisions2[i])")
+	end
+
+	plot!(legend=:topleft)
+	ylabel!("Causal entroy (S)")
+	xlabel!("Distance to threshold")
+end
+
 # ╔═╡ 78821ef8-2960-44ba-b6d3-533f22b7b853
 md"## Early-warning signals comparison"
 
@@ -2283,6 +2299,7 @@ version = "1.4.1+1"
 # ╟─62431e99-2ecc-46fb-aa7f-f3cfa08d654b
 # ╠═460f46b9-c998-4eee-adce-e25dc78b58a3
 # ╟─391d4d68-8a98-4965-91be-ed6b4af23f75
+# ╟─07dae1b0-6f88-42e9-986a-f02f868e3f51
 # ╟─78821ef8-2960-44ba-b6d3-533f22b7b853
 # ╠═f2454075-8ea9-4c86-8eca-59280f7d2d39
 # ╟─9ad3fc84-de80-4893-beb5-7a6e2d59f532
@@ -2290,7 +2307,7 @@ version = "1.4.1+1"
 # ╠═eb2f315e-63d2-47e7-a691-a69e2a773be5
 # ╟─c383ab30-22ff-43c6-a3ce-33e58b7d5685
 # ╠═a0a78733-c6d6-4add-b7c3-6b485cdeefe9
-# ╠═5cc62bc7-542a-4265-9d2f-c20a493b4e9a
+# ╟─5cc62bc7-542a-4265-9d2f-c20a493b4e9a
 # ╠═f3d693b2-91a8-4c22-b8e3-bc254991b526
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

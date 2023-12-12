@@ -286,7 +286,7 @@ end
 
 # ╔═╡ a0a78733-c6d6-4add-b7c3-6b485cdeefe9
 begin
-	autocorrelation_time_step4 = 5
+	autocorrelation_time_step4 = 10
 	autocorrelation_time_range = autocorrelation_time_step4:autocorrelation_time_step4:(t_max4-1)
 
 	autocorrelation_idx_step::Int64 = autocorrelation_time_step4 ÷ step4

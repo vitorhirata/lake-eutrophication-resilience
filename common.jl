@@ -28,10 +28,33 @@ function _f(
     return influx - 0.65 * P + 2.5 * (P^2) / ((1.95)^2 + P^2)
 end
 
-function _evolve_step(P0::Float64, I::Float64, step::Float64)::Float64
+function _evolve_step(P0::Float64, I::Float64, step::Float64, deterministic::Bool = true)::Float64
+    if deterministic
+        _evolve_step_deterministic(P0, I, step)
+    else
+        _evolve_step_stochastic(P0, I, step)
+    end
+end
+
+function _evolve_step_deterministic(P0::Float64, I::Float64, step::Float64)::Float64
     tspan = (0.0, step)
     prob = ODEProblem(_f, P0, tspan, I)
     sol = solve(prob, Tsit5())
+    return sol.u[end]
+end
+
+function _evolve_step_stochastic(
+        P0::Float64,
+        I::Float64,
+        step::Float64,
+        μ::Float64 = 0.03,
+        σ::Float64 = 0.004
+)::Float64
+    tspan = (0.0, step)
+    W = GeometricBrownianMotionProcess(μ, σ, 0.0, 1.0, 1.0)
+    g(P, influx, time) = 1
+    prob = SDEProblem(_f, g, P0, tspan, I, noise=W)
+    sol = solve(prob, EM(), dt = 0.1)
     return sol.u[end]
 end
 

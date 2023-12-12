@@ -68,6 +68,8 @@ begin
 	plot!(influx_options_root[lim1:lim2], roots[2, lim1:lim2], label="Instable state")
 	plot!(influx_options_root[1:lim2], roots[1, 1:lim2], label="Clean stable state")
 
+	hline!([0.4], label="Number of options drop")
+	
 	plot!(legend=:bottomright)
 	ylabel!("Fixed points (P*)")
 	xlabel!("Influx (I)")
@@ -79,11 +81,42 @@ md"## Pathway diversity implementation"
 # ╔═╡ 8935e90f-548e-41fd-a0d1-4e9be83e0de7
 begin
 	P = 0.0:0.05:4.0
-	n_possible_influx = number_possible_influx.(P)
+	number_options0 = 10:5:30
 
-	plot(collect(P), n_possible_influx, legend = false)
-	ylabel!("Number of possible influx")
+	local n_possible_influx = number_possible_influx.(P, number_options0[1])
+	plot(collect(P), n_possible_influx, label="Maximum number of options = $(number_options0[1])")
+	for number_option in number_options0[2:end]
+		n_possible_influx = number_possible_influx.(P, number_option)
+		plot!(collect(P), n_possible_influx, label="Maximum number of options = $(number_option)")
+	end
+	
+	ylabel!("Number of options")
 	xlabel!("Amount of phosphorus (P)")
+end
+
+# ╔═╡ 4d29d46f-c9e8-4502-9102-6a8bf2b570a0
+begin
+	# P_init3 = 0.1
+	influx3 = 0.1
+	decision_step3 = 10.0
+	number_decision3 = 4
+
+	P_init_options3 = collect(0:0.4:3)
+	number_options3 = collect(5:5:30)
+
+	s_final3 = run_entropy(P_init_options3, influx3, decision_step3, number_decision3, number_options3)
+end
+
+# ╔═╡ 0457877f-ecef-4d7c-8cf2-ba6c35a933d9
+begin
+	plot(number_options3, s_final3[1, :], label="Initial condition = $(P_init_options3[1])", left_margin = 5Plots.mm)
+	for i in 2:length(P_init_options3)
+    	plot!(number_options3, s_final3[i, :], label="Initial condition = $(P_init_options3[i])", left_margin = 5Plots.mm)
+	end
+
+	plot!(legend=:outerbottomright, size=(680,400))
+	ylabel!("Causal entroy (S)")
+	xlabel!("Maximum number of options")
 end
 
 # ╔═╡ 7476d4d1-275d-4a11-a299-500566f32f0b
@@ -94,7 +127,7 @@ begin
 	# number_decision0 = 4
 
 	decision_steps0 = [5.0, 10.0, 20.0]
-	number_decisions0 = [1, 3, 5, 7]
+	number_decisions0 = [1, 3, 5, 7] #[1, 3, 5, 7]
 
 	s_final0 = run_entropy(P_init0, influx0, decision_steps0, number_decisions0)
 end
@@ -111,31 +144,6 @@ begin
 	xlabel!("Number of decisions")
 end
 
-# ╔═╡ 33886715-037f-407a-9f7b-ebd8b6562296
-begin
-	# P_init1 = 0.1
-	influx1 = 0.1
-	decision_step1 = 10.0
-	# number_decision1 = 4
-
-	P_init_options1 = [0, 0.1, 0.2, 0.3, 0.4]
-	number_decisions1 = [1, 3, 5, 7]
-
-	s_final1 = run_entropy(P_init_options1, influx1, decision_step1, number_decisions1)
-end
-
-# ╔═╡ 62431e99-2ecc-46fb-aa7f-f3cfa08d654b
-begin
-	plot(number_decisions1, s_final1[1, :], label="Initial state (P0) = $(P_init_options1[1])")
-	for i in 2:length(P_init_options1)
-    	plot!(number_decisions1, s_final1[i, :], label="Initial state (P0) = $(P_init_options1[i])")
-	end
-
-	plot!(legend=:bottomright)
-	ylabel!("Causal entroy (S)")
-	xlabel!("Number of decisions")
-end
-
 # ╔═╡ 460f46b9-c998-4eee-adce-e25dc78b58a3
 begin
 	# P_init2 = 0.1
@@ -143,8 +151,8 @@ begin
 	decision_step2 = 10.0
 	# number_decision1 = 4
 
-	P_init_options2 = collect(0:0.4:3)
-	number_decisions2 = [1, 3, 5, 7]
+	P_init_options2 = collect(0:0.3:3)
+	number_decisions2 = collect(1:1:7)
 
 	s_final2 = run_entropy(P_init_options2, influx2, decision_step2, number_decisions2)
 end
@@ -152,7 +160,7 @@ end
 # ╔═╡ 391d4d68-8a98-4965-91be-ed6b4af23f75
 begin
 	plot(number_decisions2, s_final2[1, :], label="Initial state (P0) = $(P_init_options2[1])")
-	for i in 2:length(P_init_options2)
+	for i in [4, 5, 6, 8, 9, 10]
     	plot!(number_decisions2, s_final2[i, :], label="Initial state (P0) = $(P_init_options2[i])")
 	end
 
@@ -164,11 +172,12 @@ end
 # ╔═╡ 07dae1b0-6f88-42e9-986a-f02f868e3f51
 begin
 	threshold2 = get_root(f_root, 1.3, influx2)
+	println(threshold2)
 	distance_threshold2 = threshold2 .- P_init_options2
 	println(P_init_options2, ' ', distance_threshold2)
-	
+
 	plot(distance_threshold2, s_final2[:, 1], label="Number of decisions = $(number_decisions2[1])")
-	for i in 2:length(number_decisions2)
+	for i in [2, 3, 5, 7]
     	plot!(distance_threshold2, s_final2[:, i], label="Number of decisions = $(number_decisions2[i])")
 	end
 
@@ -182,32 +191,32 @@ md"## Early-warning signals comparison"
 
 # ╔═╡ f2454075-8ea9-4c86-8eca-59280f7d2d39
 begin
-	P_init3 = 0.02
-	# influx3 = 0.1
-	t_max3 = 150
-	step3 = 0.5
-	decision_step3 = 1.0
-	number_decision3 = 4
-	n_scenarious3 = 1
+	P_init4 = 0.02
+	# influx4 = 0.1
+	t_max4 = 150
+	step4 = 0.5
+	decision_step4 = 1.0
+	number_decision4 = 4
+	n_scenarious4 = 1
 
-	influx3_options = [0.02, 0.1, 0.15, 0.17, 0.18, 0.19, 0.2, 0.225, 0.25]
-	
-	s3 = []
-	p3 = []
-	
-	for (index, influx3) in enumerate(influx3_options)
-		s3_temp, p3_temp = run_scenarios(P_init3, influx3, t_max3, step3, decision_step3, number_decision3, n_scenarious3)
+	influx4_options = [0.02, 0.1, 0.15, 0.17, 0.18, 0.19, 0.2, 0.225, 0.25]
 
-		push!(s3, s3_temp)
-		push!(p3, p3_temp)
+	s4 = []
+	p4 = []
+
+	for (index, influx4) in enumerate(influx4_options)
+		s4_temp, p4_temp = run_scenarios(P_init4, influx4, t_max4, step4, decision_step4, number_decision4, n_scenarious4)
+
+		push!(s4, s4_temp)
+		push!(p4, p4_temp)
 	end
 end
 
 # ╔═╡ 9ad3fc84-de80-4893-beb5-7a6e2d59f532
 begin
-	plot(collect(1:step3:t_max3), p3[1], label="Influx (I) = $(influx3_options[1])")
-	for i in 2:length(influx3_options)
-    	plot!(collect(1:step3:t_max3), p3[i], label="Influx (I) = $(influx3_options[i])")
+	plot(collect(1:step4:t_max4), p4[1], label="Influx (I) = $(influx4_options[1])")
+	for i in 2:length(influx4_options)
+    	plot!(collect(1:step4:t_max4), p4[i], label="Influx (I) = $(influx4_options[i])")
 	end
 
 	plot!(legend=:right)
@@ -217,9 +226,9 @@ end
 
 # ╔═╡ 3952565b-733a-48bf-ac4d-017d6e2e26c5
 begin
-	plot(collect(1:step3:t_max3), s3[1], label="Influx (I) = $(influx3_options[1])")
-	for i in 2:length(influx3_options)
-    	plot!(collect(1:step3:t_max3), s3[i], label="Influx (I) = $(influx3_options[i])")
+	plot(collect(1:step4:t_max4), s4[1], label="Influx (I) = $(influx4_options[1])")
+	for i in 2:length(influx4_options)
+    	plot!(collect(1:step4:t_max4), s4[i], label="Influx (I) = $(influx4_options[i])")
 	end
 
 	plot!(legend=:right)
@@ -227,77 +236,81 @@ begin
 	xlabel!("Time (t)")
 end
 
+# ╔═╡ f3d693b2-91a8-4c22-b8e3-bc254991b526
+begin
+	threshold = get_root(f_root, 1.3, influx4_options[1])
+	plot(collect(1:step4:t_max4), threshold .- p4[1], label="Influx (I) = $(influx4_options[1])")
+
+	for i in 2:length(influx4_options)
+		threshold = get_root(f_root, 1.3, influx4_options[i])
+		if influx4_options[i] > 0.17
+			threshold = 0.63
+		end
+		println(threshold)
+    	plot!(collect(1:step4:t_max4), threshold .- p4[i], label="Influx (I) = $(influx4_options[i])")
+	end
+
+	plot!(legend=:right)
+	ylabel!("Distance to threshold")
+	xlabel!("Time (t)")
+end
+
 # ╔═╡ eb2f315e-63d2-47e7-a691-a69e2a773be5
 begin
-	variance_time_step3 = 5
-	variance_time_range = (variance_time_step3):variance_time_step3:(t_max3-1)
-	variance_idx_step::Int64 = variance_time_step3 ÷ step3
-	
-	variance_time_series = zeros(length(influx3_options), length(variance_time_range))
+	variance_time_step4 = 5
+	variance_time_range = (variance_time_step4):variance_time_step4:(t_max4-1)
+	variance_idx_step::Int64 = variance_time_step4 ÷ step4
 
-	for (index_I, influx3) in enumerate(influx3_options)
+	variance_time_series = zeros(length(influx4_options), length(variance_time_range))
+
+	for (index_I, influx) in enumerate(influx4_options)
 		for (index_t, time) in enumerate(variance_time_range)
-			time_idx::Int64 = time ÷ step3 + 1
-			variance_time_series[index_I, index_t] = var(p3[index_I][(time_idx-variance_idx_step):time_idx])
+			time_idx::Int64 = time ÷ step4 + 1
+			variance_time_series[index_I, index_t] = var(p4[index_I][(time_idx-variance_idx_step):time_idx])
 		end
 	end
 end
 
 # ╔═╡ c383ab30-22ff-43c6-a3ce-33e58b7d5685
 begin
-	plot(collect(variance_time_range), variance_time_series[1, :], label="Influx (I) = $(influx3_options[1])")
-	for i in 2:length(influx3_options)
-    	plot!(collect(variance_time_range), variance_time_series[i, :], label="Influx (I) = $(influx3_options[i])")
+	plot(collect(variance_time_range), variance_time_series[1, :], label="Influx (I) = $(influx4_options[1])")
+	for i in 2:length(influx4_options)
+    	plot!(collect(variance_time_range), variance_time_series[i, :], label="Influx (I) = $(influx4_options[i])")
 	end
 
 	plot!(legend=:topright)
-	xlims!(0, t_max3)
+	xlims!(0, t_max4)
 	ylabel!("Variance")
 	xlabel!("Time (t)")
 end
 
 # ╔═╡ a0a78733-c6d6-4add-b7c3-6b485cdeefe9
 begin
-	autocorrelation_time_step3 = 5
-	autocorrelation_time_range = autocorrelation_time_step3:autocorrelation_time_step3:(t_max3-1)
-	
-	autocorrelation_idx_step::Int64 = autocorrelation_time_step3 ÷ step3
-	
-	autocorrelation_time_series = zeros(length(influx3_options), length(autocorrelation_time_range))
+	autocorrelation_time_step4 = 5
+	autocorrelation_time_range = autocorrelation_time_step4:autocorrelation_time_step4:(t_max4-1)
 
-	for (index_I, influx3) in enumerate(influx3_options)
+	autocorrelation_idx_step::Int64 = autocorrelation_time_step4 ÷ step4
+
+	autocorrelation_time_series = zeros(length(influx4_options), length(autocorrelation_time_range))
+
+	for (index_I, influx) in enumerate(influx4_options)
 		for (index_t, time) in enumerate(autocorrelation_time_range)
-			time_idx::Int64 = time ÷ step3 + 1
-			autocorrelation_time_series[index_I, index_t] = autocor(p3[index_I][(time_idx-autocorrelation_idx_step):time_idx], [1])[1]
+			time_idx::Int64 = time ÷ step4 + 1
+			autocorrelation_time_series[index_I, index_t] = autocor(p4[index_I][(time_idx-autocorrelation_idx_step):time_idx], [1])[1]
 		end
 	end
 end
 
 # ╔═╡ 5cc62bc7-542a-4265-9d2f-c20a493b4e9a
 begin
-	plot(collect(autocorrelation_time_range), autocorrelation_time_series[1, :], label="Influx (I) = $(influx3_options[1])", left_margin = 5Plots.mm)
-	for i in 2:length(influx3_options)
-    	plot!(collect(autocorrelation_time_range), autocorrelation_time_series[i, :], label="Influx (I) = $(influx3_options[i])", left_margin = 5Plots.mm)
+	plot(collect(autocorrelation_time_range), autocorrelation_time_series[1, :], label="Influx (I) = $(influx4_options[1])", left_margin = 5Plots.mm)
+	for i in 2:length(influx4_options)
+    	plot!(collect(autocorrelation_time_range), autocorrelation_time_series[i, :], label="Influx (I) = $(influx4_options[i])", left_margin = 5Plots.mm)
 	end
 
 	plot!(legend=:outerbottomright, size=(680,400))
-	xlims!(0, t_max3)
+	xlims!(0, t_max4)
 	ylabel!("Aucorrelation lag 1")
-	xlabel!("Time (t)")
-end
-
-# ╔═╡ f3d693b2-91a8-4c22-b8e3-bc254991b526
-begin
-	threshold = get_root(f_root, 1.3, influx3_options[1])
-	plot(collect(1:step3:t_max3), threshold .- p3[1], label="Influx (I) = $(influx3_options[1])")
-
-	for i in 2:length(influx3_options)
-		threshold = get_root(f_root, 1.7, influx3_options[i])
-    	plot!(collect(1:step3:t_max3), threshold .- p3[i], label="Influx (I) = $(influx3_options[i])")
-	end
-
-	plot!(legend=:right)
-	ylabel!("Distance to threshold")
 	xlabel!("Time (t)")
 end
 
@@ -2290,13 +2303,13 @@ version = "1.4.1+1"
 # ╠═c29a6b3a-1949-4e49-9ee1-519cb240dab6
 # ╟─88437506-a585-43a6-9df3-5b979ef0313f
 # ╠═1d3b8409-24a6-4dbe-809e-3b9d4bcdf355
-# ╠═218d8442-a241-4f99-a79f-3f16e5f8a177
+# ╟─218d8442-a241-4f99-a79f-3f16e5f8a177
 # ╟─3965fdff-83c2-45b0-9146-f86f1fc48353
 # ╟─8935e90f-548e-41fd-a0d1-4e9be83e0de7
+# ╠═4d29d46f-c9e8-4502-9102-6a8bf2b570a0
+# ╟─0457877f-ecef-4d7c-8cf2-ba6c35a933d9
 # ╠═7476d4d1-275d-4a11-a299-500566f32f0b
 # ╟─910287c9-ac70-4907-9c31-e54363eeeecd
-# ╠═33886715-037f-407a-9f7b-ebd8b6562296
-# ╟─62431e99-2ecc-46fb-aa7f-f3cfa08d654b
 # ╠═460f46b9-c998-4eee-adce-e25dc78b58a3
 # ╟─391d4d68-8a98-4965-91be-ed6b4af23f75
 # ╟─07dae1b0-6f88-42e9-986a-f02f868e3f51
@@ -2304,10 +2317,10 @@ version = "1.4.1+1"
 # ╠═f2454075-8ea9-4c86-8eca-59280f7d2d39
 # ╟─9ad3fc84-de80-4893-beb5-7a6e2d59f532
 # ╟─3952565b-733a-48bf-ac4d-017d6e2e26c5
+# ╟─f3d693b2-91a8-4c22-b8e3-bc254991b526
 # ╠═eb2f315e-63d2-47e7-a691-a69e2a773be5
 # ╟─c383ab30-22ff-43c6-a3ce-33e58b7d5685
 # ╠═a0a78733-c6d6-4add-b7c3-6b485cdeefe9
 # ╟─5cc62bc7-542a-4265-9d2f-c20a493b4e9a
-# ╠═f3d693b2-91a8-4c22-b8e3-bc254991b526
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

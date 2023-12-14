@@ -47,24 +47,28 @@ function _evolve_step_stochastic(
         P0::Float64,
         I::Float64,
         step::Float64,
-        μ::Float64 = 0.03,
-        σ::Float64 = 0.004
+        μ::Float64 = 0.05,
+        σ::Float64 = 0.004,
+        dt::Float64 = 0.05,
 )::Float64
     tspan = (0.0, step)
     W = GeometricBrownianMotionProcess(μ, σ, 0.0, 1.0, 1.0)
-    g(P, influx, time) = 1
     prob = SDEProblem(_f, g, P0, tspan, I, noise=W)
-    sol = solve(prob, EM(), dt = 0.1)
+    sol = solve(prob, EM(), dt = dt)
     return sol.u[end]
 end
+
+g(P, I=nothing, time=nothing) = 1
 
 function _entropy(
         P0::Float64,
         I::Float64,
         decision_step::Float64,
         number_decision::Int64,
+        deterministic::Bool = true,
         number_options::Int64 = 10,
         prob::Float64 = 1.0,
+
 )::Float64
     possible_a_vec = _possible_influx(P0, number_options)
     step_prob = 1.0 / length(possible_a_vec)
@@ -75,7 +79,7 @@ function _entropy(
     end
 
     final_prob = prob * step_prob
-    P_final = map(a -> _evolve_step(P0, I, decision_step), possible_a_vec)
+    P_final = map(a -> _evolve_step(P0, I, decision_step, deterministic), possible_a_vec)
     results = map(input -> _entropy(input[1], input[2], decision_step, number_decision-1, number_options, final_prob), zip(P_final, possible_a_vec))
 
     return sum(results)

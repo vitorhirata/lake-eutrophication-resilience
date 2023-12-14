@@ -34,7 +34,7 @@ function _run_scenario(
 
     for (index, t0) in enumerate(times)
         P_final[index] = P0
-        s_final[index] = _entropy(P0, I, decision_step, number_decision)
+        s_final[index] = _entropy(P0, I, decision_step, number_decision, false)
 
         P0 = _evolve_step(P0, I, step, false)
     end

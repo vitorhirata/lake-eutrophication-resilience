@@ -91,6 +91,9 @@ begin
 	plot!()
 end
 
+# ╔═╡ 1fb01ceb-8090-47fd-9e8d-e0d1bb482120
+md"### Analysing the scaling effect for varying maximum number of options"
+
 # ╔═╡ 4d29d46f-c9e8-4502-9102-6a8bf2b570a0
 begin
 	# P_init3 = 0.1
@@ -125,6 +128,9 @@ begin
 	s_final0 = run_entropy(P_init0, influx0, decision_steps0, number_decisions0)
 end
 
+# ╔═╡ 10907ccd-8b54-49c3-b96d-69a71f181a75
+md"### Effect of the number of decision and decision time step"
+
 # ╔═╡ 34360da5-4b5f-465b-8795-a678ee2670ad
 begin
 	label0 = map(decision_step -> "Decision step = $(decision_step)", decision_steps0)
@@ -132,6 +138,9 @@ begin
 
 	plot(number_decisions0, transpose(s_final0), label = label0, legend=:bottomright, ylabel = "Pathway diversity", xlabel = "Number of decisions")
 end
+
+# ╔═╡ b234dee6-0966-4634-a830-40f2dfb92ac8
+md"### Pathway diversity and distance to the basin threshold"
 
 # ╔═╡ 460f46b9-c998-4eee-adce-e25dc78b58a3
 begin
@@ -149,13 +158,13 @@ end
 # ╔═╡ 68d42c3a-7363-4658-aaae-b00b1af6a2ac
 begin
 	label2 = map(P_init -> "Initial state (P0) = $(P_init)", P_init_options2)
-	selected_index2 = [1, 4, 5, 6, 9, 10, 11]
+	selected_index2 = [1, 2, 3, 4, 5, 6, 7, 9]
 	
 	s_final2_filtered = stack([s_final2[i, :] for i in selected_index2], dims=1)
 	label2 = [label2[i] for i in selected_index2]
 	label2 = reshape(label2, (1,length(selected_index2)))
 
-	plot(number_decisions2, transpose(s_final2_filtered), label=label2, legend=:bottomright, ylabel = "Pathway diversity", xlabel = "Number of decisions")
+	plot(number_decisions2, transpose(s_final2_filtered), label=label2, legend=:topleft, ylabel = "Pathway diversity", xlabel = "Number of decisions")
 	# make way to filter some options [4, 5, 6, 8, 9, 10]
 end
 
@@ -183,8 +192,8 @@ begin
 	P_init4 = 0.02
 	# influx4 = 0.1
 	t_max4 = 150
-	step4 = 0.5
-	decision_step4 = 1.0
+	step4 = 0.125
+	decision_step4 = 5.0
 	number_decision4 = 4
 	n_scenarious4 = 1
 
@@ -203,6 +212,7 @@ end
 
 # ╔═╡ eb2f315e-63d2-47e7-a691-a69e2a773be5
 begin
+	# Compute variance
 	variance_time_step4 = 5
 	variance_time_range = (variance_time_step4):variance_time_step4:(t_max4-1)
 	variance_idx_step::Int64 = variance_time_step4 ÷ step4
@@ -215,11 +225,9 @@ begin
 			variance_ts[index_t, index_I] = var(p4[index_I][(time_idx-variance_idx_step):time_idx])
 		end
 	end
-end
 
-# ╔═╡ a0a78733-c6d6-4add-b7c3-6b485cdeefe9
-begin
-	autocorrelation_time_step4 = 10
+	# Compute autocorrelation
+	autocorrelation_time_step4 = 15
 	autocorrelation_time_range = autocorrelation_time_step4:autocorrelation_time_step4:(t_max4-1)
 
 	autocorrelation_idx_step::Int64 = autocorrelation_time_step4 ÷ step4
@@ -2253,17 +2261,19 @@ version = "1.4.1+1"
 # ╟─218d8442-a241-4f99-a79f-3f16e5f8a177
 # ╟─3965fdff-83c2-45b0-9146-f86f1fc48353
 # ╟─8935e90f-548e-41fd-a0d1-4e9be83e0de7
+# ╟─1fb01ceb-8090-47fd-9e8d-e0d1bb482120
 # ╠═4d29d46f-c9e8-4502-9102-6a8bf2b570a0
 # ╟─18f6ef7d-897b-4a34-83c8-4b39f6d61400
 # ╠═7476d4d1-275d-4a11-a299-500566f32f0b
+# ╟─10907ccd-8b54-49c3-b96d-69a71f181a75
 # ╟─34360da5-4b5f-465b-8795-a678ee2670ad
+# ╟─b234dee6-0966-4634-a830-40f2dfb92ac8
 # ╠═460f46b9-c998-4eee-adce-e25dc78b58a3
-# ╟─68d42c3a-7363-4658-aaae-b00b1af6a2ac
+# ╠═68d42c3a-7363-4658-aaae-b00b1af6a2ac
 # ╟─2c4d17c6-9452-4448-9538-963851703cb9
 # ╟─78821ef8-2960-44ba-b6d3-533f22b7b853
 # ╠═f2454075-8ea9-4c86-8eca-59280f7d2d39
 # ╠═eb2f315e-63d2-47e7-a691-a69e2a773be5
-# ╠═a0a78733-c6d6-4add-b7c3-6b485cdeefe9
 # ╟─9ad3fc84-de80-4893-beb5-7a6e2d59f532
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

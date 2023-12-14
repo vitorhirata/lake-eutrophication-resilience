@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.27
+# v0.19.35
 
 using Markdown
 using InteractiveUtils
@@ -82,16 +82,13 @@ md"## Pathway diversity implementation"
 begin
 	P = 0.0:0.05:4.0
 	number_options0 = 10:5:30
-
-	local n_possible_influx = number_possible_influx.(P, number_options0[1])
-	plot(collect(P), n_possible_influx, label="Maximum number of options = $(number_options0[1])")
-	for number_option in number_options0[2:end]
+	
+	plot(ylabel="Number of options", xlabel="Amount of phosphorus (P)")
+	for number_option in number_options0
 		n_possible_influx = number_possible_influx.(P, number_option)
 		plot!(collect(P), n_possible_influx, label="Maximum number of options = $(number_option)")
 	end
-	
-	ylabel!("Number of options")
-	xlabel!("Amount of phosphorus (P)")
+	plot!()
 end
 
 # ╔═╡ 4d29d46f-c9e8-4502-9102-6a8bf2b570a0
@@ -107,16 +104,12 @@ begin
 	s_final3 = run_entropy(P_init_options3, influx3, decision_step3, number_decision3, number_options3)
 end
 
-# ╔═╡ 0457877f-ecef-4d7c-8cf2-ba6c35a933d9
+# ╔═╡ 18f6ef7d-897b-4a34-83c8-4b39f6d61400
 begin
-	plot(number_options3, s_final3[1, :], label="Initial condition = $(P_init_options3[1])", left_margin = 5Plots.mm)
-	for i in 2:length(P_init_options3)
-    	plot!(number_options3, s_final3[i, :], label="Initial condition = $(P_init_options3[i])", left_margin = 5Plots.mm)
-	end
-
-	plot!(legend=:outerbottomright, size=(680,400))
-	ylabel!("Causal entroy (S)")
-	xlabel!("Maximum number of options")
+	label3 = map(P_init -> "Initial condition = $(P_init)", P_init_options3)
+	label3 = reshape(label3, (1,length(P_init_options3)))
+	
+	plot(number_options3, transpose(s_final3), label=label3, left_margin = 5Plots.mm, legend=:outerbottomright, size=(680,400), ylabel = "Pathway diversity", xlabel = "Maximum number of options")
 end
 
 # ╔═╡ 7476d4d1-275d-4a11-a299-500566f32f0b
@@ -132,23 +125,19 @@ begin
 	s_final0 = run_entropy(P_init0, influx0, decision_steps0, number_decisions0)
 end
 
-# ╔═╡ 910287c9-ac70-4907-9c31-e54363eeeecd
+# ╔═╡ 34360da5-4b5f-465b-8795-a678ee2670ad
 begin
-	plot(number_decisions0, s_final0[1, :], label="decision_step = $(decision_steps0[1])")
-	for i in 2:length(decision_steps0)
-    	plot!(number_decisions0, s_final0[i, :], label="decision_step = $(decision_steps0[i])")
-	end
+	label0 = map(decision_step -> "Decision step = $(decision_step)", decision_steps0)
+	label0 = reshape(label0, (1,length(decision_steps0)))
 
-    plot!(legend=:bottomright)
-	ylabel!("Causal entroy (S)")
-	xlabel!("Number of decisions")
+	plot(number_decisions0, transpose(s_final0), label = label0, legend=:bottomright, ylabel = "Pathway diversity", xlabel = "Number of decisions")
 end
 
 # ╔═╡ 460f46b9-c998-4eee-adce-e25dc78b58a3
 begin
 	# P_init2 = 0.1
 	influx2 = 0.1
-	decision_step2 = 10.0
+	decision_step2 = 5.0
 	# number_decision1 = 4
 
 	P_init_options2 = collect(0:0.3:3)
@@ -157,33 +146,33 @@ begin
 	s_final2 = run_entropy(P_init_options2, influx2, decision_step2, number_decisions2)
 end
 
-# ╔═╡ 391d4d68-8a98-4965-91be-ed6b4af23f75
+# ╔═╡ 68d42c3a-7363-4658-aaae-b00b1af6a2ac
 begin
-	plot(number_decisions2, s_final2[1, :], label="Initial state (P0) = $(P_init_options2[1])")
-	for i in [4, 5, 6, 8, 9, 10]
-    	plot!(number_decisions2, s_final2[i, :], label="Initial state (P0) = $(P_init_options2[i])")
-	end
+	label2 = map(P_init -> "Initial state (P0) = $(P_init)", P_init_options2)
+	selected_index2 = [1, 4, 5, 6, 9, 10, 11]
+	
+	s_final2_filtered = stack([s_final2[i, :] for i in selected_index2], dims=1)
+	label2 = [label2[i] for i in selected_index2]
+	label2 = reshape(label2, (1,length(selected_index2)))
 
-	plot!(legend=:bottomright)
-	ylabel!("Causal entroy (S)")
-	xlabel!("Number of decisions")
+	plot(number_decisions2, transpose(s_final2_filtered), label=label2, legend=:bottomright, ylabel = "Pathway diversity", xlabel = "Number of decisions")
+	# make way to filter some options [4, 5, 6, 8, 9, 10]
 end
 
-# ╔═╡ 07dae1b0-6f88-42e9-986a-f02f868e3f51
+# ╔═╡ 2c4d17c6-9452-4448-9538-963851703cb9
 begin
+	label22 = map(n_decision -> "Number of decisions = $(n_decision)", number_decisions2)
+	selected_index22 = [1, 2, 3, 5, 7]
+	
+	s_final22_filtered = stack([s_final2[:, i] for i in selected_index22], dims=1)
+	label22 = [label22[i] for i in selected_index22]
+	label22 = reshape(label22, (1,length(selected_index22)))
+
 	threshold2 = get_root(f_root, 1.3, influx2)
-	println(threshold2)
 	distance_threshold2 = threshold2 .- P_init_options2
-	println(P_init_options2, ' ', distance_threshold2)
-
-	plot(distance_threshold2, s_final2[:, 1], label="Number of decisions = $(number_decisions2[1])")
-	for i in [2, 3, 5, 7]
-    	plot!(distance_threshold2, s_final2[:, i], label="Number of decisions = $(number_decisions2[i])")
-	end
-
-	plot!(legend=:topleft)
-	ylabel!("Causal entroy (S)")
-	xlabel!("Distance to threshold")
+	println(threshold2, ' ', P_init_options2, ' ', distance_threshold2)
+	
+	plot(distance_threshold2, transpose(s_final22_filtered), label=label22, legend=:topleft, ylabel="Pathway diversity", xlabel="Distance to threshold")
 end
 
 # ╔═╡ 78821ef8-2960-44ba-b6d3-533f22b7b853
@@ -212,76 +201,20 @@ begin
 	end
 end
 
-# ╔═╡ 9ad3fc84-de80-4893-beb5-7a6e2d59f532
-begin
-	plot(collect(1:step4:t_max4), p4[1], label="Influx (I) = $(influx4_options[1])")
-	for i in 2:length(influx4_options)
-    	plot!(collect(1:step4:t_max4), p4[i], label="Influx (I) = $(influx4_options[i])")
-	end
-
-	plot!(legend=:right)
-	ylabel!("Amount of Phosphorus (P)")
-	xlabel!("Time (t)")
-end
-
-# ╔═╡ 3952565b-733a-48bf-ac4d-017d6e2e26c5
-begin
-	plot(collect(1:step4:t_max4), s4[1], label="Influx (I) = $(influx4_options[1])")
-	for i in 2:length(influx4_options)
-    	plot!(collect(1:step4:t_max4), s4[i], label="Influx (I) = $(influx4_options[i])")
-	end
-
-	plot!(legend=:right)
-	ylabel!("Entropy (S)")
-	xlabel!("Time (t)")
-end
-
-# ╔═╡ f3d693b2-91a8-4c22-b8e3-bc254991b526
-begin
-	threshold = get_root(f_root, 1.3, influx4_options[1])
-	plot(collect(1:step4:t_max4), threshold .- p4[1], label="Influx (I) = $(influx4_options[1])")
-
-	for i in 2:length(influx4_options)
-		threshold = get_root(f_root, 1.3, influx4_options[i])
-		if influx4_options[i] > 0.17
-			threshold = 0.63
-		end
-		println(threshold)
-    	plot!(collect(1:step4:t_max4), threshold .- p4[i], label="Influx (I) = $(influx4_options[i])")
-	end
-
-	plot!(legend=:right)
-	ylabel!("Distance to threshold")
-	xlabel!("Time (t)")
-end
-
 # ╔═╡ eb2f315e-63d2-47e7-a691-a69e2a773be5
 begin
 	variance_time_step4 = 5
 	variance_time_range = (variance_time_step4):variance_time_step4:(t_max4-1)
 	variance_idx_step::Int64 = variance_time_step4 ÷ step4
 
-	variance_time_series = zeros(length(influx4_options), length(variance_time_range))
+	variance_ts = zeros(length(variance_time_range), length(influx4_options))
 
 	for (index_I, influx) in enumerate(influx4_options)
 		for (index_t, time) in enumerate(variance_time_range)
 			time_idx::Int64 = time ÷ step4 + 1
-			variance_time_series[index_I, index_t] = var(p4[index_I][(time_idx-variance_idx_step):time_idx])
+			variance_ts[index_t, index_I] = var(p4[index_I][(time_idx-variance_idx_step):time_idx])
 		end
 	end
-end
-
-# ╔═╡ c383ab30-22ff-43c6-a3ce-33e58b7d5685
-begin
-	plot(collect(variance_time_range), variance_time_series[1, :], label="Influx (I) = $(influx4_options[1])")
-	for i in 2:length(influx4_options)
-    	plot!(collect(variance_time_range), variance_time_series[i, :], label="Influx (I) = $(influx4_options[i])")
-	end
-
-	plot!(legend=:topright)
-	xlims!(0, t_max4)
-	ylabel!("Variance")
-	xlabel!("Time (t)")
 end
 
 # ╔═╡ a0a78733-c6d6-4add-b7c3-6b485cdeefe9
@@ -291,27 +224,41 @@ begin
 
 	autocorrelation_idx_step::Int64 = autocorrelation_time_step4 ÷ step4
 
-	autocorrelation_time_series = zeros(length(influx4_options), length(autocorrelation_time_range))
+	autocorrelation_ts = zeros(length(autocorrelation_time_range), length(influx4_options))
 
 	for (index_I, influx) in enumerate(influx4_options)
 		for (index_t, time) in enumerate(autocorrelation_time_range)
 			time_idx::Int64 = time ÷ step4 + 1
-			autocorrelation_time_series[index_I, index_t] = autocor(p4[index_I][(time_idx-autocorrelation_idx_step):time_idx], [1])[1]
+			autocorrelation_ts[index_t, index_I] = autocor(p4[index_I][(time_idx-autocorrelation_idx_step):time_idx], [1])[1]
 		end
 	end
 end
 
-# ╔═╡ 5cc62bc7-542a-4265-9d2f-c20a493b4e9a
+# ╔═╡ 9ad3fc84-de80-4893-beb5-7a6e2d59f532
 begin
-	plot(collect(autocorrelation_time_range), autocorrelation_time_series[1, :], label="Influx (I) = $(influx4_options[1])", left_margin = 5Plots.mm)
-	for i in 2:length(influx4_options)
-    	plot!(collect(autocorrelation_time_range), autocorrelation_time_series[i, :], label="Influx (I) = $(influx4_options[i])", left_margin = 5Plots.mm)
-	end
+	label4 = map(influx_value -> "Influx = $(influx_value)", influx4_options)
+	xticks4 = 0:25:length(1:step4:t_max4)
+	xlims4 = (0, t_max4+1)
+	selected_index4 = [1, 2, 3, 4, 5, 9]
 
-	plot!(legend=:outerbottomright, size=(680,400))
-	xlims!(0, t_max4)
-	ylabel!("Aucorrelation lag 1")
-	xlabel!("Time (t)")
+	label4 = [label4[i] for i in selected_index4]
+	label4 = reshape(label4, (1,length(selected_index4)))
+	p4_filtered = [p4[i, :] for i in selected_index4]
+	s4_filtered = [s4[i, :] for i in selected_index4]
+	variance_ts_filtered = [variance_ts[:, i] for i in selected_index4]
+	autocorrelation_ts_filtered = [autocorrelation_ts[:, i] for i in selected_index4]
+
+	
+	plt1 = plot(collect(1:step4:t_max4), p4_filtered, label=label4, xticks=xticks4, ylabel="Amount of Phosphorus", xlims=xlims4, left_margin = 5Plots.mm)
+
+	plt2 = plot(collect(variance_time_range), variance_ts_filtered, label=false, xticks=xticks4, ylabel="Variance", xlims=xlims4, left_margin = 10Plots.mm)
+	
+	plt3 = plot(collect(1:step4:t_max4), s4_filtered, label=false, ylabel="Pathway diversity", xlabel="Time (year)", xticks=xticks4, xlims=xlims4, left_margin = 5Plots.mm)
+
+	plt4 = plot(collect(autocorrelation_time_range), autocorrelation_ts_filtered, label=false, xticks=xticks4, ylabel="Aucorrelation lag 1", xlabel="Time (year)", xlims=xlims4, left_margin = 10Plots.mm)
+
+	plot(plt1, plt2, plt3, plt4, layout=(2,2), legend=:outerbottomright, size=(675,360), guidefontsize=9)
+	plot!()
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -2307,20 +2254,16 @@ version = "1.4.1+1"
 # ╟─3965fdff-83c2-45b0-9146-f86f1fc48353
 # ╟─8935e90f-548e-41fd-a0d1-4e9be83e0de7
 # ╠═4d29d46f-c9e8-4502-9102-6a8bf2b570a0
-# ╟─0457877f-ecef-4d7c-8cf2-ba6c35a933d9
+# ╟─18f6ef7d-897b-4a34-83c8-4b39f6d61400
 # ╠═7476d4d1-275d-4a11-a299-500566f32f0b
-# ╟─910287c9-ac70-4907-9c31-e54363eeeecd
+# ╟─34360da5-4b5f-465b-8795-a678ee2670ad
 # ╠═460f46b9-c998-4eee-adce-e25dc78b58a3
-# ╟─391d4d68-8a98-4965-91be-ed6b4af23f75
-# ╟─07dae1b0-6f88-42e9-986a-f02f868e3f51
+# ╟─68d42c3a-7363-4658-aaae-b00b1af6a2ac
+# ╟─2c4d17c6-9452-4448-9538-963851703cb9
 # ╟─78821ef8-2960-44ba-b6d3-533f22b7b853
 # ╠═f2454075-8ea9-4c86-8eca-59280f7d2d39
-# ╟─9ad3fc84-de80-4893-beb5-7a6e2d59f532
-# ╟─3952565b-733a-48bf-ac4d-017d6e2e26c5
-# ╟─f3d693b2-91a8-4c22-b8e3-bc254991b526
 # ╠═eb2f315e-63d2-47e7-a691-a69e2a773be5
-# ╟─c383ab30-22ff-43c6-a3ce-33e58b7d5685
 # ╠═a0a78733-c6d6-4add-b7c3-6b485cdeefe9
-# ╟─5cc62bc7-542a-4265-9d2f-c20a493b4e9a
+# ╟─9ad3fc84-de80-4893-beb5-7a6e2d59f532
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

@@ -101,8 +101,8 @@ begin
 	decision_step3 = 5.0
 	time_horizon3 = 20.0
 
-	P_init_options3 = collect(0:0.4:3)
-	number_options3 = collect(5:5:30)
+	P_init_options3 = collect(0:0.5:3)
+	number_options3 = collect(10:20:80)
 
 	s_final3 = run_entropy(P_init_options3, influx3, decision_step3, time_horizon3, number_options3)
 end
@@ -149,7 +149,7 @@ begin
 	decision_step2 = 5.0
 	# time_horizon2 = 20.0
 
-	P_init_options2 = collect(0:0.3:3)
+	P_init_options2 = collect(0:0.1:2.4)
 	time_horizons2 = collect(decision_step2:decision_step2:35.0)
 
 	s_final2 = run_entropy(P_init_options2, influx2, decision_step2, time_horizons2)
@@ -158,7 +158,7 @@ end
 # ╔═╡ 68d42c3a-7363-4658-aaae-b00b1af6a2ac
 begin
 	label2 = map(P_init -> "Initial state (P0) = $(P_init)", P_init_options2)
-	selected_index2 = [1, 2, 3, 4, 5, 6, 7, 9]
+	selected_index2 = [1, 4, 7, 10, 13, 16, 19, 25]
 
 	s_final2_filtered = stack([s_final2[i, :] for i in selected_index2], dims=1)
 	label2 = [label2[i] for i in selected_index2]

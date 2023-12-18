@@ -4,13 +4,14 @@ function run_scenarios(
         t_max::Int64,
         step::Float64,
         decision_step::Float64,
-        number_decision::Int64,
+        time_horizon::Float64,
         n_scenarious::Int64
 )::Tuple{Vector{Float64}, Vector{Float64}}
 
     times = 1:step:t_max
     s_final = zeros(length(times))
     P_final = zeros(length(times))
+    number_decision::Int64 = floor(time_horizon / decision_step)
 
     for _ in 1:n_scenarious
         s, P = _run_scenario(P0, I, t_max, step, decision_step, number_decision)

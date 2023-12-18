@@ -99,12 +99,12 @@ begin
 	# P_init3 = 0.1
 	influx3 = 0.1
 	decision_step3 = 5.0
-	number_decision3 = 4
+	time_horizon3 = 20.0
 
 	P_init_options3 = collect(0:0.4:3)
 	number_options3 = collect(5:5:30)
 
-	s_final3 = run_entropy(P_init_options3, influx3, decision_step3, number_decision3, number_options3)
+	s_final3 = run_entropy(P_init_options3, influx3, decision_step3, time_horizon3, number_options3)
 end
 
 # ╔═╡ 18f6ef7d-897b-4a34-83c8-4b39f6d61400
@@ -115,28 +115,28 @@ begin
 	plot(number_options3, transpose(s_final3), label=label3, left_margin = 5Plots.mm, legend=:outerbottomright, size=(680,400), ylabel = "Pathway diversity", xlabel = "Maximum number of options")
 end
 
+# ╔═╡ 10907ccd-8b54-49c3-b96d-69a71f181a75
+md"### Effect of the number of decision and decision time step"
+
 # ╔═╡ 7476d4d1-275d-4a11-a299-500566f32f0b
 begin
 	P_init0 = 0.1
 	influx0 = 0.1
 	# decision_step0 = 10
-	# number_decision0 = 4
+	# time_horizon0 = 30
 
-	decision_steps0 = [5.0, 10.0, 20.0]
-	number_decisions0 = [1, 3, 5, 7] #[1, 3, 5, 7]
+	decision_steps0 = [4.0, 6.0, 8.0]
+	time_horizons0 = [8.0, 18.0, 24.0]
 
-	s_final0 = run_entropy(P_init0, influx0, decision_steps0, number_decisions0)
+	s_final0 = run_entropy(P_init0, influx0, decision_steps0, time_horizons0)
 end
-
-# ╔═╡ 10907ccd-8b54-49c3-b96d-69a71f181a75
-md"### Effect of the number of decision and decision time step"
 
 # ╔═╡ 34360da5-4b5f-465b-8795-a678ee2670ad
 begin
-	label0 = map(decision_step -> "Decision step = $(decision_step)", decision_steps0)
-	label0 = reshape(label0, (1,length(decision_steps0)))
+	label0 = map(decision_step -> "Time horizon = $(decision_step)", time_horizons0)
+	label0 = reshape(label0, (1,length(time_horizons0)))
 
-	plot(number_decisions0, transpose(s_final0), label = label0, legend=:bottomright, ylabel = "Pathway diversity", xlabel = "Number of decisions")
+	plot(decision_steps0, s_final0, label = label0, legend=:topright, ylabel = "Pathway diversity", xlabel = "Decision step")
 end
 
 # ╔═╡ b234dee6-0966-4634-a830-40f2dfb92ac8
@@ -147,12 +147,12 @@ begin
 	# P_init2 = 0.1
 	influx2 = 0.1
 	decision_step2 = 5.0
-	# number_decision1 = 4
+	# time_horizon2 = 20.0
 
 	P_init_options2 = collect(0:0.3:3)
-	number_decisions2 = collect(1:1:7)
+	time_horizons2 = collect(decision_step2:decision_step2:35.0)
 
-	s_final2 = run_entropy(P_init_options2, influx2, decision_step2, number_decisions2)
+	s_final2 = run_entropy(P_init_options2, influx2, decision_step2, time_horizons2)
 end
 
 # ╔═╡ 68d42c3a-7363-4658-aaae-b00b1af6a2ac
@@ -164,13 +164,12 @@ begin
 	label2 = [label2[i] for i in selected_index2]
 	label2 = reshape(label2, (1,length(selected_index2)))
 
-	plot(number_decisions2, transpose(s_final2_filtered), label=label2, legend=:topleft, ylabel = "Pathway diversity", xlabel = "Number of decisions")
-	# make way to filter some options [4, 5, 6, 8, 9, 10]
+	plot(time_horizons2, transpose(s_final2_filtered), label=label2, legend=:topleft, ylabel = "Pathway diversity", xlabel = "Time horizon")
 end
 
 # ╔═╡ 2c4d17c6-9452-4448-9538-963851703cb9
 begin
-	label22 = map(n_decision -> "Number of decisions = $(n_decision)", number_decisions2)
+	label22 = map(t_horizon -> "Time horizon = $(t_horizon)", time_horizons2)
 	selected_index22 = [1, 2, 3, 5, 7]
 
 	s_final22_filtered = stack([s_final2[:, i] for i in selected_index22], dims=1)
@@ -194,8 +193,8 @@ begin
 	# influx4 = 0.1
 	t_max4 = 150
 	step4 = 0.125
+	time_horizon4 = 20.0
 	decision_step4 = 5.0
-	number_decision4 = 4
 	n_scenarious4 = 1
 
 	influx4_options = [0.02, 0.1, 0.15, 0.17, 0.18, 0.19, 0.2, 0.225, 0.25]
@@ -204,7 +203,7 @@ begin
 	p4 = []
 
 	for (index, influx4) in enumerate(influx4_options)
-		s4_temp, p4_temp = run_scenarios(P_init4, influx4, t_max4, step4, decision_step4, number_decision4, n_scenarious4)
+		s4_temp, p4_temp = run_scenarios(P_init4, influx4, t_max4, step4, decision_step4, time_horizon4, n_scenarious4)
 
 		push!(s4, s4_temp)
 		push!(p4, p4_temp)
@@ -2397,9 +2396,9 @@ version = "1.4.1+1"
 # ╟─8935e90f-548e-41fd-a0d1-4e9be83e0de7
 # ╟─1fb01ceb-8090-47fd-9e8d-e0d1bb482120
 # ╠═4d29d46f-c9e8-4502-9102-6a8bf2b570a0
-# ╟─18f6ef7d-897b-4a34-83c8-4b39f6d61400
-# ╠═7476d4d1-275d-4a11-a299-500566f32f0b
+# ╠═18f6ef7d-897b-4a34-83c8-4b39f6d61400
 # ╟─10907ccd-8b54-49c3-b96d-69a71f181a75
+# ╠═7476d4d1-275d-4a11-a299-500566f32f0b
 # ╟─34360da5-4b5f-465b-8795-a678ee2670ad
 # ╟─b234dee6-0966-4634-a830-40f2dfb92ac8
 # ╠═460f46b9-c998-4eee-adce-e25dc78b58a3

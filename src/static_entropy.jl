@@ -41,7 +41,7 @@ function run_entropy(
 
     for (idx_P0, P0) in enumerate(P0_options)
         for (idx_number_option, number_option) in enumerate(number_options)
-            s_final[idx_P0, idx_number_option] = _entropy(P0, influx, decision_step, number_decision, number_option)
+            s_final[idx_P0, idx_number_option] = _entropy(P0, influx, decision_step, number_decision, true, number_option)
         end
     end
     return s_final

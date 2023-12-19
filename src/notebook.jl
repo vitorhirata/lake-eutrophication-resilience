@@ -214,32 +214,13 @@ end
 begin
 	# Compute variance
 	variance_time_step4 = 5
-	variance_time_range = (variance_time_step4):variance_time_step4:(t_max4-1)
-	variance_idx_step::Int64 = variance_time_step4 ÷ step4
-
-	variance_ts = zeros(length(variance_time_range), length(influx4_options))
-
-	for (index_I, influx) in enumerate(influx4_options)
-		for (index_t, time) in enumerate(variance_time_range)
-			time_idx::Int64 = time ÷ step4 + 1
-			variance_ts[index_t, index_I] = var(p4[index_I][(time_idx-variance_idx_step):time_idx])
-		end
-	end
+	variance_idx_step4::Int64 = variance_time_step4 ÷ 0.125
+	variance_ts = compute_variance(p4, variance_idx_step4)
 
 	# Compute autocorrelation
-	autocorrelation_time_step4 = 15
-	autocorrelation_time_range = autocorrelation_time_step4:autocorrelation_time_step4:(t_max4-1)
-
-	autocorrelation_idx_step::Int64 = autocorrelation_time_step4 ÷ step4
-
-	autocorrelation_ts = zeros(length(autocorrelation_time_range), length(influx4_options))
-
-	for (index_I, influx) in enumerate(influx4_options)
-		for (index_t, time) in enumerate(autocorrelation_time_range)
-			time_idx::Int64 = time ÷ step4 + 1
-			autocorrelation_ts[index_t, index_I] = autocor(p4[index_I][(time_idx-autocorrelation_idx_step):time_idx], [1])[1]
-		end
-	end
+	autocorr_time_step4 = 15
+	autocorr_idx_step4::Int64 = autocorr_time_step4 ÷ 0.125
+	autocorr_ts = compute_autocorrelation(p4, autocorr_idx_step4)
 end
 
 # ╔═╡ 9ad3fc84-de80-4893-beb5-7a6e2d59f532
@@ -253,17 +234,17 @@ begin
 	label4 = reshape(label4, (1,length(selected_index4)))
 	p4_filtered = [p4[i, :] for i in selected_index4]
 	s4_filtered = [s4[i, :] for i in selected_index4]
-	variance_ts_filtered = [variance_ts[:, i] for i in selected_index4]
-	autocorrelation_ts_filtered = [autocorrelation_ts[:, i] for i in selected_index4]
+	variance_ts_filtered = [variance_ts[(variance_idx_step4+1):end, i] for i in selected_index4]
+	autocorrelation_ts_filtered = [autocorr_ts[(autocorr_idx_step4+1):end, i] for i in selected_index4]
 
 
 	plt1 = plot(collect(1:step4:t_max4), p4_filtered, label=label4, xticks=xticks4, ylabel="Amount of Phosphorus", xlims=xlims4, left_margin = 5Plots.mm)
 
-	plt2 = plot(collect(variance_time_range), variance_ts_filtered, label=false, xticks=xticks4, ylabel="Variance", xlims=xlims4, left_margin = 10Plots.mm)
+	plt2 = plot(collect((variance_time_step4+1):step4:t_max4), variance_ts_filtered, label=false, xticks=xticks4, ylabel="Variance", xlims=xlims4, left_margin = 10Plots.mm)
 
 	plt3 = plot(collect(1:step4:t_max4), s4_filtered, label=false, ylabel="Pathway diversity", xlabel="Time (year)", xticks=xticks4, xlims=xlims4, left_margin = 5Plots.mm)
 
-	plt4 = plot(collect(autocorrelation_time_range), autocorrelation_ts_filtered, label=false, xticks=xticks4, ylabel="Aucorrelation lag 1", xlabel="Time (year)", xlims=xlims4, left_margin = 10Plots.mm)
+	plt4 = plot(collect((autocorr_time_step4+1):step4:t_max4), autocorrelation_ts_filtered, label=false, xticks=xticks4, ylabel="Aucorrelation lag 1", xlabel="Time (year)", xlims=xlims4, left_margin = 10Plots.mm)
 
 	plot(plt1, plt2, plt3, plt4, layout=(2,2), legend=:outerbottomright, size=(675,360), guidefontsize=9)
 	plot!()
@@ -2407,6 +2388,6 @@ version = "1.4.1+1"
 # ╟─78821ef8-2960-44ba-b6d3-533f22b7b853
 # ╠═f2454075-8ea9-4c86-8eca-59280f7d2d39
 # ╠═eb2f315e-63d2-47e7-a691-a69e2a773be5
-# ╟─9ad3fc84-de80-4893-beb5-7a6e2d59f532
+# ╠═9ad3fc84-de80-4893-beb5-7a6e2d59f532
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

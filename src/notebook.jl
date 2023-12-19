@@ -42,21 +42,13 @@ md"## Bifurcation analysis of the differential equation"
 
 # ╔═╡ 1d3b8409-24a6-4dbe-809e-3b9d4bcdf355
 begin
-	f_root(P, I) = _f(P, I, 0.0)
-
-	function get_root(func, root, parameter)
-		Z = ZeroProblem(func, root)
-		q = solve(Z, Order1(), p=parameter)
-		return q
-	end
-
 	influx_options_root = influx_options_root2 = range(0.00, 0.3, step = 0.001) |> collect
 	roots = zeros(3, length(influx_options_root))
 
 	for (index, influx) in enumerate(influx_options_root)
-		roots[1, index] = get_root(f_root, 0.1, influx)
-		roots[2, index] = get_root(f_root, 1.3, influx)
-		roots[3, index] = get_root(f_root, 2.7, influx)
+		roots[1, index] = get_root(0.1, influx)
+		roots[2, index] = get_root(1.3, influx)
+		roots[3, index] = get_root(2.7, influx)
 	end
 end
 
@@ -2372,7 +2364,7 @@ version = "1.4.1+1"
 # ╠═c29a6b3a-1949-4e49-9ee1-519cb240dab6
 # ╟─88437506-a585-43a6-9df3-5b979ef0313f
 # ╠═1d3b8409-24a6-4dbe-809e-3b9d4bcdf355
-# ╟─218d8442-a241-4f99-a79f-3f16e5f8a177
+# ╠═218d8442-a241-4f99-a79f-3f16e5f8a177
 # ╟─3965fdff-83c2-45b0-9146-f86f1fc48353
 # ╟─8935e90f-548e-41fd-a0d1-4e9be83e0de7
 # ╟─1fb01ceb-8090-47fd-9e8d-e0d1bb482120

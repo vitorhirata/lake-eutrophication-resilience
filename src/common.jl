@@ -17,6 +17,12 @@ function number_possible_influx(
     return round(Int64, result)
 end
 
+function get_root(root, parameter)
+    Z = ZeroProblem(f_root, root)
+    sol = solve(Z, Order1(), p=parameter)
+    return sol
+end
+
 function _f(
     P::Float64,
     influx::Float64,
@@ -27,6 +33,8 @@ function _f(
 )::Float64
     return influx - 0.65 * P + 2.5 * (P^2) / ((1.95)^2 + P^2)
 end
+
+f_root(P, I) = _f(P, I, 0.0)
 
 function _evolve_step(P0::Float64, I::Float64, step::Float64, deterministic::Bool = true)::Float64
     if deterministic

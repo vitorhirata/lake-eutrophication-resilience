@@ -87,7 +87,7 @@ function _entropy(
     end
 
     final_prob = prob * step_prob
-    P_final = map(a -> _evolve_step(P0, I, decision_step, deterministic), possible_a_vec)
+    P_final = map(new_I -> _evolve_step(P0, new_I, decision_step, deterministic), possible_a_vec)
     results = map(input -> _entropy(input[1], input[2], decision_step, number_decision-1, deterministic, number_options, final_prob), zip(P_final, possible_a_vec))
 
     return sum(results)

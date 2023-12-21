@@ -39,7 +39,7 @@
 
         entropy = PathwayDiversity._entropy(P0, I, decision_step, number_decision, deterministic, maximum_options)
 
-        @test entropy ≈ 4.605170 rtol=1e-5
+        @test entropy ≈ 4.416255 rtol=1e-5
     end
 
     @testset "High P0 and number of decisions two" begin
@@ -52,7 +52,7 @@
 
         entropy = PathwayDiversity._entropy(P0, I, decision_step, number_decision, deterministic, maximum_options)
 
-        @test entropy ≈ 2.4849067 rtol=1e-5
+        @test entropy ≈ 2.756454 rtol=1e-5
     end
 
     @testset "High P0, number of decisions five and initial influx high" begin
@@ -65,6 +65,6 @@
 
         entropy = PathwayDiversity._entropy(P0, I, decision_step, number_decision, deterministic, maximum_options)
 
-        @test entropy ≈ 12.129983 rtol=1e-5
+        @test entropy ≈ 11.856449 rtol=1e-5
     end
 end

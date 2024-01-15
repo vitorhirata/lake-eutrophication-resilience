@@ -3,6 +3,15 @@ using Plots
 using Infiltrator
 using Revise
 
+function all()
+    bifurcation()
+    number_options()
+    scaling()
+    decision_scales()
+    distance_basin_threshold()
+    early_warning_signals()
+end
+
 function bifurcation()
     influx_options_root = influx_options_root2 = range(0.00, 0.3,  step = 0.001) |> collect
     roots = zeros(3, length(influx_options_root)  )

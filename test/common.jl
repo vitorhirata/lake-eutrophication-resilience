@@ -11,7 +11,7 @@
         number_options = PathwayDiversity.number_possible_influx(P0, maximum_options)
 
         @test number_options == 10
-        @test entropy ≈ 2.302585 rtol=1e-5
+        @test entropy ≈ log(number_options) rtol=1e-5
     end
 
     @testset "High P0 and number of decisions one" begin
@@ -26,7 +26,7 @@
         number_options = PathwayDiversity.number_possible_influx(P0, maximum_options)
 
         @test number_options == 4
-        @test entropy ≈ 1.386294 rtol=1e-5
+        @test entropy ≈ log(number_options) rtol=1e-5
     end
 
     @testset "Low P0 and number of decisions two" begin
@@ -39,7 +39,7 @@
 
         entropy = PathwayDiversity._entropy(P0, I, decision_step, number_decision, deterministic, maximum_options)
 
-        @test entropy ≈ 4.416255 rtol=1e-5
+        @test entropy ≈ (5*log(100)+log(90)+log(80)+log(70)+log(60)+log(50))/10 rtol=1e-5
     end
 
     @testset "High P0 and number of decisions two" begin
@@ -52,7 +52,7 @@
 
         entropy = PathwayDiversity._entropy(P0, I, decision_step, number_decision, deterministic, maximum_options)
 
-        @test entropy ≈ 2.756454 rtol=1e-5
+        @test entropy ≈ (log(5*4)+log(4*4)+log(4*4)+log(3*4))/4 rtol=1e-5
     end
 
     @testset "High P0, number of decisions five and initial influx high" begin

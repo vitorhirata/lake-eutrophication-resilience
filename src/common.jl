@@ -75,6 +75,52 @@ function _entropy(
         number_decision::Int64,
         deterministic::Bool = true,
         number_options::Int64 = 10,
+)::Float64
+    past_probability = [1]
+    past_state = [P0]
+    probability = []
+    state = []
+
+    for decision in 1:number_decision
+        probability = []
+        state = []
+
+        if decision == number_decision
+            for idx in 1:length(past_state)
+                possible_a_vec = _possible_influx(past_state[idx], number_options)
+                step_prob = 1.0 / length(possible_a_vec)
+
+                probability = vcat(probability, past_probability[idx] .* fill(step_prob, length(possible_a_vec)))
+            end
+        else
+            for idx in 1:length(past_state)
+                possible_a_vec = _possible_influx(past_state[idx], number_options)
+                step_prob = 1.0 / length(possible_a_vec)
+
+                added_prob = past_probability[idx] .* fill(step_prob, length(possible_a_vec))
+                probability = vcat(probability, added_prob)
+
+                added_state = map(new_I -> _evolve_step(past_state[idx], new_I, decision_step, deterministic), possible_a_vec)
+                state = vcat(state, added_state)
+            end
+        end
+
+        past_probability = probability
+        past_state = state
+    end
+
+    entropy = sum(map(prob -> -prob*log(prob), probability))
+
+    return entropy
+end
+
+function _entropy2(
+        P0::Float64,
+        I::Float64,
+        decision_step::Float64,
+        number_decision::Int64,
+        deterministic::Bool = true,
+        number_options::Int64 = 10,
         prob::Float64 = 1.0,
 
 )::Float64

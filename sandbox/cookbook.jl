@@ -117,7 +117,7 @@ function _plot_bifurcation(roots, influx_options_root)
     plot!(influx_options_root[lim1:lim2], roots[2, lim1:lim2], label="Instable state")
     plot!(influx_options_root[1:lim2], roots[1, 1:lim2], label="Clean stable state")
 
-    hline!([0.4], label="Number of options drop", legend=:bottomright,
+    hline!([0.4], label="Number of options drop", legend=:bottomright, size=(952,560),
            ylabel = "Fixed points (P*)", xlabel = "Influx (I)")
     savefig("../output/bifurcation.png")
 end
@@ -127,7 +127,7 @@ function _plot_scaling(s_final, P_init_options, number_options)
     label = reshape(label, (1,length(P_init_options)))
 
     plot(number_options, transpose(s_final), label=label, left_margin = 5Plots.mm, legend=:outerbottomright,
-         size=(680,400), ylabel = "Pathway diversity", xlabel = "Maximum number of options")
+         size=(952,560), ylabel = "Pathway diversity", xlabel = "Maximum number of options")
     savefig("../output/scaling.png")
 end
 
@@ -135,7 +135,7 @@ function _plot_decision_scales(s_final, time_horizons, decision_steps)
     label = map(decision_step -> "Time horizon = $(decision_step)", time_horizons)
     label = reshape(label, (1,length(time_horizons)))
 
-    plot(decision_steps, s_final, label = label, legend=:topright,
+    plot(decision_steps, s_final, label = label, legend=:topright, size=(952,560),
          ylabel = "Pathway diversity", xlabel = "Decision step")
     savefig("../output/decision_scales.png")
 end
@@ -148,7 +148,7 @@ function _plot_time_inital_state(s_final, P_init_options, time_horizons)
     label = [label[i] for i in selected_index]
     label = reshape(label, (1,length(selected_index)))
 
-    plot(time_horizons, transpose(s_final_filtered), label=label, legend=:topleft,
+    plot(time_horizons, transpose(s_final_filtered), label=label, legend=:topleft, size=(952,560),
          ylabel = "Pathway diversity", xlabel = "Time horizon")
     savefig("../output/time_initial_state.png")
 end
@@ -162,7 +162,7 @@ function _plot_distance_threshold(s_final, P_init_options, time_horizons, thresh
     label = reshape(label, (1,length(selected_index)))
     distance_threshold = threshold .- P_init_options
 
-    plot(distance_threshold, transpose(s_final_filtered), label=label, legend=:topleft,
+    plot(distance_threshold, transpose(s_final_filtered), label=label, legend=:topleft, size=(952,560),
          ylabel="Pathway diversity", xlabel="Distance to threshold")
     vline!([0.0], label=false)
 
@@ -195,7 +195,7 @@ function _plot_early_warning_signals(p, s, variance_ts, autocorr_ts, influx_opti
     plt4 = plot(collect((autocorr_time_step+1):step:t_max), autocorrelation_ts_filtered, label=false, xticks=xticks,
                 ylabel="Aucorrelation lag 1", xlabel="Time (year)", xlims=xlims, left_margin = 10Plots.mm)
 
-    plot(plt1, plt2, plt3, plt4, layout=(2,2), legend=:outerbottomright, size=(675,360), guidefontsize=9)
+    plot(plt1, plt2, plt3, plt4, layout=(2,2), legend=:outerbottomright, size=(1350,720), guidefontsize=10)
     savefig("../output/early_warning_signal.png")
 end
 

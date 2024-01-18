@@ -1,7 +1,7 @@
+using Revise
+using Infiltrator
 using PathwayDiversity
 using Plots
-using Infiltrator
-using Revise
 
 function all()
     bifurcation()

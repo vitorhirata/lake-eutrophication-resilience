@@ -100,7 +100,7 @@ function early_warning_signals()
     variance_ts = PathwayDiversity.compute_variance(p, variance_idx_step)
 
     # Compute autocorrelation
-    autocorr_time_step = 15
+    autocorr_time_step = 25
     autocorr_idx_step::Int64 = autocorr_time_step ÷ step
     autocorr_ts = PathwayDiversity.compute_autocorrelation(p, autocorr_idx_step)
 

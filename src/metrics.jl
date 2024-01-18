@@ -15,7 +15,7 @@ function compute_autocorrelation(time_series::Vector{Any}, autocor_step::Int64):
 
     for index_influx in 1:1:length(time_series)
         for index_time in (autocor_step+1):1:length(time_series[1])
-            autocor_ts[index_time, index_influx] = autocor(time_series[index_influx][(index_time-autocor_step):index_time], [1])[1]
+            autocor_ts[index_time, index_influx] = cor(time_series[index_influx][(index_time-autocor_step):(index_time-1)], time_series[index_influx][(index_time-autocor_step+1):(index_time)])
         end
     end
 

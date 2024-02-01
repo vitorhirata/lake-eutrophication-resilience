@@ -83,12 +83,13 @@ function early_warning_signals()
     time_horizon = 20.0
     decision_step = 5.0
     n_scenarious = 1
-    influx_options = [0.02, 0.1, 0.15, 0.17, 0.18, 0.19, 0.2, 0.225, 0.25]
+    influx = 0.03
+    influx_taxes = [0.0, 0.0001, 0.0005, 0.001, 0.0015, 0.002]
 
     s = []
     p = []
-    for (index, influx) in enumerate(influx_options)
-        s_temp, p_temp = PathwayDiversity.run_scenarios(P_init, influx, t_max, step, decision_step, time_horizon, n_scenarious)
+    for (index, influx_tax) in enumerate(influx_taxes)
+        s_temp, p_temp = PathwayDiversity.run_scenarios(P_init, influx, influx_tax, t_max, step, decision_step, time_horizon, n_scenarious)
 
         push!(s, s_temp)
         push!(p, p_temp)
@@ -104,7 +105,7 @@ function early_warning_signals()
     autocorr_idx_step::Int64 = autocorr_time_step ÷ step
     autocorr_ts = PathwayDiversity.compute_autocorrelation(p, autocorr_idx_step)
 
-    _plot_early_warning_signals(p, s, variance_ts, autocorr_ts, influx_options,
+    _plot_early_warning_signals(p, s, variance_ts, autocorr_ts, influx_taxes,
                                 step, t_max, variance_time_step, autocorr_time_step)
 
     return p, s, variance_ts, autocorr_ts
@@ -169,13 +170,13 @@ function _plot_distance_threshold(s_final, P_init_options, time_horizons, thresh
     savefig("../output/distance_threshold.png")
 end
 
-function _plot_early_warning_signals(p, s, variance_ts, autocorr_ts, influx_options, step, t_max,
+function _plot_early_warning_signals(p, s, variance_ts, autocorr_ts, influx_taxes, step, t_max,
         variance_time_step, autocorr_time_step
 )
-    label = map(influx_value -> "Influx = $(influx_value)", influx_options)
+    label = map(influx_tax -> "Influx_tax = $(influx_tax)", influx_taxes)
     xticks = 0:25:length(1:step:t_max)
     xlims = (0, t_max+1)
-    selected_index = [1, 2, 3, 4, 5, 9]
+    selected_index = [1, 2, 3, 4, 5, 6]
 
     label = [label[i] for i in selected_index]
     label = reshape(label, (1,length(selected_index)))

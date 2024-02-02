@@ -182,14 +182,14 @@ function _plot_early_warning_signals(result, variance_ts, autocorr_ts, influx_ta
 
     plt1 = plot(collect(1:step:t_max), p, label=label, xticks=xticks, ylabel="Amount of Phosphorus",
                 xlims=xlims, left_margin = 5Plots.mm)
-    plt2 = plot(collect((variance_time_step+1):step:t_max), variance, label=false, xticks=xticks,
-                ylabel="Variance", xlims=xlims, left_margin = 10Plots.mm)
-    plt3 = plot(collect(1:step:t_max), s, label=false, ylabel="Pathway diversity", xlabel="Time (year)",
+    plt2 = plot(collect(1:step:t_max), s, label=false, ylabel="Pathway diversity",
                 xticks=xticks, xlims=xlims, left_margin = 5Plots.mm)
+    plt3 = plot(collect((variance_time_step+1):step:t_max), variance, label=false, xticks=xticks,
+                ylabel="Variance", xlims=xlims, left_margin = 10Plots.mm)
     plt4 = plot(collect((autocorr_time_step+1):step:t_max), autocorr, label=false, xticks=xticks,
-                ylabel="Aucorrelation lag 1", xlabel="Time (year)", xlims=xlims, left_margin = 10Plots.mm)
+                ylabel="Aucorrelation", xlabel="Time (year)", xlims=xlims, left_margin = 10Plots.mm)
 
-    plot(plt1, plt2, plt3, plt4, layout=(2,2), legend=:outerbottomright, size=(1350,720), guidefontsize=10)
+    plot(plt1, plt2, plt3, plt4, layout=(4,1), legend=:topleft, size=(1000,900), guidefontsize=10)
     savefig("../output/early_warning_signal.png")
 end
 

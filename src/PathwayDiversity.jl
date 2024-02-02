@@ -1,6 +1,6 @@
 module PathwayDiversity
 
-using DifferentialEquations
+using OrdinaryDiffEq, StochasticDiffEq, DiffEqNoiseProcess
 using Statistics
 using StatsBase
 using Roots

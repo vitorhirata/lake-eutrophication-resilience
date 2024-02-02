@@ -1,43 +1,35 @@
 function run_scenarios(
         P0::Float64,
         I::Float64,
-        I_tax::Float64,
+        I_taxes::Vector{Float64},
         t_max::Int64,
         step::Float64,
         decision_step::Float64,
         time_horizon::Float64,
-        n_scenarious::Int64
-)::Tuple{Vector{Float64}, Vector{Float64}}
+)::Array{Float64, 3}
 
     times = 1:step:t_max
-    s_final = zeros(length(times))
-    P_final = zeros(length(times))
+    results = zeros(length(I_taxes), length(times), 2)
     number_decision::Int64 = floor(time_horizon / decision_step)
 
-    for _ in 1:n_scenarious
-        s, P = _run_scenario(P0, I, I_tax, number_decision, t_max, step, decision_step)
-        s_final += s
-        P_final += P
+    for (index, I_tax) in enumerate(I_taxes)
+        results[index, :, :] = _run_scenario(P0, I, I_tax, number_decision, t_max, step, decision_step)
     end
 
-    s_final /= n_scenarious
-    P_final /= n_scenarious
-
-    return s_final, P_final
+    return results
 end
 
 function _run_scenario(
         P0::Float64, I::Float64, I_tax::Float64, number_decision::Int64,
         t_max::Int64, step::Float64, decision_step::Float64, I_step::Float64 = 1.0
-)::Tuple{Vector{Float64}, Vector{Float64}}
+)::Matrix{Float64}
 
     times = 1:step:t_max
-    s_final = zeros(length(times))
-    P_final = zeros(length(times))
+    result = zeros(length(times), 2)
 
     for (index, t0) in enumerate(times)
-        P_final[index] = P0
-        s_final[index] = _entropy(P0, I, decision_step, number_decision, false)
+        result[index, 1] = P0
+        result[index, 2] = _entropy(P0, I, decision_step, number_decision, false)
 
         P0 = _evolve_step(P0, I, step, false)
         if t0 % I_step == 0
@@ -45,5 +37,5 @@ function _run_scenario(
         end
     end
 
-    return s_final, P_final
+    return result
 end

@@ -82,33 +82,25 @@ function early_warning_signals()
     step = 0.125
     time_horizon = 20.0
     decision_step = 5.0
-    n_scenarious = 1
     influx = 0.03
     influx_taxes = [0.0, 0.0001, 0.0005, 0.001, 0.0015, 0.002]
 
-    s = []
-    p = []
-    for (index, influx_tax) in enumerate(influx_taxes)
-        s_temp, p_temp = PathwayDiversity.run_scenarios(P_init, influx, influx_tax, t_max, step, decision_step, time_horizon, n_scenarious)
-
-        push!(s, s_temp)
-        push!(p, p_temp)
-    end
+    result = PathwayDiversity.run_scenarios(P_init, influx, influx_taxes, t_max, step, decision_step, time_horizon)
 
     # Compute variance
     variance_time_step = 5
     variance_idx_step::Int64 = variance_time_step ÷ step
-    variance_ts = PathwayDiversity.compute_variance(p, variance_idx_step)
+    variance_ts = PathwayDiversity.compute_variance(result[:, :, 1], variance_idx_step)
 
     # Compute autocorrelation
     autocorr_time_step = 25
     autocorr_idx_step::Int64 = autocorr_time_step ÷ step
-    autocorr_ts = PathwayDiversity.compute_autocorrelation(p, autocorr_idx_step)
+    autocorr_ts = PathwayDiversity.compute_autocorrelation(result[:, :, 1], autocorr_idx_step)
 
-    _plot_early_warning_signals(p, s, variance_ts, autocorr_ts, influx_taxes,
+    _plot_early_warning_signals(result, variance_ts, autocorr_ts, influx_taxes,
                                 step, t_max, variance_time_step, autocorr_time_step)
 
-    return p, s, variance_ts, autocorr_ts
+    return result, variance_ts, autocorr_ts
 end
 
 function _plot_bifurcation(roots, influx_options_root)
@@ -170,22 +162,22 @@ function _plot_distance_threshold(s_final, P_init_options, time_horizons, thresh
     savefig("../output/distance_threshold.png")
 end
 
-function _plot_early_warning_signals(p, s, variance_ts, autocorr_ts, influx_taxes, step, t_max,
+function _plot_early_warning_signals(result, variance_ts, autocorr_ts, influx_taxes, step, t_max,
         variance_time_step, autocorr_time_step
 )
     label = map(influx_tax -> "Influx_tax = $(influx_tax)", influx_taxes)
     xticks = 0:25:length(1:step:t_max)
     xlims = (0, t_max+1)
-    selected_index = [1, 2, 3, 4, 5, 6]
 
-    label = [label[i] for i in selected_index]
+    selected_index = [1, 2, 3, 4, 5, 6]
+    label = label[selected_index]
     label = reshape(label, (1,length(selected_index)))
-    p_filtered = [p[i, :] for i in selected_index]
-    s_filtered = [s[i, :] for i in selected_index]
+    p_filtered = transpose(result[selected_index, :, 1])
+    s_filtered = transpose(result[selected_index, :, 2])
     variance_idx_step::Int64 = variance_time_step ÷ step
     autocorr_idx_step::Int64 = autocorr_time_step ÷ step
-    variance_ts_filtered = [variance_ts[(variance_idx_step+1):end, i] for i in selected_index]
-    autocorrelation_ts_filtered = [autocorr_ts[(autocorr_idx_step+1):end, i] for i in selected_index]
+    variance_ts_filtered = transpose(variance_ts[selected_index, (variance_idx_step+1):end])
+    autocorrelation_ts_filtered = transpose(autocorr_ts[selected_index, (autocorr_idx_step+1):end])
 
     plt1 = plot(collect(1:step:t_max), p_filtered, label=label, xticks=xticks, ylabel="Amount of Phosphorus",
                 xlims=xlims, left_margin = 5Plots.mm)

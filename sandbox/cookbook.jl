@@ -2,6 +2,7 @@ using Revise
 using Infiltrator
 using PathwayDiversity
 using Plots
+using NamedDims
 
 function all()
     bifurcation()
@@ -90,12 +91,12 @@ function early_warning_signals()
     # Compute variance
     variance_time_step = 5
     variance_idx_step::Int64 = variance_time_step ÷ step
-    variance_ts = PathwayDiversity.compute_variance(result[:, :, 1], variance_idx_step)
+    variance_ts = PathwayDiversity.compute_variance(result[type=1], variance_idx_step)
 
     # Compute autocorrelation
     autocorr_time_step = 25
     autocorr_idx_step::Int64 = autocorr_time_step ÷ step
-    autocorr_ts = PathwayDiversity.compute_autocorrelation(result[:, :, 1], autocorr_idx_step)
+    autocorr_ts = PathwayDiversity.compute_autocorrelation(result[type=1], autocorr_idx_step)
 
     _plot_early_warning_signals(result, variance_ts, autocorr_ts, influx_taxes,
                                 step, t_max, variance_time_step, autocorr_time_step)
@@ -170,22 +171,22 @@ function _plot_early_warning_signals(result, variance_ts, autocorr_ts, influx_ta
     xlims = (0, t_max+1)
 
     selected_index = [1, 2, 3, 4, 5, 6]
-    label = label[selected_index]
-    label = reshape(label, (1,length(selected_index)))
-    p_filtered = transpose(result[selected_index, :, 1])
-    s_filtered = transpose(result[selected_index, :, 2])
+    label = reshape(label[selected_index], (1,length(selected_index)))
+    p = result[type=1, influx_tax=selected_index]
+    s = result[type=2, influx_tax=selected_index]
+
     variance_idx_step::Int64 = variance_time_step ÷ step
     autocorr_idx_step::Int64 = autocorr_time_step ÷ step
-    variance_ts_filtered = transpose(variance_ts[selected_index, (variance_idx_step+1):end])
-    autocorrelation_ts_filtered = transpose(autocorr_ts[selected_index, (autocorr_idx_step+1):end])
+    variance = variance_ts[time=(variance_idx_step+1):end, influx_tax=selected_index]
+    autocorr = autocorr_ts[time=(autocorr_idx_step+1):end, influx_tax=selected_index]
 
-    plt1 = plot(collect(1:step:t_max), p_filtered, label=label, xticks=xticks, ylabel="Amount of Phosphorus",
+    plt1 = plot(collect(1:step:t_max), p, label=label, xticks=xticks, ylabel="Amount of Phosphorus",
                 xlims=xlims, left_margin = 5Plots.mm)
-    plt2 = plot(collect((variance_time_step+1):step:t_max), variance_ts_filtered, label=false, xticks=xticks,
+    plt2 = plot(collect((variance_time_step+1):step:t_max), variance, label=false, xticks=xticks,
                 ylabel="Variance", xlims=xlims, left_margin = 10Plots.mm)
-    plt3 = plot(collect(1:step:t_max), s_filtered, label=false, ylabel="Pathway diversity", xlabel="Time (year)",
+    plt3 = plot(collect(1:step:t_max), s, label=false, ylabel="Pathway diversity", xlabel="Time (year)",
                 xticks=xticks, xlims=xlims, left_margin = 5Plots.mm)
-    plt4 = plot(collect((autocorr_time_step+1):step:t_max), autocorrelation_ts_filtered, label=false, xticks=xticks,
+    plt4 = plot(collect((autocorr_time_step+1):step:t_max), autocorr, label=false, xticks=xticks,
                 ylabel="Aucorrelation lag 1", xlabel="Time (year)", xlims=xlims, left_margin = 10Plots.mm)
 
     plot(plt1, plt2, plt3, plt4, layout=(2,2), legend=:outerbottomright, size=(1350,720), guidefontsize=10)

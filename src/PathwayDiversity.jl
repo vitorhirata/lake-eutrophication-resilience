@@ -3,6 +3,7 @@ module PathwayDiversity
 using OrdinaryDiffEq, StochasticDiffEq, DiffEqNoiseProcess
 using Statistics
 using StatsBase
+using GLM
 using Roots
 using NamedDims
 

@@ -5,6 +5,7 @@ version = "0.1.0"
 
 [deps]
 DiffEqNoiseProcess = "77a26b50-5914-5dd7-bc55-306e6241c503"
+GLM = "38e38edf-8417-5370-95a0-9cbb8c7f171a"
 NamedDims = "356022a1-0364-5f58-8944-0da4b18d706f"
 OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
 Roots = "f2b01f46-fcfa-551c-844a-d8ac1e96c665"

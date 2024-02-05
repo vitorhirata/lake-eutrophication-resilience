@@ -88,20 +88,23 @@ function early_warning_signals()
 
     result = PathwayDiversity.run_scenarios(P_init, influx, influx_taxes, t_max, step, decision_step, time_horizon)
 
+    times = collect(1:step:t_max)
+    residuals = PathwayDiversity.detrend(result[type=1], times)
+
     # Compute variance
     variance_time_step = 5
     variance_idx_step::Int64 = variance_time_step ÷ step
-    variance_ts = PathwayDiversity.compute_variance(result[type=1], variance_idx_step)
+    variance_ts = PathwayDiversity.compute_variance(residuals, variance_idx_step)
 
     # Compute autocorrelation
     autocorr_time_step = 25
     autocorr_idx_step::Int64 = autocorr_time_step ÷ step
-    autocorr_ts = PathwayDiversity.compute_autocorrelation(result[type=1], autocorr_idx_step)
+    autocorr_ts = PathwayDiversity.compute_autocorrelation(residuals, autocorr_idx_step)
 
-    _plot_early_warning_signals(result, variance_ts, autocorr_ts, influx_taxes,
+    _plot_early_warning_signals(result, residuals, variance_ts, autocorr_ts, influx_taxes,
                                 step, t_max, variance_time_step, autocorr_time_step)
 
-    return result, variance_ts, autocorr_ts
+    return result, residuals, variance_ts, autocorr_ts
 end
 
 function _plot_bifurcation(roots, influx_options_root)
@@ -163,7 +166,7 @@ function _plot_distance_threshold(s_final, P_init_options, time_horizons, thresh
     savefig("../output/distance_threshold.png")
 end
 
-function _plot_early_warning_signals(result, variance_ts, autocorr_ts, influx_taxes, step, t_max,
+function _plot_early_warning_signals(result, residuals, variance_ts, autocorr_ts, influx_taxes, step, t_max,
         variance_time_step, autocorr_time_step
 )
     label = map(influx_tax -> "Influx_tax = $(influx_tax)", influx_taxes)
@@ -174,6 +177,7 @@ function _plot_early_warning_signals(result, variance_ts, autocorr_ts, influx_ta
     label = reshape(label[selected_index], (1,length(selected_index)))
     p = result[type=1, influx_tax=selected_index]
     s = result[type=2, influx_tax=selected_index]
+    residual = residuals[influx_tax=selected_index]
 
     variance_idx_step::Int64 = variance_time_step ÷ step
     autocorr_idx_step::Int64 = autocorr_time_step ÷ step
@@ -182,14 +186,16 @@ function _plot_early_warning_signals(result, variance_ts, autocorr_ts, influx_ta
 
     plt1 = plot(collect(1:step:t_max), p, label=label, xticks=xticks, ylabel="Amount of Phosphorus",
                 xlims=xlims, left_margin = 5Plots.mm)
-    plt2 = plot(collect(1:step:t_max), s, label=false, ylabel="Pathway diversity",
+    plt2 = plot(collect(1:step:t_max), residual, label=false, ylabel="Residuals",
                 xticks=xticks, xlims=xlims, left_margin = 5Plots.mm)
-    plt3 = plot(collect((variance_time_step+1):step:t_max), variance, label=false, xticks=xticks,
+    plt3 = plot(collect(1:step:t_max), s, label=false, ylabel="Pathway diversity",
+                xticks=xticks, xlims=xlims, left_margin = 5Plots.mm)
+    plt4 = plot(collect((variance_time_step+1):step:t_max), variance, label=false, xticks=xticks,
                 ylabel="Variance", xlims=xlims, left_margin = 10Plots.mm)
-    plt4 = plot(collect((autocorr_time_step+1):step:t_max), autocorr, label=false, xticks=xticks,
+    plt5 = plot(collect((autocorr_time_step+1):step:t_max), autocorr, label=false, xticks=xticks,
                 ylabel="Aucorrelation", xlabel="Time (year)", xlims=xlims, left_margin = 10Plots.mm)
 
-    plot(plt1, plt2, plt3, plt4, layout=(4,1), legend=:topleft, size=(1000,900), guidefontsize=10)
+    plot(plt1, plt2, plt3, plt4, plt5, layout=(5,1), legend=:topleft, size=(1250,900), guidefontsize=10)
     savefig("../output/early_warning_signal.png")
 end
 

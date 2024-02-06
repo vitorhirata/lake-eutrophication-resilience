@@ -55,8 +55,8 @@ function _evolve_step_stochastic(
         P0::Float64,
         I::Float64,
         step::Float64,
-        μ::Float64 = 0.05,
-        σ::Float64 = 0.004,
+        μ::Float64 = 0.1,
+        σ::Float64 = 0.01,
         dt::Float64 = 0.05,
 )::Float64
     tspan = (0.0, step)

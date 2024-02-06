@@ -21,8 +21,9 @@ function compute_autocorrelation(time_series::NamedDimsArray, autocor_step::Int6
     return autocor_ts
 end
 
-function detrend(time_series::NamedDimsArray, times::Vector{Float64})
+function detrend(time_series::NamedDimsArray, times::StepRangeLen{Float64})
     result = NamedDimsArray{(:time, :influx_tax)}(zeros(size(time_series)))
+    times = collect(times)
 
     for index_influx in 1:1:size(time_series, :influx_tax)
         p_influx = parent(time_series[influx_tax=index_influx])

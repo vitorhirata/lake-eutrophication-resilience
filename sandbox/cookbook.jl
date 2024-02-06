@@ -79,30 +79,27 @@ end
 
 function early_warning_signals()
     P_init = 0.02
-    t_max = 150
-    step = 0.125
+    times = 1:0.125:150
     time_horizon = 20.0
     decision_step = 5.0
     influx = 0.03
     influx_taxes = [0.0, 0.0001, 0.0005, 0.001, 0.0015, 0.002]
 
-    result = PathwayDiversity.run_scenarios(P_init, influx, influx_taxes, t_max, step, decision_step, time_horizon)
-
-    times = collect(1:step:t_max)
+    result = PathwayDiversity.run_scenarios(P_init, influx, influx_taxes, times, decision_step, time_horizon)
     residuals = PathwayDiversity.detrend(result[type=1], times)
 
     # Compute variance
     variance_time_step = 5
-    variance_idx_step::Int64 = variance_time_step ÷ step
+    variance_idx_step::Int64 = variance_time_step ÷ step(times)
     variance_ts = PathwayDiversity.compute_variance(residuals, variance_idx_step)
 
     # Compute autocorrelation
     autocorr_time_step = 25
-    autocorr_idx_step::Int64 = autocorr_time_step ÷ step
+    autocorr_idx_step::Int64 = autocorr_time_step ÷ step(times)
     autocorr_ts = PathwayDiversity.compute_autocorrelation(residuals, autocorr_idx_step)
 
     _plot_early_warning_signals(result, residuals, variance_ts, autocorr_ts, influx_taxes,
-                                step, t_max, variance_time_step, autocorr_time_step)
+                                times, variance_time_step, autocorr_time_step)
 
     return result, residuals, variance_ts, autocorr_ts
 end
@@ -166,12 +163,12 @@ function _plot_distance_threshold(s_final, P_init_options, time_horizons, thresh
     savefig("../output/distance_threshold.png")
 end
 
-function _plot_early_warning_signals(result, residuals, variance_ts, autocorr_ts, influx_taxes, step, t_max,
+function _plot_early_warning_signals(result, residuals, variance_ts, autocorr_ts, influx_taxes, times,
         variance_time_step, autocorr_time_step
 )
     label = map(influx_tax -> "Influx_tax = $(influx_tax)", influx_taxes)
-    xticks = 0:25:length(1:step:t_max)
-    xlims = (0, t_max+1)
+    xticks = 0:25:length(times)
+    xlims = (0, times[end]+1)
 
     selected_index = [1, 2, 3, 4, 5, 6]
     label = reshape(label[selected_index], (1,length(selected_index)))
@@ -179,20 +176,20 @@ function _plot_early_warning_signals(result, residuals, variance_ts, autocorr_ts
     s = result[type=2, influx_tax=selected_index]
     residual = residuals[influx_tax=selected_index]
 
-    variance_idx_step::Int64 = variance_time_step ÷ step
-    autocorr_idx_step::Int64 = autocorr_time_step ÷ step
+    variance_idx_step::Int64 = variance_time_step ÷ step(times)
+    autocorr_idx_step::Int64 = autocorr_time_step ÷ step(times)
     variance = variance_ts[time=(variance_idx_step+1):end, influx_tax=selected_index]
     autocorr = autocorr_ts[time=(autocorr_idx_step+1):end, influx_tax=selected_index]
 
-    plt1 = plot(collect(1:step:t_max), p, label=label, xticks=xticks, ylabel="Amount of Phosphorus",
+    plt1 = plot(collect(times), p, label=label, xticks=xticks, ylabel="Amount of Phosphorus",
                 xlims=xlims, left_margin = 5Plots.mm)
-    plt2 = plot(collect(1:step:t_max), residual, label=false, ylabel="Residuals",
+    plt2 = plot(collect(times), residual, label=false, ylabel="Residuals",
                 xticks=xticks, xlims=xlims, left_margin = 5Plots.mm)
-    plt3 = plot(collect(1:step:t_max), s, label=false, ylabel="Pathway diversity",
+    plt3 = plot(collect(times), s, label=false, ylabel="Pathway diversity",
                 xticks=xticks, xlims=xlims, left_margin = 5Plots.mm)
-    plt4 = plot(collect((variance_time_step+1):step:t_max), variance, label=false, xticks=xticks,
+    plt4 = plot(collect((variance_time_step+1):step(times):times[end]), variance, label=false, xticks=xticks,
                 ylabel="Variance", xlims=xlims, left_margin = 10Plots.mm)
-    plt5 = plot(collect((autocorr_time_step+1):step:t_max), autocorr, label=false, xticks=xticks,
+    plt5 = plot(collect((autocorr_time_step+1):step(times):times[end]), autocorr, label=false, xticks=xticks,
                 ylabel="Aucorrelation", xlabel="Time (year)", xlims=xlims, left_margin = 10Plots.mm)
 
     plot(plt1, plt2, plt3, plt4, plt5, layout=(5,1), legend=:topleft, size=(1250,900), guidefontsize=10)

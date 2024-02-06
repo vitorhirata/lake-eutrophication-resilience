@@ -4,6 +4,7 @@ using OrdinaryDiffEq, StochasticDiffEq, DiffEqNoiseProcess
 using Statistics
 using StatsBase
 using GLM
+using Loess
 using Roots
 using NamedDims
 

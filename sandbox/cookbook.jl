@@ -86,7 +86,7 @@ function early_warning_signals()
     influx_taxes = [0.0, 0.0005, 0.001]
 
     result = PathwayDiversity.run_scenarios(P_init, influx, influx_taxes, times, decision_step, time_horizon)
-    residuals = PathwayDiversity.detrend(result[type=1], times)
+    residuals = PathwayDiversity.detrend(result[type=1], times, "loess")
 
     # Compute variance
     variance_time_step = 20

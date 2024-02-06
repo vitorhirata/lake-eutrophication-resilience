@@ -21,7 +21,17 @@ function compute_autocorrelation(time_series::NamedDimsArray, autocor_step::Int6
     return autocor_ts
 end
 
-function detrend(time_series::NamedDimsArray, times::StepRangeLen{Float64})
+function detrend(time_series::NamedDimsArray, times::StepRangeLen{Float64}, type::String)
+    if type == "linear"
+        return linear_detrend(time_series, times)
+    elseif type == "loess"
+        return loess_detrend(time_series, times)
+    else
+        throw(ArgumentError("Invalid type of detrend"))
+    end
+end
+
+function linear_detrend(time_series::NamedDimsArray, times::StepRangeLen{Float64})
     result = NamedDimsArray{(:time, :influx_tax)}(zeros(size(time_series)))
     times = collect(times)
 
@@ -30,6 +40,19 @@ function detrend(time_series::NamedDimsArray, times::StepRangeLen{Float64})
         data = (;times,p_influx)
         model = lm(@formula(p_influx ~ times), data)
         result[influx_tax=index_influx] = residuals(model)
+    end
+    return result
+end
+
+function loess_detrend(time_series::NamedDimsArray, times::StepRangeLen{Float64})
+    result = NamedDimsArray{(:time, :influx_tax)}(zeros(size(time_series)))
+    times = collect(times)
+
+    for index_influx in 1:1:size(time_series, :influx_tax)
+        p_influx = parent(time_series[influx_tax=index_influx])
+        model = loess(times, p_influx, span=0.5)
+        smooth_function = predict(model, times)
+        result[influx_tax=index_influx] = p_influx - smooth_function
     end
     return result
 end

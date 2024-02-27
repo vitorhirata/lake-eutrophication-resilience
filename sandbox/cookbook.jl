@@ -162,7 +162,7 @@ function _plot_distance_threshold(s_final, P_init_options, time_horizons, thresh
 end
 
 function _plot_early_warning_signals(result, residuals, variance_ts, autocorr_ts, influx_taxes, times,
-        variance_time_step, autocorr_time_step
+        variance_time_step, autocorr_time_step, include_residual = false
 )
     label = map(influx_tax -> "Influx_tax = $(influx_tax)", influx_taxes)
     xticks = 0:25:length(times)
@@ -190,7 +190,11 @@ function _plot_early_warning_signals(result, residuals, variance_ts, autocorr_ts
     plt5 = plot(collect((autocorr_time_step+1):step(times):times[end]), autocorr, label=false, xticks=xticks,
                 ylabel="Autocorrelation", xlabel="Time (year)", xlims=xlims, left_margin = 10Plots.mm)
 
-    plot(plt1, plt2, plt3, plt4, plt5, layout=(5,1), legend=:topleft, size=(1300,900), guidefontsize=10)
+    if include_residual
+        plot(plt1, plt2, plt3, plt4, plt5, layout=(5,1), legend=:topleft, size=(1000,900), guidefontsize=12)
+    else
+        plot(plt1, plt3, plt4, plt5, layout=(4,1), legend=:topleft, size=(1000,900), guidefontsize=12)
+    end
     savefig("../output/early_warning_signal.png")
 end
 

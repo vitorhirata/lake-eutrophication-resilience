@@ -154,8 +154,8 @@ function _plot_distance_threshold(s_final, P_init_options, time_horizons, thresh
     label = reshape(label, (1,length(selected_index)))
     distance_threshold = threshold .- P_init_options
 
-    plot(distance_threshold, transpose(s_final_filtered), label=label, legend=:topleft, size=(952,560),
-         ylabel="Pathway diversity", xlabel="Distance to threshold")
+    plot(distance_threshold, transpose(s_final_filtered), label=label, legend=:topleft, size=(952,600),
+          ylabel="Pathway diversity", xlabel="Distance to threshold", guidefontsize=12, left_margin = 10Plots.mm)
     vline!([0.0], label=false)
 
     savefig("../output/distance_threshold.png")

@@ -1,32 +1,23 @@
-function run_scenarios(
+function run_scenario(
         P0::Float64,
         I::Float64,
-        I_taxes::Vector{Float64},
+        I_tax::Float64,
         times::StepRangeLen{Float64},
         decision_step::Float64,
-        time_horizon::Float64,
-)::NamedDimsArray
+        time_horizons::Vector{Float64},
+        I_step::Float64 = 1.0
+)::Tuple{NamedDimsArray, NamedDimsArray}
 
-    results = NamedDimsArray{(:time, :influx_tax, :type)}(zeros(length(times), length(I_taxes), 2))
-    number_decision::Int64 = floor(time_horizon / decision_step)
+    p = NamedDimsArray{(:time,)}(zeros(length(times)))
+    s = NamedDimsArray{(:time, :time_horizon)}(zeros(length(times), length(time_horizons)))
+    number_decision::Vector{Int64} = map(time_horizon -> floor(time_horizon / decision_step), time_horizons)
 
-    for (index, I_tax) in enumerate(I_taxes)
-        results[influx_tax=index] = _run_scenario(P0, I, I_tax, number_decision, times, decision_step)
-    end
+    for (index_t, t0) in enumerate(times)
+        p[index_t] = P0
 
-    return results
-end
-
-function _run_scenario(
-        P0::Float64, I::Float64, I_tax::Float64, number_decision::Int64,
-        times::StepRangeLen{Float64}, decision_step::Float64, I_step::Float64 = 1.0
-)::NamedDimsArray
-
-    result = NamedDimsArray{(:time, :type)}(zeros(length(times), 2))
-
-    for (index, t0) in enumerate(times)
-        result[index, 1] = P0
-        result[index, 2] = _entropy(P0, I, decision_step, number_decision, false)
+        for (index_h, time_horizon) in enumerate(time_horizons)
+            s[index_t, index_h] = _entropy(P0, I, decision_step, number_decision[index_h], false)
+        end
 
         P0 = _evolve_step(P0, I, step(times), false)
         if t0 % I_step == 0
@@ -34,5 +25,5 @@ function _run_scenario(
         end
     end
 
-    return result
+    return p, s
 end

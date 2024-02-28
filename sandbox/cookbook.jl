@@ -78,13 +78,14 @@ end
 function early_warning_signals()
     P_init = 0.27
     times = 1:0.125:75
-    time_horizon = 20.0
+    time_horizons = [5.0, 10.0, 20.0]
     decision_step = 5.0
     influx = 0.03
-    influx_taxes = [0.0, 0.0005, 0.001]
+    influx_tax = 0.001
 
-    result = PathwayDiversity.run_scenarios(P_init, influx, influx_taxes, times, decision_step, time_horizon)
-    residuals = PathwayDiversity.detrend(result[type=1], times, "loess")
+    p, s = PathwayDiversity.run_scenario(P_init, influx, influx_tax, times, decision_step, time_horizons)
+    residuals = PathwayDiversity.detrend(p, times, "loess")
+    s = PathwayDiversity.normalize_pd(s)
 
     # Compute variance
     variance_time_step = 20
@@ -96,10 +97,10 @@ function early_warning_signals()
     autocorr_idx_step::Int64 = autocorr_time_step ÷ step(times)
     autocorr_ts = PathwayDiversity.compute_autocorrelation(residuals, autocorr_idx_step)
 
-    _plot_early_warning_signals(result, residuals, variance_ts, autocorr_ts, influx_taxes,
+    _plot_early_warning_signals(p, s, residuals, variance_ts, autocorr_ts, time_horizons,
                                 times, variance_time_step, autocorr_time_step)
 
-    return result, residuals, variance_ts, autocorr_ts
+    return p, s, residuals, variance_ts, autocorr_ts
 end
 
 function _plot_bifurcation(roots, influx_options_root)
@@ -161,39 +162,37 @@ function _plot_distance_threshold(s_final, P_init_options, time_horizons, thresh
     savefig("../output/distance_threshold.png")
 end
 
-function _plot_early_warning_signals(result, residuals, variance_ts, autocorr_ts, influx_taxes, times,
+function _plot_early_warning_signals(p, s, residuals, variance_ts, autocorr_ts, time_horizons, times,
         variance_time_step, autocorr_time_step, include_residual = false
 )
-    label = map(influx_tax -> "Influx_tax = $(influx_tax)", influx_taxes)
+    label = map(time_horizon -> "Time horizon = $(time_horizon)", time_horizons)
     xticks = 0:25:length(times)
     xlims = (0, times[end]+1)
 
     selected_index = [1, 2, 3]
     label = reshape(label[selected_index], (1,length(selected_index)))
-    p = result[type=1, influx_tax=selected_index]
-    s = result[type=2, influx_tax=selected_index]
-    residual = residuals[influx_tax=selected_index]
+    s = s[time_horizon=selected_index]
 
     variance_idx_step::Int64 = variance_time_step ÷ step(times)
     autocorr_idx_step::Int64 = autocorr_time_step ÷ step(times)
-    variance = variance_ts[time=(variance_idx_step+1):end, influx_tax=selected_index]
-    autocorr = autocorr_ts[time=(autocorr_idx_step+1):end, influx_tax=selected_index]
+    variance = variance_ts[(variance_idx_step+1):end]
+    autocorr = autocorr_ts[(autocorr_idx_step+1):end]
 
-    plt1 = plot(collect(times), p, label=label, xticks=xticks, ylabel="Amount of Phosphorus",
+    plt1 = plot(collect(times), p, label=false, xticks=xticks, ylabel="Amount of Phosphorus",
                 xlims=xlims, left_margin = 5Plots.mm)
-    plt2 = plot(collect(times), residual, label=false, ylabel="Residuals",
+    plt2 = plot(collect(times), residuals, label=false, ylabel="Residuals",
                 xticks=xticks, xlims=xlims, left_margin = 5Plots.mm)
-    plt3 = plot(collect(times), s, label=false, ylabel="Pathway diversity",
-                xticks=xticks, xlims=xlims, left_margin = 5Plots.mm)
+    plt3 = plot(collect(times), s, label=label, ylabel="Pathway diversity",
+                xticks=xticks, xlims=xlims, left_margin = 5Plots.mm, legend=:bottomleft)
     plt4 = plot(collect((variance_time_step+1):step(times):times[end]), variance, label=false, xticks=xticks,
                 ylabel="Variance", xlims=xlims, left_margin = 10Plots.mm)
     plt5 = plot(collect((autocorr_time_step+1):step(times):times[end]), autocorr, label=false, xticks=xticks,
                 ylabel="Autocorrelation", xlabel="Time (year)", xlims=xlims, left_margin = 10Plots.mm)
 
     if include_residual
-        plot(plt1, plt2, plt3, plt4, plt5, layout=(5,1), legend=:topleft, size=(1000,900), guidefontsize=12)
+        plot(plt1, plt2, plt3, plt4, plt5, layout=(5,1), size=(1000,900), guidefontsize=12)
     else
-        plot(plt1, plt3, plt4, plt5, layout=(4,1), legend=:topleft, size=(1000,900), guidefontsize=12)
+        plot(plt1, plt3, plt4, plt5, layout=(4,1), size=(1000,900), guidefontsize=12)
     end
     savefig("../output/early_warning_signal.png")
 end

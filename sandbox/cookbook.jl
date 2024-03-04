@@ -68,8 +68,6 @@ function distance_basin_threshold()
 
     s_final = PathwayDiversity.run_entropy(P_init_options, influx, decision_step, time_horizons)
 
-    _plot_time_inital_state(s_final, P_init_options, time_horizons)
-
     threshold = PathwayDiversity.get_root(1.3, influx)
     _plot_distance_threshold(s_final, P_init_options, time_horizons, threshold)
     return s_final, threshold
@@ -133,19 +131,6 @@ function _plot_decision_scales(s_final, time_horizons, decision_steps)
     savefig("../output/decision_scales.png")
 end
 
-function _plot_time_inital_state(s_final, P_init_options, time_horizons)
-    label = map(P_init -> "Initial state (P0) = $(P_init)", P_init_options)
-    selected_index = [1, 4, 7, 10, 13, 16, 19, 25]
-
-    s_final_filtered = stack([s_final[i, :] for i in selected_index], dims=1)
-    label = [label[i] for i in selected_index]
-    label = reshape(label, (1,length(selected_index)))
-
-    plot(time_horizons, transpose(s_final_filtered), label=label, legend=:topleft, size=(952,560),
-         ylabel = "Pathway diversity", xlabel = "Time horizon")
-    savefig("../output/time_initial_state.png")
-end
-
 function _plot_distance_threshold(s_final, P_init_options, time_horizons, threshold)
     label = map(t_horizon -> "Time horizon = $(t_horizon)", time_horizons)
     selected_index = [1, 2, 3, 5, 7]
@@ -155,7 +140,7 @@ function _plot_distance_threshold(s_final, P_init_options, time_horizons, thresh
     label = reshape(label, (1,length(selected_index)))
     distance_threshold = threshold .- P_init_options
 
-    plot(distance_threshold, transpose(s_final_filtered), label=label, legend=:topleft, size=(952,600),
+    plot(distance_threshold, transpose(s_final_filtered), label=label, legend=:topright, size=(952,600), xflip = true,
           ylabel="Pathway diversity", xlabel="Distance to threshold", guidefontsize=12, left_margin = 10Plots.mm)
     vline!([0.0], label=false)
 

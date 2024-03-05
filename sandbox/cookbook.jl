@@ -63,10 +63,11 @@ end
 function distance_basin_threshold()
     influx = 0.1
     decision_step = 5.0
-    P_init_options = collect(0:0.1:2.4)
+    P_init_options = collect(0:0.1:3)
     time_horizons = [5.0, 10.0, 15.0, 25.0, 35.0]
 
     s = PathwayDiversity.run_entropy(P_init_options, influx, decision_step, time_horizons)
+    s = PathwayDiversity.normalize_pd(s)
 
     threshold = PathwayDiversity.get_root(1.3, influx)
     distance_threshold = threshold .- P_init_options
@@ -141,9 +142,9 @@ function _plot_distance_threshold(s, distance_threshold, time_horizons)
     label = [label[i] for i in selected_index]
     label = reshape(label, (1,length(selected_index)))
 
-    plot(distance_threshold, s, label=label, legend=:topright, size=(952,600), xflip = true,
+    plot(distance_threshold, s, label=label, legend=:topright, size=(952,600), xflip = true, ylims=(0.0,1.0),
           ylabel="Pathway diversity", xlabel="Distance to threshold", guidefontsize=12, left_margin = 10Plots.mm)
-    vline!([0.0], label=false)
+    vline!([0.0], label=false, color="black")
 
     savefig("../output/distance_threshold.png")
 end

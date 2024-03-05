@@ -1,6 +1,6 @@
 function normalize_pd(time_series::NamedDimsArray)::NamedDimsArray
     for index_time_horizon in 1:1:size(time_series, :time_horizon)
-        time_series[time_horizon=index_time_horizon] /= time_series[time=1,time_horizon=index_time_horizon]
+        time_series[time_horizon=index_time_horizon] /= maximum(time_series[time_horizon=index_time_horizon])
     end
 
     return time_series

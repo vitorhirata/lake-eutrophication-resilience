@@ -44,9 +44,9 @@ function scaling()
     P_init_options = collect(0:0.5:3)
     number_options = collect(10:20:80)
 
-    s_final = PathwayDiversity.run_entropy(P_init_options, influx, decision_step, time_horizon, number_options)
-    _plot_scaling(s_final, P_init_options, number_options)
-    return s_final
+    s = PathwayDiversity.run_entropy(P_init_options, influx, decision_step, time_horizon, number_options)
+    _plot_scaling(s, P_init_options, number_options)
+    return s
 end
 
 function decision_scales()
@@ -55,22 +55,24 @@ function decision_scales()
     decision_steps = [4.0, 6.0, 8.0]
     time_horizons = [8.0, 18.0, 24.0]
 
-    s_final = PathwayDiversity.run_entropy(P_init, influx, decision_steps, time_horizons)
-    _plot_decision_scales(s_final, time_horizons, decision_steps)
-    return s_final
+    s = PathwayDiversity.run_entropy(P_init, influx, decision_steps, time_horizons)
+    _plot_decision_scales(s, time_horizons, decision_steps)
+    return s
 end
 
 function distance_basin_threshold()
     influx = 0.1
     decision_step = 5.0
     P_init_options = collect(0:0.1:2.4)
-    time_horizons = collect(decision_step:decision_step:35.0)
+    time_horizons = [5.0, 10.0, 15.0, 25.0, 35.0]
 
-    s_final = PathwayDiversity.run_entropy(P_init_options, influx, decision_step, time_horizons)
+    s = PathwayDiversity.run_entropy(P_init_options, influx, decision_step, time_horizons)
 
     threshold = PathwayDiversity.get_root(1.3, influx)
-    _plot_distance_threshold(s_final, P_init_options, time_horizons, threshold)
-    return s_final, threshold
+    distance_threshold = threshold .- P_init_options
+
+    _plot_distance_threshold(s, distance_threshold, time_horizons)
+    return s, distance_threshold
 end
 
 function early_warning_signals()
@@ -113,34 +115,33 @@ function _plot_bifurcation(roots, influx_options_root)
     savefig("../output/bifurcation.png")
 end
 
-function _plot_scaling(s_final, P_init_options, number_options)
+function _plot_scaling(s, P_init_options, number_options)
     label = map(P_init -> "Initial condition = $(P_init)", P_init_options)
     label = reshape(label, (1,length(P_init_options)))
 
-    plot(number_options, transpose(s_final), label=label, left_margin = 5Plots.mm, legend=:outerbottomright,
+    plot(number_options, s, label=label, left_margin = 5Plots.mm, legend=:outerbottomright,
          size=(952,560), ylabel = "Pathway diversity", xlabel = "Maximum number of options")
     savefig("../output/scaling.png")
 end
 
-function _plot_decision_scales(s_final, time_horizons, decision_steps)
+function _plot_decision_scales(s, time_horizons, decision_steps)
     label = map(decision_step -> "Time horizon = $(decision_step)", time_horizons)
     label = reshape(label, (1,length(time_horizons)))
 
-    plot(decision_steps, s_final, label = label, legend=:topright, size=(952,560),
-         ylabel = "Pathway diversity", xlabel = "Decision step")
+    plot(decision_steps, s, label = label, legend=:topright, size=(952,560),
+         ylabel = "Pathway diversity", xlabel = "Decision step", guidefontsize=12, left_margin = 10Plots.mm)
     savefig("../output/decision_scales.png")
 end
 
-function _plot_distance_threshold(s_final, P_init_options, time_horizons, threshold)
+function _plot_distance_threshold(s, distance_threshold, time_horizons)
     label = map(t_horizon -> "Time horizon = $(t_horizon)", time_horizons)
-    selected_index = [1, 2, 3, 5, 7]
+    selected_index = [1, 2, 3, 4, 5]
 
-    s_final_filtered = stack([s_final[:, i] for i in selected_index], dims=1)
+    s = s[time_horizon=selected_index]
     label = [label[i] for i in selected_index]
     label = reshape(label, (1,length(selected_index)))
-    distance_threshold = threshold .- P_init_options
 
-    plot(distance_threshold, transpose(s_final_filtered), label=label, legend=:topright, size=(952,600), xflip = true,
+    plot(distance_threshold, s, label=label, legend=:topright, size=(952,600), xflip = true,
           ylabel="Pathway diversity", xlabel="Distance to threshold", guidefontsize=12, left_margin = 10Plots.mm)
     vline!([0.0], label=false)
 

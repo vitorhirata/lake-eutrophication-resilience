@@ -3,16 +3,14 @@ function run_entropy(
     influx::Float64,
     decision_steps::Vector{Float64},
     time_horizons::Vector{Float64},
-)::Matrix{Float64}
-    s_final = zeros(length(decision_steps), length(time_horizons))
+)::NamedDimsArray
+    s = NamedDimsArray{(:decision_step, :time_horizon)}(zeros(length(decision_steps), length(time_horizons)))
 
-    for (idx_decision_step, decision_step) in enumerate(decision_steps)
-        for (idx_time_horizon, time_horizon) in enumerate(time_horizons)
-            number_decision::Int64 = floor(time_horizon / decision_step)
-            s_final[idx_decision_step, idx_time_horizon] = _entropy(P0, influx, decision_step, number_decision)
-        end
+    for (idx_step, step) in enumerate(decision_steps), (idx_time_horizon, time_horizon) in enumerate(time_horizons)
+        number_decision::Int64 = floor(time_horizon / step)
+        s[idx_step, idx_time_horizon] = _entropy(P0, influx, step, number_decision)
     end
-    return s_final
+    return s
 end
 
 function run_entropy(
@@ -20,16 +18,14 @@ function run_entropy(
     influx::Float64,
     decision_step::Float64,
     time_horizons::Vector{Float64},
-)::Matrix{Float64}
-    s_final = zeros(length(P0_options), length(time_horizons))
+)::NamedDimsArray
+    s = NamedDimsArray{(:P0, :time_horizon)}(zeros(length(P0_options), length(time_horizons)))
 
-    for (idx_P0, P0) in enumerate(P0_options)
-        for (idx_time_horizon, time_horizon) in enumerate(time_horizons)
-            number_decision::Int64 = floor(time_horizon / decision_step)
-            s_final[idx_P0, idx_time_horizon] = _entropy(P0, influx, decision_step, number_decision)
-        end
+    for (idx_P0, P0) in enumerate(P0_options), (idx_time_horizon, time_horizon) in enumerate(time_horizons)
+        number_decision::Int64 = floor(time_horizon / decision_step)
+        s[idx_P0, idx_time_horizon] = _entropy(P0, influx, decision_step, number_decision)
     end
-    return s_final
+    return s
 end
 
 function run_entropy(
@@ -38,16 +34,13 @@ function run_entropy(
     decision_step::Float64,
     time_horizon::Float64,
     number_options::Vector{Int64}
-)::Matrix{Float64}
-    s_final = zeros(length(P0_options), length(number_options))
+)::NamedDimsArray
+    s = NamedDimsArray{(:number_options, :P0)}(zeros(length(number_options), length(P0_options)))
     number_decision::Int64 = floor(time_horizon / decision_step)
 
-    for (idx_P0, P0) in enumerate(P0_options)
-        for (idx_number_option, number_option) in enumerate(number_options)
-            s_final[idx_P0, idx_number_option] =
-            _entropy(P0, influx, decision_step, number_decision, true, number_option) /
-            (number_decision * log(number_option))
-        end
+    for (idx_P0, P0) in enumerate(P0_options), (idx_number_option, number_option) in enumerate(number_options)
+        s[idx_number_option, idx_P0] = _entropy(P0, influx, decision_step, number_decision, true, number_option)
+        s[idx_number_option, idx_P0] /= (number_decision * log(number_option))
     end
-    return s_final
+    return s
 end

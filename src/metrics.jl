@@ -1,3 +1,12 @@
+function cross_threshold(time_series::NamedDimsArray, times::StepRangeLen{Float64},
+    base_influx::Float64, influx_tax::Float64, I_step::Float64 = 1.0
+)
+    influx_ts = [base_influx + influx_tax * (time ÷ I_step) for time in times]
+    thresholds = map(influx -> get_root(1.3, influx), influx_ts)
+    first_cross = findfirst(item -> item > 0, time_series - thresholds)
+    return first_cross
+end
+
 function max_kendall_tau_idx(time_series::NamedDimsArray, times::StepRangeLen{Float64})::Tuple{Int64, Float64}
     kendall_range = _kendall_range(time_series, times)
     times = collect(times)

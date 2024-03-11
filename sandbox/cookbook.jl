@@ -98,7 +98,7 @@ function early_warning_signals()
     autocorr_idx_step::Int64 = autocorr_time_step ÷ step(times)
     autocorr_ts = PathwayDiversity.compute_autocorrelation(residuals, autocorr_idx_step)
 
-    max_points = [nothing,
+    max_points = [PathwayDiversity.cross_threshold(p, times, influx, influx_tax),
                   [PathwayDiversity.max_kendall_tau_idx(s[time_horizon=idx], times) for idx in 1:3],
                   PathwayDiversity.max_kendall_tau_idx(variance_ts, times),
                   PathwayDiversity.max_kendall_tau_idx(autocorr_ts, times)]
@@ -172,10 +172,12 @@ function _plot_early_warning_signals(p, s, residuals, variance_ts, autocorr_ts, 
 
     plt1 = plot(collect(times), p, label=false, xticks=xticks, ylabel="Amount of Phosphorus",
                 xlims=xlims, left_margin = 5Plots.mm)
+    vline!([times[tipping_points[1]]], label="Tipping point", color="black", lw=2)
     plt2 = plot(collect(times), residuals, label=false, ylabel="Residuals",
                 xticks=xticks, xlims=xlims, left_margin = 5Plots.mm)
     plt3 = plot(collect(times), s, label=label, ylabel="Pathway diversity",
                 xticks=xticks, xlims=xlims, left_margin = 5Plots.mm, legend=:bottomleft)
+    vline!([times[tipping_points[1]]], label=false, color="black", lw=2)
     for horizon in selected_index
         scatter!([times[max_points[2][horizon][1]]], [s[time=max_points[2][horizon][1], time_horizon=horizon]],
                  label="Kendall-τ=$(round(max_points[2][horizon][2]; digits=2))", markerstrokewidth=0, color=horizon)
@@ -184,10 +186,12 @@ function _plot_early_warning_signals(p, s, residuals, variance_ts, autocorr_ts, 
                 ylabel="Variance", xlims=xlims, left_margin = 10Plots.mm)
     scatter!([times[max_points[3][1]]], [variance[max_points[3][1]-(variance_idx_step+1)]],
              label="Kendall-τ=$(round(max_points[3][2]; digits=2))", markerstrokewidth=0, color=1)
+    vline!([times[tipping_points[1]]], label=false, color="black", lw=2)
     plt5 = plot(collect((autocorr_time_step+1):step(times):times[end]), autocorr, label=false, xticks=xticks,
                 ylabel="Autocorrelation", xlabel="Time (year)", xlims=xlims, left_margin = 10Plots.mm)
     scatter!([times[max_points[4][1]]], [autocorr[max_points[4][1]-(autocorr_idx_step+1)]],
              label="Kendall-τ=$(round(max_points[4][2]; digits=2))", markerstrokewidth=0, color=1)
+    vline!([times[tipping_points[1]]], label=false, color="black", lw=2)
 
     if include_residual
         plot(plt1, plt2, plt3, plt4, plt5, layout=(5,1), size=(1000,900), guidefontsize=12)

@@ -8,9 +8,9 @@ using Loess
 using Roots
 using NamedDims
 
-include("common.jl")
-include("scenario.jl")
-include("static_entropy.jl")
+include("base.jl")
+include("time_series_simulation.jl")
+include("static_simulation.jl")
 include("metrics.jl")
 
 end

@@ -7,7 +7,6 @@ function run_scenario(
         time_horizons::Vector{Float64},
         I_step::Float64 = 1.0
 )::Tuple{NamedDimsArray, NamedDimsArray}
-
     p = NamedDimsArray{(:time,)}(zeros(length(times)))
     s = NamedDimsArray{(:time, :time_horizon)}(zeros(length(times), length(time_horizons)))
     number_decision::Vector{Int64} = map(time_horizon -> floor(time_horizon / decision_step), time_horizons)
@@ -23,6 +22,7 @@ function run_scenario(
         if t0 % I_step == 0
             I += I_tax
         end
+        t0 % 20 == 0 && println("Finished running $(t0) time step")
     end
 
     return p, s

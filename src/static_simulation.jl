@@ -10,6 +10,7 @@ function run_entropy(
     for (idx_P0, P0) in enumerate(P0_options), (idx_time_horizon, time_horizon) in enumerate(time_horizons)
         number_decision::Int64 = floor(time_horizon / decision_step)
         s[idx_P0, idx_time_horizon] = _entropy(P0, influx, decision_step, number_decision)
+        time_horizon == time_horizons[end] && P0 % 0.5 == 0 && println("Finished model for P0=$(P0)")
     end
     return s
 end
@@ -28,6 +29,7 @@ function run_entropy(
     for (idx_P0, P0) in enumerate(P0_options), (idx_number_option, number_option) in enumerate(number_options)
         s[idx_number_option, idx_P0] = _entropy(P0, influx, decision_step, number_decision, true, number_option)
         s[idx_number_option, idx_P0] /= (number_decision * log(number_option))
+        number_option == number_options[end] && P0 % 1.0 == 0 && println("Finished model for P0=$(P0)")
     end
     return s
 end
@@ -44,6 +46,7 @@ function run_entropy(
     for (idx_step, step) in enumerate(decision_steps), (idx_time_horizon, time_horizon) in enumerate(time_horizons)
         number_decision::Int64 = floor(time_horizon / step)
         s[idx_step, idx_time_horizon] = _entropy(P0, influx, step, number_decision)
+        time_horizon == time_horizons[end] && println("Finished model for P0=$(P0)")
     end
     return s
 end

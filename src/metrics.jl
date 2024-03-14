@@ -1,3 +1,11 @@
+function finite_difference(time_series::NamedDimsArray, interval::Float64)::NamedDimsArray
+    result = NamedDimsArray{(:P0, :time_horizon)}(zeros(size(time_series, :P0)-1, size(time_series, :time_horizon)))
+    for horizon_idx in 1:size(time_series, :time_horizon)
+        result[time_horizon=horizon_idx] = abs.(diff(parent(time_series[time_horizon=horizon_idx]))) / interval
+    end
+    return result
+end
+
 function threshold_points(p::NamedDimsArray, s::NamedDimsArray, times::StepRangeLen{Float64},
         variance::NamedDimsArray, autocorrelation::NamedDimsArray,
         base_influx::Float64, influx_tax::Float64, I_step::Float64 = 1.0

@@ -63,17 +63,18 @@ end
 function distance_basin_threshold()
     influx = 0.1
     decision_step = 5.0
-    P_init_options = collect(0:0.1:3)
-    time_horizons = [5.0, 10.0, 15.0, 25.0, 35.0]
+    P_init_options = collect(0:0.05:3)
+    time_horizons = [10.0, 20.0, 35.0]
 
     s = PathwayDiversity.run_entropy(P_init_options, influx, decision_step, time_horizons)
     s = PathwayDiversity.normalize_pd(s)
+    s_diff = PathwayDiversity.finite_difference(s, 0.05)
 
     threshold = PathwayDiversity.get_root(1.3, influx)
     distance_threshold = threshold .- P_init_options
 
-    _plot_distance_threshold(s, distance_threshold, time_horizons)
-    return s, distance_threshold
+    _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons)
+    return s, distance_threshold, s_diff
 end
 
 function early_warning_signals()
@@ -137,18 +138,23 @@ function _plot_decision_scales(s, time_horizons, decision_steps)
     savefig("../output/decision_scales.png")
 end
 
-function _plot_distance_threshold(s, distance_threshold, time_horizons)
+function _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons)
     label = map(t_horizon -> "Time horizon = $(t_horizon)", time_horizons)
-    selected_index = [1, 2, 3, 4, 5]
+    selected_index = [1, 2, 3]
 
     s = s[time_horizon=selected_index]
+    s_diff = s_diff[time_horizon=selected_index]
     label = [label[i] for i in selected_index]
     label = reshape(label, (1,length(selected_index)))
 
-    plot(distance_threshold, s, label=label, legend=:topright, size=(952,600), xflip = true, ylims=(0.0,1.0),
-          ylabel="Pathway diversity", xlabel="Distance to threshold", guidefontsize=12, left_margin = 10Plots.mm)
+    plt1 = plot(distance_threshold, s, label=label, legend=:left, xflip = true,
+          ylabel="Pathway diversity", left_margin = 10Plots.mm)
+    vline!([0.0], label=false, color="black")
+    plt2 = plot(distance_threshold[2:end], s_diff, label=label, legend=:left, color=[1 2 3], xflip = true,
+          ylabel="Pathway diversity derivate", xlabel="Distance to threshold", left_margin = 10Plots.mm)
     vline!([0.0], label=false, color="black")
 
+    plot(plt1, plt2, layout=(2,1), size=(1000,1200), guidefontsize=12)
     savefig("../output/distance_threshold.png")
 end
 

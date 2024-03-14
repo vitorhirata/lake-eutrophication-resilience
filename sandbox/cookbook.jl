@@ -86,6 +86,7 @@ function early_warning_signals()
     influx_tax = 0.001
 
     p, s = PathwayDiversity.run_scenario(P_init, influx, influx_tax, times, decision_step, time_horizons)
+
     residuals = PathwayDiversity.detrend(p, times, "loess")
     s = PathwayDiversity.normalize_pd(s)
 

@@ -25,5 +25,9 @@ function run_scenario(
         t0 % 20 == 0 && println("Finished running $(t0) time step")
     end
 
+    timestamp = @sprintf("%.0f", time())
+    base_filename = "../output/$(timestamp)_ews_"
+    writedlm("$(base_filename)p.csv",  p, ',')
+    writedlm("$(base_filename)s.csv",  s, ',')
     return p, s
 end

@@ -1,6 +1,6 @@
 function number_possible_influx(
     P::Float64,
-    max_options::Int64 = 10,
+    max_options::Int64,
     P_threshold::Float64 = 0.4,
     options_in_threshold::Int64 = max_options,
     final_P::Float64 = 3.0

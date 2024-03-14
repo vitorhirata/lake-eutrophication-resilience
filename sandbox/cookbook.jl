@@ -30,7 +30,7 @@ function number_options()
     P = 0.0:0.05:4.0
     number_options = 10
 
-    n_possible_influx = PathwayDiversity.number_possible_influx.(P, number_option)
+    n_possible_influx = PathwayDiversity.number_possible_influx.(P, number_options)
     plot(collect(P), n_possible_influx, label=false, ylabel="Number of options", xlabel="Amount of phosphorus (x)",
          guidefontsize=12)
     savefig("../output/number_options.png")

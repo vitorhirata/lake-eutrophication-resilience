@@ -151,7 +151,7 @@ function _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons)
           ylabel="Pathway diversity", left_margin = 10Plots.mm)
     vline!([0.0], label=false, color="black")
     plt2 = plot(distance_threshold[2:end], s_diff, label=label, legend=:left, color=[1 2 3], xflip = true,
-          ylabel="Pathway diversity derivate", xlabel="Distance to threshold", left_margin = 10Plots.mm)
+          ylabel="Pathway diversity derivative", xlabel="Distance to threshold", left_margin = 10Plots.mm)
     vline!([0.0], label=false, color="black")
 
     plot(plt1, plt2, layout=(2,1), size=(1000,1200), guidefontsize=12)

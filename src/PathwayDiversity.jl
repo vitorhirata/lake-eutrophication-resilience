@@ -10,6 +10,7 @@ using NamedDims
 using Printf
 using DelimitedFiles
 using Plots
+using StatsPlots
 
 include("base.jl")
 include("time_series_simulation.jl")

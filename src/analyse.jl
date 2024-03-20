@@ -29,7 +29,7 @@ function early_warning_signals(
     tipping_points, kendall_tau = PathwayDiversity.threshold_points(p, s, times, variance_ts, autocorr_ts,
                                                                     influx, influx_tax)
 
-    _plot_early_warning_signals(p, s, residuals, variance_ts, autocorr_ts, time_horizons,
+    _plot_early_warning_signals(timestamp, p, s, residuals, variance_ts, autocorr_ts, time_horizons,
                                 times, variance_time_step, autocorr_time_step, tipping_points, kendall_tau)
 end
 
@@ -97,19 +97,19 @@ function distance_basin_threshold(
     threshold = PathwayDiversity.get_root(1.3, influx)
     distance_threshold = threshold .- P_init_options
 
-    _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons)
+    _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons, timestamp)
 end
 
 function decision_scales(decision_steps::Vector{Float64}, time_horizons::Vector{Float64}, timestamp::String)
     s = readdlm("../output/$(timestamp)_decision_scale_s.csv", ',')
     s = NamedDimsArray{(:decision_step, :time_horizon)}(s)
-    _plot_decision_scales(s, time_horizons, decision_steps)
+    _plot_decision_scales(s, time_horizons, decision_steps, timestamp)
 end
 
 function scaling(P_init_options::Vector{Float64}, number_options::Vector{Int64}, timestamp::String)
     s = readdlm("../output/$(timestamp)_scale_initial_s.csv", ',')
     s = NamedDimsArray{(:number_options, :P0)}(s)
-    _plot_scaling(s, P_init_options, number_options)
+    _plot_scaling(s, P_init_options, number_options, timestamp)
 end
 
 function number_options(P_options::StepRangeLen{Float64}, max_number_options::Int64)

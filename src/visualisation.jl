@@ -1,4 +1,4 @@
-function _plot_early_warning_signals(p, s, residuals, variance_ts, autocorr_ts, time_horizons, times,
+function _plot_early_warning_signals(timestamp, p, s, residuals, variance_ts, autocorr_ts, time_horizons, times,
         variance_time_step, autocorr_time_step, tipping_points, kendall_tau, include_residual = false
 )
     label = map(time_horizon -> "Time horizon = $(time_horizon)", time_horizons)
@@ -42,7 +42,7 @@ function _plot_early_warning_signals(p, s, residuals, variance_ts, autocorr_ts, 
     else
         plot(plt1, plt3, plt4, plt5, layout=(4,1), size=(1000,900), guidefontsize=12)
     end
-    savefig("../output/early_warning_signal.png")
+    savefig("../output/$(timestamp)_early_warning_signal.png")
 end
 
 function _plot_kendall_taus(kendall_taus, time_horizons)
@@ -62,7 +62,7 @@ function _plot_kendall_taus(kendall_taus, time_horizons)
     savefig("../output/kendall_tau.png")
 end
 
-function _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons)
+function _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons, timestamp)
     label = map(t_horizon -> "Time horizon = $(t_horizon)", time_horizons)
     selected_index = [1, 2, 3]
 
@@ -79,26 +79,26 @@ function _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons)
     vline!([0.0], label=false, color="black")
 
     plot(plt1, plt2, layout=(2,1), size=(1000,1200), guidefontsize=12)
-    savefig("../output/distance_threshold.png")
+    savefig("../output/$(timestamp)_distance_threshold.png")
 end
 
-function _plot_decision_scales(s, time_horizons, decision_steps)
+function _plot_decision_scales(s, time_horizons, decision_steps, timestamp)
     label = map(decision_step -> "Time horizon = $(decision_step)", time_horizons)
     label = reshape(label, (1,length(time_horizons)))
 
     plot(decision_steps, s, label = label, legend=:topright, size=(952,560),
          ylabel = "Pathway diversity", xlabel = "Decision step", guidefontsize=12, left_margin = 10Plots.mm)
-    savefig("../output/decision_scales.png")
+    savefig("../output/$(timestamp)_decision_scales.png")
 end
 
 
-function _plot_scaling(s, P_init_options, number_options)
+function _plot_scaling(s, P_init_options, number_options, timestamp)
     label = map(P_init -> "Initial condition = $(P_init)", P_init_options)
     label = reshape(label, (1,length(P_init_options)))
 
     plot(number_options, s, label=label, left_margin = 5Plots.mm, legend=:outerbottomright,
          size=(952,560), ylabel = "Pathway diversity", xlabel = "Maximum number of options")
-    savefig("../output/scaling.png")
+    savefig("../output/$(timestamp)_scaling.png")
 end
 
 function _plot_number_option(n_possible_influx, P_options)

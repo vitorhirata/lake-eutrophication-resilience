@@ -111,3 +111,19 @@ function scaling(P_init_options::Vector{Float64}, number_options::Vector{Int64},
     s = NamedDimsArray{(:number_options, :P0)}(s)
     _plot_scaling(s, P_init_options, number_options)
 end
+
+function number_options(P_options::StepRangeLen{Float64}, max_number_options::Int64)
+    n_possible_influx = PathwayDiversity.number_possible_influx.(P_options, max_number_options)
+    _plot_number_option(n_possible_influx, P_options)
+end
+
+function bifurcation(influx_options_root::Vector{Float64})
+    roots = zeros(3, length(influx_options_root))
+
+    for (index, influx) in enumerate(influx_options_root)
+        roots[1, index] = PathwayDiversity.get_root(0.1, influx)
+        roots[2, index] = PathwayDiversity.get_root(1.3, influx)
+        roots[3, index] = PathwayDiversity.get_root(2.7, influx)
+    end
+    _plot_bifurcation(roots, influx_options_root)
+end

@@ -100,3 +100,22 @@ function _plot_scaling(s, P_init_options, number_options)
          size=(952,560), ylabel = "Pathway diversity", xlabel = "Maximum number of options")
     savefig("../output/scaling.png")
 end
+
+function _plot_number_option(n_possible_influx, P_options)
+    plot(collect(P_options), n_possible_influx, label=false, ylabel="Number of options",
+         xlabel="Amount of phosphorus (x)", guidefontsize=12)
+    savefig("../output/number_options.png")
+
+end
+
+function _plot_bifurcation(roots, influx_options_root)
+    lim1 = 19
+    lim2 = 174
+    plot(influx_options_root[lim1:end], roots[3, lim1:end], label="Eutrophicated stable state")
+    plot!(influx_options_root[lim1:lim2], roots[2, lim1:lim2], label="Instable state")
+    plot!(influx_options_root[1:lim2], roots[1, 1:lim2], label="Clean stable state")
+
+    hline!([0.4], label="Number of options drop", legend=:bottomright, size=(952,560),
+           ylabel = "Fixed points (P*)", xlabel = "Influx (I)", left_margin = 10Plots.mm)
+    savefig("../output/bifurcation.png")
+end

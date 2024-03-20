@@ -15,26 +15,16 @@ function all()
 end
 
 function bifurcation()
-    influx_options_root = influx_options_root2 = range(0.00, 0.3,  step = 0.001) |> collect
-    roots = zeros(3, length(influx_options_root)  )
+    influx_options_root = collect(range(0.00, 0.3,  step = 0.001))
 
-    for (index, influx) in enumerate(influx_options_root)
-        roots[1, index] = PathwayDiversity.get_root(0.1, influx)
-        roots[2, index] = PathwayDiversity.get_root(1.3, influx)
-        roots[3, index] = PathwayDiversity.get_root(2.7, influx)
-    end
-    _plot_bifurcation(roots, influx_options_root)
-    return roots
+    PathwayDiversity.bifurcation(influx_options_root)
 end
 
 function number_options()
-    P = 0.0:0.05:4.0
-    number_options = 10
+    P_options = 0.0:0.05:4.0
+    max_number_options = 10
 
-    n_possible_influx = PathwayDiversity.number_possible_influx.(P, number_options)
-    plot(collect(P), n_possible_influx, label=false, ylabel="Number of options", xlabel="Amount of phosphorus (x)",
-         guidefontsize=12)
-    savefig("../output/number_options.png")
+    PathwayDiversity.number_options(P_options, max_number_options)
 end
 
 function scaling()
@@ -96,16 +86,4 @@ function kendall_taus()
         timestamps[run] = PathwayDiversity.run_scenario(; parameters...)
     end
     PathwayDiversity.early_warning_kendall_taus(timestamps; parameters...)
-end
-
-function _plot_bifurcation(roots, influx_options_root)
-    lim1 = 19
-    lim2 = 174
-    plot(influx_options_root[lim1:end], roots[3, lim1:end], label="Eutrophicated stable state")
-    plot!(influx_options_root[lim1:lim2], roots[2, lim1:lim2], label="Instable state")
-    plot!(influx_options_root[1:lim2], roots[1, 1:lim2], label="Clean stable state")
-
-    hline!([0.4], label="Number of options drop", legend=:bottomright, size=(952,560),
-           ylabel = "Fixed points (P*)", xlabel = "Influx (I)")
-    savefig("../output/bifurcation.png")
 end

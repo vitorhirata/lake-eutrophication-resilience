@@ -1,8 +1,6 @@
 using Revise
 using Infiltrator
 using PathwayDiversity
-using Plots
-using NamedDims
 
 function all()
     bifurcation()

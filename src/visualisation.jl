@@ -61,3 +61,42 @@ function _plot_kendall_taus(kendall_taus, time_horizons)
     plot(plt1, plt2, layout=(2,1), size=(600,500), guidefontsize=12)
     savefig("../output/kendall_tau.png")
 end
+
+function _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons)
+    label = map(t_horizon -> "Time horizon = $(t_horizon)", time_horizons)
+    selected_index = [1, 2, 3]
+
+    s = s[time_horizon=selected_index]
+    s_diff = s_diff[time_horizon=selected_index]
+    label = [label[i] for i in selected_index]
+    label = reshape(label, (1,length(selected_index)))
+
+    plt1 = plot(distance_threshold, s, label=label, legend=:left, xflip = true,
+          ylabel="Pathway diversity", left_margin = 10Plots.mm)
+    vline!([0.0], label=false, color="black")
+    plt2 = plot(distance_threshold[2:end], s_diff, label=label, legend=:left, color=[1 2 3], xflip = true,
+          ylabel="Pathway diversity derivative", xlabel="Distance to threshold", left_margin = 10Plots.mm)
+    vline!([0.0], label=false, color="black")
+
+    plot(plt1, plt2, layout=(2,1), size=(1000,1200), guidefontsize=12)
+    savefig("../output/distance_threshold.png")
+end
+
+function _plot_decision_scales(s, time_horizons, decision_steps)
+    label = map(decision_step -> "Time horizon = $(decision_step)", time_horizons)
+    label = reshape(label, (1,length(time_horizons)))
+
+    plot(decision_steps, s, label = label, legend=:topright, size=(952,560),
+         ylabel = "Pathway diversity", xlabel = "Decision step", guidefontsize=12, left_margin = 10Plots.mm)
+    savefig("../output/decision_scales.png")
+end
+
+
+function _plot_scaling(s, P_init_options, number_options)
+    label = map(P_init -> "Initial condition = $(P_init)", P_init_options)
+    label = reshape(label, (1,length(P_init_options)))
+
+    plot(number_options, s, label=label, left_margin = 5Plots.mm, legend=:outerbottomright,
+         size=(952,560), ylabel = "Pathway diversity", xlabel = "Maximum number of options")
+    savefig("../output/scaling.png")
+end

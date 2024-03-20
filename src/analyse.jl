@@ -82,3 +82,32 @@ function early_warning_kendall_taus(
 
     _plot_kendall_taus(kendall_taus, time_horizons)
 end
+
+function distance_basin_threshold(
+        P_init_options::Vector{Float64},
+        influx::Float64,
+        time_horizons::Vector{Float64},
+        timestamp::String
+)
+    s = readdlm("../output/$(timestamp)_distance_basin_s.csv", ',')
+    s = NamedDimsArray{(:P0, :time_horizon)}(s)
+    s = PathwayDiversity.normalize_pd(s)
+    s_diff = PathwayDiversity.finite_difference(s, 0.05)
+
+    threshold = PathwayDiversity.get_root(1.3, influx)
+    distance_threshold = threshold .- P_init_options
+
+    _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons)
+end
+
+function decision_scales(decision_steps::Vector{Float64}, time_horizons::Vector{Float64}, timestamp::String)
+    s = readdlm("../output/$(timestamp)_decision_scale_s.csv", ',')
+    s = NamedDimsArray{(:decision_step, :time_horizon)}(s)
+    _plot_decision_scales(s, time_horizons, decision_steps)
+end
+
+function scaling(P_init_options::Vector{Float64}, number_options::Vector{Int64}, timestamp::String)
+    s = readdlm("../output/$(timestamp)_scale_initial_s.csv", ',')
+    s = NamedDimsArray{(:number_options, :P0)}(s)
+    _plot_scaling(s, P_init_options, number_options)
+end

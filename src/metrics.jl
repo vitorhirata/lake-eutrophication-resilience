@@ -96,19 +96,30 @@ function _cross_threshold(time_series::NamedDimsArray, times::StepRangeLen{Float
     return first_cross
 end
 
-function _max_kendall_tau(time_series::NamedDimsArray, times::StepRangeLen{Float64})::Tuple{Int64, Float64}
-    kendall_range = _kendall_range(time_series, times)
+function _max_kendall_tau(
+    time_series::NamedDimsArray, times::StepRangeLen{Float64}, kendall_threshold::Float64 = 0.55
+)::Tuple{Int64, Float64}
+    begin_point, kendall_range = _kendall_range(time_series, times)
     times = collect(times)
     time_series = parent(time_series)
 
-    kendall = [corkendall(times[idx:end], time_series[idx:end]) for idx in kendall_range]
-    max_kendall = findmax(abs.(kendall))
-    return kendall_range[max_kendall[2]], round(max_kendall[1]; digits=2)
-end
+    kendall = [corkendall(times[begin_point:idx], time_series[begin_point:idx]) for idx in kendall_range]
+    idx_threshold = findfirst(x -> x > kendall_threshold, abs.(kendall))
 
-function _kendall_range(time_series::NamedDimsArray, times::StepRangeLen{Float64})::StepRangeLen{Int64}
-    begin_kendall::Int64 = findfirst(x -> x != 0, time_series)
-    step_kendall::Int64 = (2 / step(times))
+    if idx_threshold == nothing
+        return length(times), round(kendall[end]; digits=2)
+    end
+    return kendall_range[idx_threshold], round(kendall[idx_threshold]; digits=2)
+end
+#    max_kendall = findmax(abs.(kendall))
+#    return kendall_range[max_kendall[2]], round(max_kendall[1]; digits=2)
+
+function _kendall_range(
+    time_series::NamedDimsArray, times::StepRangeLen{Float64}, kendell_shift::Int64 = 20
+)::Tuple{Int64, StepRangeLen{Int64}}
+    step_kendall::Int64 = (1 / step(times))
+    begin_point::Int64 = findfirst(x -> x != 0, time_series)
+    begin_kendall::Int64 = begin_point + kendell_shift * step_kendall
     end_kendall::Int64 = length(time_series) - 2 * step_kendall
-    return begin_kendall:step_kendall:end_kendall
+    return begin_point, begin_kendall:step_kendall:end_kendall
 end

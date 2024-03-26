@@ -17,12 +17,12 @@ function early_warning_signals(
     s = PathwayDiversity.normalize_pd(s)
 
     # Compute variance
-    variance_time_step = 20
+    variance_time_step = 30
     variance_idx_step::Int64 = variance_time_step ÷ step(times)
     variance_ts = PathwayDiversity.compute_variance(residuals, variance_idx_step)
 
     # Compute autocorrelation
-    autocorr_time_step = 20
+    autocorr_time_step = 30
     autocorr_idx_step::Int64 = autocorr_time_step ÷ step(times)
     autocorr_ts = PathwayDiversity.compute_autocorrelation(residuals, autocorr_idx_step)
 

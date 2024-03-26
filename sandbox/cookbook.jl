@@ -59,7 +59,7 @@ end
 function early_warning_signals()
     parameters = Dict(
         :P_init => 0.27,
-        :times => 1:0.125:75,
+        :times => 1:0.125:80,
         :time_horizons => [5.0, 10.0, 20.0],
         :decision_step => 5.0,
         :influx => 0.03,
@@ -73,7 +73,7 @@ function kendall_taus()
     repetitions = 50
     parameters = Dict(
         :P_init => 0.27,
-        :times => 1:0.125:75,
+        :times => 1:0.125:80,
         :time_horizons => [5.0, 10.0, 20.0],
         :decision_step => 5.0,
         :influx => 0.03,

@@ -11,6 +11,7 @@ using Printf
 using DelimitedFiles
 using Plots
 using StatsPlots
+using Peaks
 
 include("base.jl")
 include("time_series_simulation.jl")

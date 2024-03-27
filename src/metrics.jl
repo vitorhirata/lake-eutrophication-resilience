@@ -24,6 +24,19 @@ function threshold_points(p::NamedDimsArray, s::NamedDimsArray, times::StepRange
     return points, kendall_tau
 end
 
+function find_peaks(time_series::NamedDimsArray, time::Vector{Float64})::Vector{Int64}
+    smooth = NamedDimsArray{(:P0, :time_horizon)}(zeros(size(time_series, :P0), size(time_series, :time_horizon)))
+    peaks_idx = zeros(Int64, size(time_series, :time_horizon))
+
+    for horizon_idx in 1:size(time_series, :time_horizon)
+        model = loess(time, parent(time_series[time_horizon=horizon_idx]), span=0.5)
+        smooth[time_horizon=horizon_idx] = predict(model, time)
+        pks = findmaxima(smooth[time_horizon=horizon_idx])
+        peaks_idx[horizon_idx] = pks[:indices][1]
+    end
+    return peaks_idx
+end
+
 function normalize_pd(time_series::NamedDimsArray)::NamedDimsArray
     for index_time_horizon in 1:1:size(time_series, :time_horizon)
         time_series[time_horizon=index_time_horizon] /= maximum(time_series[time_horizon=index_time_horizon])

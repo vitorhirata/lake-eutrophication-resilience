@@ -96,8 +96,9 @@ function distance_basin_threshold(
 
     threshold = PathwayDiversity.get_root(1.3, influx)
     distance_threshold = threshold .- P_init_options
+    peaks_idx = PathwayDiversity.find_peaks(s_diff, distance_threshold[2:end])
 
-    _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons, timestamp)
+    _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons, timestamp, peaks_idx)
 end
 
 function decision_scales(decision_steps::Vector{Float64}, time_horizons::Vector{Float64}, timestamp::String)

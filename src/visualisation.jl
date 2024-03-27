@@ -62,7 +62,7 @@ function _plot_kendall_taus(kendall_taus, time_horizons)
     savefig("../output/kendall_tau.png")
 end
 
-function _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons, timestamp)
+function _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons, timestamp, peaks_idx)
     label = map(t_horizon -> "Time horizon = $(t_horizon)", time_horizons)
     selected_index = [1, 2, 3]
 
@@ -70,12 +70,14 @@ function _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons, 
     s_diff = s_diff[time_horizon=selected_index]
     label = [label[i] for i in selected_index]
     label = reshape(label, (1,length(selected_index)))
+    peak_values = [s_diff[P0=peak_idx, time_horizon=idx] for (idx,peak_idx) in enumerate(peaks_idx)]
 
     plt1 = plot(distance_threshold, s, label=label, legend=:left, xflip = true,
           ylabel="Pathway diversity", left_margin = 10Plots.mm)
     vline!([0.0], label=false, color="black")
     plt2 = plot(distance_threshold[2:end], s_diff, label=label, legend=:left, color=[1 2 3], xflip = true,
           ylabel="Pathway diversity derivative", xlabel="Distance to threshold", left_margin = 10Plots.mm)
+    scatter!(distance_threshold[2:end][peaks_idx], peak_values, label=false, markerstrokewidth=0, color=[1, 2, 3])
     vline!([0.0], label=false, color="black")
 
     plot(plt1, plt2, layout=(2,1), size=(1000,1200), guidefontsize=12)

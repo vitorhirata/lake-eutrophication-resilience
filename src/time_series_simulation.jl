@@ -8,11 +8,13 @@ function run_scenario(;
         influx_step::Float64 = 1.0
 )::String
     p = NamedDimsArray{(:time,)}(zeros(length(times)))
+    influx_ts = NamedDimsArray{(:time,)}(zeros(length(times)))
     s = NamedDimsArray{(:time, :time_horizon)}(zeros(length(times), length(time_horizons)))
     number_decision::Vector{Int64} = map(time_horizon -> floor(time_horizon / decision_step), time_horizons)
 
     for (index_t, t0) in enumerate(times)
         p[index_t] = P_init
+        influx_ts[index_t] = influx
 
         for (index_h, time_horizon) in enumerate(time_horizons)
             s[index_t, index_h] = _entropy(P_init, influx, decision_step, number_decision[index_h], false)
@@ -28,6 +30,7 @@ function run_scenario(;
     timestamp = @sprintf("%.0f", time())
     base_filename = "../output/$(timestamp)_ews_"
     writedlm("$(base_filename)p.csv",  p, ',')
+    writedlm("$(base_filename)influx.csv",  influx_ts, ',')
     writedlm("$(base_filename)s.csv",  s, ',')
     return timestamp
 end

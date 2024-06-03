@@ -8,13 +8,15 @@ function early_warning_signals(
         time_horizons::Vector{Float64}
 )
 
-    p = readdlm("../output/$(timestamp)_ews_p.csv", ',')
-    p = NamedDimsArray{(:time,)}(vec(p))
-    s = readdlm("../output/$(timestamp)_ews_s.csv", ',')
-    s = NamedDimsArray{(:time, :time_horizon)}(s)
+    p_ts = readdlm("../output/$(timestamp)_ews_p.csv", ',')
+    p_ts = NamedDimsArray{(:time,)}(vec(p_ts))
+    influx_ts = readdlm("../output/$(timestamp)_ews_influx.csv", ',')
+    influx_ts = NamedDimsArray{(:time,)}(vec(influx_ts))
+    s_ts = readdlm("../output/$(timestamp)_ews_s.csv", ',')
+    s_ts = NamedDimsArray{(:time, :time_horizon)}(s_ts)
 
-    residuals = PathwayDiversity.detrend(p, times, "loess")
-    s = PathwayDiversity.normalize_pd(s)
+    residuals = PathwayDiversity.detrend(p_ts,times, "loess")
+    s_ts = PathwayDiversity.normalize_pd(s_ts)
 
     # Compute variance
     variance_time_step = 30
@@ -26,11 +28,18 @@ function early_warning_signals(
     autocorr_idx_step::Int64 = autocorr_time_step ÷ step(times)
     autocorr_ts = PathwayDiversity.compute_autocorrelation(residuals, autocorr_idx_step)
 
-    tipping_points, kendall_tau = PathwayDiversity.threshold_points(p, s, times, variance_ts, autocorr_ts,
+    # Compute distance to threshold
+    thresholds = NamedDimsArray{(:time,)}(zeros(length(p_ts)))
+    for (idx, infl) in enumerate(influx_ts)
+        thresholds[idx] = p_ts[idx] - PathwayDiversity.get_root(1.3, infl)
+    end
+
+    tipping_points, kendall_tau = PathwayDiversity.threshold_points(p_ts,s_ts, times, variance_ts, autocorr_ts,
                                                                     influx, influx_tax)
 
-    _plot_early_warning_signals(timestamp, p, s, residuals, variance_ts, autocorr_ts, time_horizons,
-                                times, variance_time_step, autocorr_time_step, tipping_points, kendall_tau)
+    _plot_early_warning_signals(timestamp, p_ts,s_ts, residuals, variance_ts, autocorr_ts, influx_ts, thresholds,
+                                time_horizons, times, variance_time_step, autocorr_time_step, tipping_points,
+                                kendall_tau)
 end
 
 function distance_basin_threshold(

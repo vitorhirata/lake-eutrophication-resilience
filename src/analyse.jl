@@ -113,6 +113,13 @@ function scaling(P_init_options::Vector{Float64}, number_options::Vector{Int64},
     _plot_scaling(s, P_init_options, number_options, timestamp)
 end
 
+function number_options_simulation(
+    P0_options::Vector{Float64}, influx_options::Vector{Float64}, max_number_options::Int64
+)
+    n_options = PathwayDiversity.run_number_options_simulation(P0_options, influx_options, max_number_options)
+    _plot_number_options_simulation(P0_options, influx_options, n_options)
+end
+
 function number_options(P_options::StepRangeLen{Float64}, max_number_options::Int64)
     n_possible_influx = PathwayDiversity.number_possible_influx.(P_options, max_number_options)
     _plot_number_option(n_possible_influx, P_options)

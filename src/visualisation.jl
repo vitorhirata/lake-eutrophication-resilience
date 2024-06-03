@@ -103,6 +103,12 @@ function _plot_scaling(s, P_init_options, number_options, timestamp)
     savefig("../output/$(timestamp)_scaling.png")
 end
 
+function _plot_number_options_simulation(P0_options, influx_options, n_options)
+    heatmap(influx_options, P0_options, n_options, label=false, ylabel="Amount of phosphorus", xlabel="Influx",
+            guidefontsize=12, colorbar_title="Future number of options", left_margin = 5Plots.mm, size=(952,560))
+    savefig("../output/number_options_simulation.png")
+end
+
 function _plot_number_option(n_possible_influx, P_options)
     plot(collect(P_options), n_possible_influx, label=false, ylabel="Number of options",
          xlabel="Amount of phosphorus (x)", guidefontsize=12)

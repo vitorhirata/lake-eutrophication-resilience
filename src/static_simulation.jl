@@ -62,3 +62,20 @@ function run_entropy(
     writedlm("$(base_filename)s.csv",  s, ',')
     return timestamp
 end
+
+# evolve one time step and compute the number of options available for each P0 and influx.
+function run_number_options_simulation(
+    P0_options::Vector{Float64},
+    influx_options::Vector{Float64},
+    max_number_options::Int64 = 20,
+    decision_step::Float64 = 1.0,
+    deterministic::Bool = true
+)
+    result = NamedDimsArray{(:P0, :influx)}(zeros(length(P0_options), length(influx_options)))
+
+    for (idx_P0, P0) in enumerate(P0_options), (idx_influx, influx) in enumerate(influx_options)
+        new_P = _evolve_step(P0, influx, decision_step, deterministic)
+        result[P0=idx_P0, influx=idx_influx] = number_possible_influx(new_P, max_number_options)
+    end
+    return result
+end

@@ -5,6 +5,7 @@ using PathwayDiversity
 function all()
     bifurcation()
     number_options()
+    number_options_simulation()
     scaling()
     decision_scales()
     distance_basin_threshold()
@@ -23,6 +24,14 @@ function number_options()
     max_number_options = 10
 
     PathwayDiversity.number_options(P_options, max_number_options)
+end
+
+function number_options_simulation()
+    P0_options = collect(0:0.01:3.5)
+    influx_options = collect(range(0.00, 0.3, step = 0.001))
+    max_number_options = 20
+
+    PathwayDiversity.number_options_simulation(P0_options, influx_options, max_number_options)
 end
 
 function scaling()

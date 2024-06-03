@@ -24,23 +24,23 @@ function _plot_early_warning_signals(timestamp, p, s, residuals, variance_ts, au
     vline!([times[tipping_points[:p]]], label=false, color="black", lw=2)
     for horizon in selected_index
         scatter!([times[tipping_points[:s][horizon]]], [s[time=tipping_points[:s][horizon], time_horizon=horizon]],
-                 label="Kendall-τ=$(kendall_tau[:s][horizon])", markerstrokewidth=0, color=horizon)
+                 label=false, markerstrokewidth=0, color=horizon)
     end
     plt4 = plot(collect((variance_time_step+1):step(times):times[end]), variance, label=false, xticks=xticks,
                 ylabel="Variance", xlims=xlims, left_margin = 10Plots.mm)
     scatter!([times[tipping_points[:var]]], [variance[tipping_points[:var]-(variance_idx_step+1)]],
-             label="Kendall-τ=$(kendall_tau[:var])", markerstrokewidth=0, color=1)
+             label=false, markerstrokewidth=0, color=1)
     vline!([times[tipping_points[:p]]], label=false, color="black", lw=2)
     plt5 = plot(collect((autocorr_time_step+1):step(times):times[end]), autocorr, label=false, xticks=xticks,
                 ylabel="Autocorrelation", xlabel="Time (year)", xlims=xlims, left_margin = 10Plots.mm)
     scatter!([times[tipping_points[:autocorr]]], [autocorr[tipping_points[:autocorr]-(autocorr_idx_step+1)]],
-             label="Kendall-τ=$(kendall_tau[:autocorr])", markerstrokewidth=0, color=1)
+             label=false, markerstrokewidth=0, color=1)
     vline!([times[tipping_points[:p]]], label=false, color="black", lw=2)
 
     if include_residual
-        plot(plt1, plt2, plt3, plt4, plt5, layout=(5,1), size=(1000,900), guidefontsize=12)
+        plot(plt1, plt2, plt3, plt4, plt5, layout=(5,1), size=(1000,1000), guidefontsize=12)
     else
-        plot(plt1, plt3, plt4, plt5, layout=(4,1), size=(1000,900), guidefontsize=12)
+        plot(plt1, plt3, plt4, plt5, layout=(4,1), size=(1000,1000), guidefontsize=12)
     end
     savefig("../output/$(timestamp)_early_warning_signal.png")
 end

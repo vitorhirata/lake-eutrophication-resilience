@@ -45,23 +45,6 @@ function _plot_early_warning_signals(timestamp, p, s, residuals, variance_ts, au
     savefig("../output/$(timestamp)_early_warning_signal.png")
 end
 
-function _plot_kendall_taus(kendall_taus, time_horizons)
-    labels = ["variance", "autocorrelation"]
-    for time_horizon in time_horizons
-        push!(labels, "PD_$(time_horizon)")
-    end
-    xticks = (1:(2+length(time_horizons)), labels)
-
-    plt1 = boxplot(parent(kendall_taus[type=1]), label=false, ylabel="Tipping point time")
-    plot!(xticks=xticks)
-
-    plt2 = boxplot(parent(kendall_taus[type=2]), label=false, ylabel="Kendall-τ value")
-    plot!(xticks=xticks)
-
-    plot(plt1, plt2, layout=(2,1), size=(600,500), guidefontsize=12)
-    savefig("../output/kendall_tau.png")
-end
-
 function _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons, timestamp, peaks_idx)
     label = map(t_horizon -> "Time horizon = $(t_horizon)", time_horizons)
     selected_index = [1, 2, 3]

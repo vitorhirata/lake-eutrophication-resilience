@@ -10,7 +10,6 @@ function all()
     decision_scales()
     distance_basin_threshold()
     early_warning_signals()
-    kendall_taus()
 end
 
 function bifurcation()
@@ -76,21 +75,4 @@ function early_warning_signals()
     )
     timestamp = PathwayDiversity.run_scenario(; parameters...)
     PathwayDiversity.early_warning_signals(timestamp; parameters...)
-end
-
-function kendall_taus()
-    repetitions = 50
-    parameters = Dict(
-        :P_init => 0.27,
-        :times => 1:0.125:80,
-        :time_horizons => [5.0, 10.0, 20.0],
-        :decision_step => 5.0,
-        :influx => 0.03,
-        :influx_tax => 0.001,
-    )
-    timestamps = Vector{String}(undef, repetitions)
-    for run in 1:repetitions
-        timestamps[run] = PathwayDiversity.run_scenario(; parameters...)
-    end
-    PathwayDiversity.early_warning_kendall_taus(timestamps; parameters...)
 end

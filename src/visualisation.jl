@@ -95,6 +95,16 @@ function _plot_number_options_simulation(P0_options, influx_options, n_options)
     savefig("../output/number_options_simulation.png")
 end
 
+function _plot_range_states(P0_options, range_states)
+    plot(P0_options, range_states[new_P = 1], label="Lower range", ylabel="New amount of phosphorus",
+         xlabel="Past amount of phosphorus", guidefontsize=12, left_margin = 5Plots.mm, size=(952,560))
+    plot!(P0_options, range_states[new_P = 2], label="Upper range")
+    threshold = PathwayDiversity.get_root(1.3, 0.1)
+    vline!([threshold], label="Tipping point", color="black", ls=:dash)
+    hline!([threshold], label=false, color="black", ls=:dash)
+    savefig("../output/range_states.png")
+end
+
 function _plot_number_option(n_possible_influx, P_options)
     plot(collect(P_options), n_possible_influx, label=false, ylabel="Number of options",
          xlabel="Amount of phosphorus (x)", guidefontsize=12)

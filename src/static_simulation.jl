@@ -79,3 +79,22 @@ function run_number_options_simulation(
     end
     return result
 end
+
+function run_range_states_simulation(
+    P0_options::Vector{Float64},
+    max_number_options::Int64 = 10,
+    decision_step::Float64 = 5.0,
+    deterministic::Bool = true
+)
+    result = NamedDimsArray{(:P0, :new_P)}(zeros(length(P0_options), 2))
+
+    for (idx, P0) in enumerate(P0_options)
+        possible_a_vec = _possible_influx(P0, max_number_options)
+
+        lower_P = _evolve_step(P0, possible_a_vec[begin], decision_step, deterministic)
+        higher_P = _evolve_step(P0, possible_a_vec[end], decision_step, deterministic)
+        result[P0=idx, new_P=1] = lower_P
+        result[P0=idx, new_P=2] = higher_P
+    end
+    return result
+end

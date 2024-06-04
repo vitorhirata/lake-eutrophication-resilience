@@ -50,7 +50,7 @@ end
 
 function _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons, timestamp, peaks_idx)
     label = map(t_horizon -> "Time horizon = $(t_horizon)", time_horizons)
-    selected_index = [1, 2, 3]
+    selected_index = [1, 2, 3, 4]
 
     s = s[time_horizon=selected_index]
     s_diff = s_diff[time_horizon=selected_index]

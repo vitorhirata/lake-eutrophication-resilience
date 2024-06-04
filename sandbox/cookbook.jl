@@ -58,7 +58,7 @@ function distance_basin_threshold()
     influx = 0.1
     decision_step = 5.0
     P_init_options = collect(0:0.05:3)
-    time_horizons = [10.0, 20.0, 35.0]
+    time_horizons = [1, 2, 4, 7] * decision_step
 
     timestamp = PathwayDiversity.run_entropy(P_init_options, influx, decision_step, time_horizons)
     PathwayDiversity.distance_basin_threshold(P_init_options, influx, time_horizons, timestamp)

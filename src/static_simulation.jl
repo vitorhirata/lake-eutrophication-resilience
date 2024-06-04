@@ -68,7 +68,7 @@ function run_number_options_simulation(
     P0_options::Vector{Float64},
     influx_options::Vector{Float64},
     max_number_options::Int64 = 20,
-    decision_step::Float64 = 1.0,
+    decision_step::Float64 = 5.0,
     deterministic::Bool = true
 )
     result = NamedDimsArray{(:P0, :influx)}(zeros(length(P0_options), length(influx_options)))

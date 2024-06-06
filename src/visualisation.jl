@@ -70,6 +70,20 @@ function _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons, 
     savefig("../output/$(timestamp)_distance_threshold.png")
 end
 
+function _plot_states_distribution(states, P0, timestamp, idx)
+    b_range = range(0, 2.6, step = 0.1)
+    plot_array = Plots.Plot[]
+    n_decision = size(states, 1)
+    for decision in 2:n_decision
+        plt1 = plot(states[decision], title="Decision $(decision-1)", seriestype = :barhist,
+                    bins=b_range, normalize=:pdf, label=false)
+        push!(plot_array,plt1)
+    end
+    xlabel!("State")
+    plot(plot_array..., layout=(n_decision-1, 1), size=(1000,1200), guidefontsize=12)
+    savefig("../output/$(timestamp)_state_distribution_$(idx).png")
+end
+
 function _plot_decision_scales(s, time_horizons, decision_steps, timestamp)
     label = map(decision_step -> "Time horizon = $(decision_step)", time_horizons)
     label = reshape(label, (1,length(time_horizons)))

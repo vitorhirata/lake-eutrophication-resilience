@@ -98,3 +98,42 @@ function run_range_states_simulation(
     end
     return result
 end
+
+function run_state_distribution(
+    P0_options::Vector{Float64},
+    time_horizon::Float64,
+    decision_step::Float64
+)::String
+    timestamp = @sprintf("%.0f", time())
+    base_filename = "../output/$(timestamp)_state_distribution_"
+
+    for (idx_P0, P0) in enumerate(P0_options)
+        states_distribution = _states_distribution(P0, time_horizon, decision_step)
+        println("Finished model for P0=$(P0)")
+        writedlm("$(base_filename)$(idx_P0).csv",  states_distribution, ',')
+    end
+    return timestamp
+end
+
+function _states_distribution(
+    P0::Float64,
+    time_horizon::Float64,
+    decision_step::Float64,
+    max_number_options::Int64 = 10,
+    deterministic::Bool = true
+)Vector{Vector{Float64}}
+
+    states_distribution = Vector{Vector{Float64}}()
+    number_decision::Int64 = floor(time_horizon / decision_step)
+    push!(states_distribution, [P0])
+
+    for decision in 2:(number_decision+1)
+        push!(states_distribution, [])
+        for state in states_distribution[decision-1]
+            possible_a_vec = _possible_influx(state, max_number_options)
+            P_final = map(new_I -> _evolve_step(state, new_I, decision_step, deterministic), possible_a_vec)
+            append!(states_distribution[decision], P_final)
+        end
+    end
+    return states_distribution
+end

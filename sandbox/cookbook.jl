@@ -9,6 +9,7 @@ function all()
     range_state()
     scaling()
     decision_scales()
+    states_distribution()
     distance_basin_threshold()
     early_warning_signals()
 end
@@ -60,6 +61,15 @@ function decision_scales()
 
     timestamp = PathwayDiversity.run_entropy(P_init, influx, decision_steps, time_horizons)
     PathwayDiversity.decision_scales(time_horizons, decision_steps, timestamp)
+end
+
+function states_distribution()
+    P0_options = [0.663, 0.913, 1.413, 1.663]
+    time_horizons = 35.0
+    decision_steps = 5.0
+
+    timestamp = PathwayDiversity.run_state_distribution(P0_options, time_horizons, decision_steps)
+    PathwayDiversity.states_distribution(P0_options, timestamp)
 end
 
 function distance_basin_threshold()

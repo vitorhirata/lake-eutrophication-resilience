@@ -70,18 +70,18 @@ function _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons, 
     savefig("../output/$(timestamp)_distance_threshold.png")
 end
 
-function _plot_states_distribution(states, P0, timestamp, idx)
-    b_range = range(0, 2.6, step = 0.1)
+function _plot_states_distribution(P0_options, n_decision, timestamp)
     plot_array = Plots.Plot[]
-    n_decision = size(states, 1)
-    for decision in 2:n_decision
-        plt1 = plot(states[decision], title="Decision $(decision-1)", seriestype = :barhist,
-                    bins=b_range, normalize=:pdf, label=false)
+    labels = reshape(map(decision -> "Decision $(decision)", 1:n_decision), 1, n_decision)
+
+    for (idx, P0) in enumerate(P0_options)
+        states = readdlm("../output/$(timestamp)_state_distribution_$(idx).csv", ',')
+        states = [_clean_vector(row) for row in eachrow(states)]
+        plt1 = violin(labels, states[2:end], label=false, title="Initial State $(P0)", ylabel="State", color=idx)
         push!(plot_array,plt1)
     end
-    xlabel!("State")
-    plot(plot_array..., layout=(n_decision-1, 1), size=(1000,1200), guidefontsize=12)
-    savefig("../output/$(timestamp)_state_distribution_$(idx).png")
+    plot(plot_array..., layout=(length(P0_options), 1), size=(800,200*length(P0_options)), guidefontsize=12)
+    savefig("../output/$(timestamp)_state_distribution.png")
 end
 
 function _plot_decision_scales(s, time_horizons, decision_steps, timestamp)
@@ -136,4 +136,14 @@ function _plot_bifurcation(roots, influx_options_root)
     hline!([0.4], label="Number of options drop", legend=:bottomright, size=(952,560),
            ylabel = "Fixed points (P*)", xlabel = "Influx (I)", left_margin = 10Plots.mm)
     savefig("../output/bifurcation.png")
+end
+
+function _clean_vector(vector)::Vector{Float64}
+    first_string = findfirst(x -> x == "", vector)
+    if first_string == nothing
+        return Vector{Float64}(vector)
+    end
+
+    new_vector = Vector{Float64}(vector[begin:first_string-1])
+    return new_vector
 end

@@ -60,12 +60,11 @@ function distance_basin_threshold(
     _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons, timestamp, peaks_idx)
 end
 
-function states_distribution(P0_options::Vector{Float64}, timestamp::String)
-    for (idx, P0) in enumerate(P0_options)
-        states = readdlm("../output/$(timestamp)_state_distribution_$(idx).csv", ',')
-        states = [_clean_vector(row) for row in eachrow(states)]
-        _plot_states_distribution(states, P0, timestamp, idx)
-    end
+function states_distribution(P0_options::Vector{Float64}, time_horizon::Float64, decision_step::Float64,
+        timestamp::String
+)
+    number_decision::Int64 = floor(time_horizon / decision_step)
+    _plot_states_distribution(P0_options, number_decision, timestamp)
 end
 
 function decision_scales(decision_steps::Vector{Float64}, time_horizons::Vector{Float64}, timestamp::String)
@@ -106,14 +105,4 @@ function bifurcation(influx_options_root::Vector{Float64})
         roots[3, index] = PathwayDiversity.get_root(2.7, influx)
     end
     _plot_bifurcation(roots, influx_options_root)
-end
-
-function _clean_vector(vector)::Vector{Float64}
-    first_string = findfirst(x -> x == "", vector)
-    if first_string == nothing
-        return Vector{Float64}(vector)
-    end
-
-    new_vector = Vector{Float64}(vector[begin:first_string-1])
-    return new_vector
 end

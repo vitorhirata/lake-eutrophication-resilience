@@ -69,7 +69,7 @@ function states_distribution()
     decision_steps = 5.0
 
     timestamp = PathwayDiversity.run_state_distribution(P0_options, time_horizons, decision_steps)
-    PathwayDiversity.states_distribution(P0_options, timestamp)
+    PathwayDiversity.states_distribution(P0_options, time_horizons, decision_steps, timestamp)
 end
 
 function distance_basin_threshold()

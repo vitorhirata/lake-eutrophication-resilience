@@ -45,6 +45,16 @@ function normalize_pd(time_series::NamedDimsArray)::NamedDimsArray
     return time_series
 end
 
+function normalize_pd(
+        time_series::NamedDimsArray, number_decision::Vector{Int64}, max_options::Int64 = 10
+)::NamedDimsArray
+    for index_time_horizon in 1:1:size(time_series, :time_horizon)
+        time_series[time_horizon=index_time_horizon] /= (number_decision[index_time_horizon] * max_options)
+    end
+
+    return time_series
+end
+
 function compute_variance(time_series::NamedDimsArray, variance_step::Int64)::NamedDimsArray
     variance_ts = NamedDimsArray{(:time, )}(zeros(length(time_series)))
 

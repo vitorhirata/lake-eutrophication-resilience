@@ -46,11 +46,13 @@ function distance_basin_threshold(
         P_init_options::Vector{Float64},
         influx::Float64,
         time_horizons::Vector{Float64},
+        decision_step::Float64,
         timestamp::String
 )
     s = readdlm("../output/$(timestamp)_distance_basin_s.csv", ',')
     s = NamedDimsArray{(:P0, :time_horizon)}(s)
-    s = PathwayDiversity.normalize_pd(s)
+    number_decision = compute_number_decision(time_horizons, decision_step)
+    s = PathwayDiversity.normalize_pd(s, number_decision)
     s_diff = PathwayDiversity.finite_difference(s, 0.05)
 
     threshold = PathwayDiversity.get_root(1.3, influx)

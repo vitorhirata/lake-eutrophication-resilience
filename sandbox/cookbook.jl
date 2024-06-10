@@ -79,7 +79,7 @@ function distance_basin_threshold()
     time_horizons = [1, 2, 4, 7] * decision_step
 
     timestamp = PathwayDiversity.run_entropy(P_init_options, influx, decision_step, time_horizons)
-    PathwayDiversity.distance_basin_threshold(P_init_options, influx, time_horizons, timestamp)
+    PathwayDiversity.distance_basin_threshold(P_init_options, influx, time_horizons, decision_step, timestamp)
 end
 
 function early_warning_signals()

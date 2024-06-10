@@ -10,7 +10,7 @@ function run_scenario(;
     p = NamedDimsArray{(:time,)}(zeros(length(times)))
     influx_ts = NamedDimsArray{(:time,)}(zeros(length(times)))
     s = NamedDimsArray{(:time, :time_horizon)}(zeros(length(times), length(time_horizons)))
-    number_decision::Vector{Int64} = map(time_horizon -> floor(time_horizon / decision_step), time_horizons)
+    number_decision = compute_number_decision(time_horizons, decision_step)
 
     for (index_t, t0) in enumerate(times)
         p[index_t] = P_init

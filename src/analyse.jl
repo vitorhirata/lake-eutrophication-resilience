@@ -63,7 +63,7 @@ end
 function states_distribution(P0_options::Vector{Float64}, time_horizon::Float64, decision_step::Float64,
         timestamp::String
 )
-    number_decision::Int64 = floor(time_horizon / decision_step)
+    number_decision = compute_number_decision(time_horizon, decision_step)
     _plot_states_distribution(P0_options, number_decision, timestamp)
 end
 

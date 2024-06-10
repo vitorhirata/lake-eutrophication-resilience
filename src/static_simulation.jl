@@ -8,7 +8,7 @@ function run_entropy(
     s = NamedDimsArray{(:P0, :time_horizon)}(zeros(length(P_init_options), length(time_horizons)))
 
     for (idx_P0, P0) in enumerate(P_init_options), (idx_time_horizon, time_horizon) in enumerate(time_horizons)
-        number_decision::Int64 = floor(time_horizon / decision_step)
+        number_decision = compute_number_decision(time_horizon, decision_step)
         s[idx_P0, idx_time_horizon] = _entropy(P0, influx, decision_step, number_decision)
         time_horizon == time_horizons[end] && P0 % 0.5 == 0 && println("Finished model for P0=$(P0)")
     end
@@ -28,7 +28,7 @@ function run_entropy(
     number_options::Vector{Int64},
 )::String
     s = NamedDimsArray{(:number_options, :P0)}(zeros(length(number_options), length(P_init_options)))
-    number_decision::Int64 = floor(time_horizon / decision_step)
+    number_decision = compute_number_decision(time_horizon, decision_step)
 
     for (idx_P0, P0) in enumerate(P_init_options), (idx_number_option, number_option) in enumerate(number_options)
         s[idx_number_option, idx_P0] = _entropy(P0, influx, decision_step, number_decision, true, number_option)
@@ -52,7 +52,7 @@ function run_entropy(
     s = NamedDimsArray{(:decision_step, :time_horizon)}(zeros(length(decision_steps), length(time_horizons)))
 
     for (idx_step, step) in enumerate(decision_steps), (idx_time_horizon, time_horizon) in enumerate(time_horizons)
-        number_decision::Int64 = floor(time_horizon / step)
+        number_decision = compute_number_decision(time_horizon, decision_step)
         s[idx_step, idx_time_horizon] = _entropy(P0, influx, step, number_decision)
         time_horizon == time_horizons[end] && println("Finished model for P0=$(P0)")
     end
@@ -124,7 +124,7 @@ function _states_distribution(
 )Vector{Vector{Float64}}
 
     states_distribution = Vector{Vector{Float64}}()
-    number_decision::Int64 = floor(time_horizon / decision_step)
+    number_decision = compute_number_decision(time_horizon, decision_step)
     push!(states_distribution, [P0])
 
     for decision in 2:(number_decision+1)

@@ -13,6 +13,7 @@ using Plots
 using StatsPlots
 using Peaks
 
+include("auxiliary.jl")
 include("base.jl")
 include("time_series_simulation.jl")
 include("static_simulation.jl")

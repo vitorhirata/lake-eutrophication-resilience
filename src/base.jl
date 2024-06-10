@@ -34,17 +34,16 @@ function _entropy(
 
 )::Float64
     possible_a_vec = _possible_influx(P0, max_number_options)
-    step_prob = 1.0 / length(possible_a_vec)
-
-    if number_decision == 1
-        final_prob = prob * step_prob
-        return length(possible_a_vec) * ( - final_prob * log(final_prob))
-    end
+    step_prob = _influx_probability(possible_a_vec)
 
     final_prob = prob * step_prob
+    if number_decision == 1
+        return mapreduce(_causal_entropy, +, final_prob)
+    end
+
     P_final = map(new_I -> _evolve_step(P0, new_I, decision_step, deterministic), possible_a_vec)
     results = map(input -> _entropy(input[1], input[2], decision_step, number_decision-1, deterministic, max_number_options,
-                                    final_prob), zip(P_final, possible_a_vec))
+                                    input[3]), zip(P_final, possible_a_vec, final_prob))
 
     return sum(results)
 end
@@ -53,6 +52,12 @@ function _possible_influx(P::Float64, max_number_options::Int64, maximun_influx:
     total_possible_influx = range(0.0, maximun_influx, max_number_options)
     return collect(total_possible_influx[1:number_possible_influx(P, max_number_options)])
 end
+
+function _influx_probability(possible_influx::Vector{Float64})::Vector{Float64}
+    prob = 1.0 / length(possible_influx)
+    return fill(prob, length(possible_influx))
+end
+
 
 function _evolve_step(P0::Float64, I::Float64, step::Float64, deterministic::Bool)::Float64
     if deterministic
@@ -97,4 +102,4 @@ end
 
 _f_root(P, I) = _f(P, I, 0.0)
 _g(P, I=nothing, time=nothing) = 1
-
+_causal_entropy(prob) = - (prob * log(prob))

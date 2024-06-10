@@ -10,6 +10,8 @@
         entropy = PathwayDiversity._entropy(P0, I, decision_step, number_decision, deterministic, maximum_options)
         number_options = PathwayDiversity.number_possible_influx(P0, maximum_options)
 
+        # Giving the assumption all decision have the same probability, we can compute the entropy using:
+        # entropy = - number_options * (1/number_options)* log(1/number_options) = log(number_options)
         @test number_options == 10
         @test entropy ≈ log(number_options) rtol=1e-5
     end
@@ -39,6 +41,10 @@
 
         entropy = PathwayDiversity._entropy(P0, I, decision_step, number_decision, deterministic, maximum_options)
 
+        # To compute the entropy in this case the number of influx from the last state will simplify with the
+        # probability of choosing the influx. So, from each final state we will have:
+        # last_n_opt*(1/first_n_opt*last_n_opt)*log(1/first_n_opt*last_n_opt)
+        # Ex. -9*(1/9*10)*log(1/90) = (1/10)*log(90)
         @test entropy ≈ (5*log(100)+log(90)+log(80)+log(70)+log(60)+log(50))/10 rtol=1e-5
     end
 

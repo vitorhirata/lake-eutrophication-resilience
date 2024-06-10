@@ -31,7 +31,7 @@ function run_entropy(
     number_decision = compute_number_decision(time_horizon, decision_step)
 
     for (idx_P0, P0) in enumerate(P_init_options), (idx_number_option, number_option) in enumerate(number_options)
-        s[idx_number_option, idx_P0] = _entropy(P0, influx, decision_step, number_decision, true, number_option)
+        s[idx_number_option, idx_P0] = _entropy(P0, influx, decision_step, number_decision; max_options=number_option)
         s[idx_number_option, idx_P0] /= (number_decision * log(number_option))
         number_option == number_options[end] && P0 % 1.0 == 0 && println("Finished model for P0=$(P0)")
     end

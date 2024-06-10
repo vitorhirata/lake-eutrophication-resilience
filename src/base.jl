@@ -28,12 +28,11 @@ function _entropy(
         I::Float64,
         decision_step::Float64,
         number_decision::Int64,
+        prob::Float64 = 1.0;
         deterministic::Bool = true,
-        max_number_options::Int64 = 10,
-        prob::Float64 = 1.0,
-
+        max_options::Int64 = 10
 )::Float64
-    possible_a_vec = _possible_influx(P0, max_number_options)
+    possible_a_vec = _possible_influx(P0, max_options)
     step_prob = _influx_probability(possible_a_vec)
 
     final_prob = prob * step_prob
@@ -42,8 +41,9 @@ function _entropy(
     end
 
     P_final = map(new_I -> _evolve_step(P0, new_I, decision_step, deterministic), possible_a_vec)
-    results = map(input -> _entropy(input[1], input[2], decision_step, number_decision-1, deterministic, max_number_options,
-                                    input[3]), zip(P_final, possible_a_vec, final_prob))
+    results = map(input -> _entropy(input[1], input[2], decision_step, number_decision-1, input[3];
+                                    deterministic=deterministic, max_options=max_options),
+                  zip(P_final, possible_a_vec, final_prob))
 
     return sum(results)
 end

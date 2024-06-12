@@ -48,8 +48,8 @@ end
 function normalize_pd(
         time_series::NamedDimsArray, number_decision::Vector{Int64}, max_options::Int64 = 10
 )::NamedDimsArray
-    for index_time_horizon in 1:1:size(time_series, :time_horizon)
-        time_series[time_horizon=index_time_horizon] /= (number_decision[index_time_horizon] * max_options)
+    for index in 1:1:size(time_series, 2)
+        time_series[:,index] /= (number_decision[index] * max_options)
     end
 
     return time_series

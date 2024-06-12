@@ -137,3 +137,35 @@ function _states_distribution(
     end
     return states_distribution
 end
+
+function run_sensitivity(
+        P0_options::Vector{Float64}, influx::Float64, time_horizon::Float64, decision_step::Vector{Float64}
+)
+    s = NamedDimsArray{(:P0, :type)}(zeros(length(P0_options), 3))
+
+    ## Default
+    number_decision = compute_number_decision(time_horizon, decision_step[1])
+    for (idx_P0, P0) in enumerate(P0_options)
+        s[idx_P0, 1] = _entropy(P0, influx, decision_step[1], number_decision)
+    end
+    println("Finished standard")
+
+    ## Less frequency of decision
+    number_decision = compute_number_decision(time_horizon, decision_step[2])
+    for (idx_P0, P0) in enumerate(P0_options)
+        s[idx_P0, 2] = _entropy(P0, influx, decision_step[2], number_decision)
+    end
+    println("Finished less decisions")
+
+    ## Different probability
+    number_decision = compute_number_decision(time_horizon, decision_step[1])
+    for (idx_P0, P0) in enumerate(P0_options)
+        s[idx_P0, 3] = _entropy(P0, influx, decision_step[2], number_decision; method="closer_more_likely")
+    end
+    println("Change probability")
+
+    timestamp = @sprintf("%.0f", time())
+    base_filename = "../output/$(timestamp)_sensitivity_"
+    writedlm("$(base_filename)s.csv",  s, ',')
+    return timestamp
+end

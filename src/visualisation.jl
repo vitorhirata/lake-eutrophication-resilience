@@ -70,6 +70,15 @@ function _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons, 
     savefig("../output/$(timestamp)_distance_threshold_derivative.png")
 end
 
+function _plot_sensitivity(s, distance_threshold, timestamp)
+    plot(distance_threshold, s[type=1], label="Default", xflip = true, legend=:topright,
+         ylabel="Pathway diversity", left_margin = 10Plots.mm, size=(1000,600), guidefontsize=12)
+    plot!(distance_threshold, s[type=2], label="Less decisions")
+    plot!(distance_threshold, s[type=3], label="Near influx")
+    vline!([0.0], label=false, color="black", xlabel="Distance to threshold")
+    savefig("../output/$(timestamp)_sensitivity.png")
+end
+
 function _plot_states_distribution(P0_options, n_decision, timestamp)
     plot_array = Plots.Plot[]
     labels = reshape(map(decision -> "Decision $(decision)", 1:n_decision), 1, n_decision)

@@ -10,6 +10,7 @@ function all()
     scaling()
     decision_scales()
     states_distribution()
+    sensitivity()
     distance_basin_threshold()
     early_warning_signals()
 end
@@ -70,6 +71,16 @@ function states_distribution()
 
     timestamp = PathwayDiversity.run_state_distribution(P0_options, time_horizons, decision_steps)
     PathwayDiversity.states_distribution(P0_options, time_horizons, decision_steps, timestamp)
+end
+
+function sensitivity()
+    P0_options = collect(0:0.05:3)
+    time_horizons = 30.0
+    influx = 0.1
+    decision_steps = [5.0, 15.0]
+
+    timestamp = PathwayDiversity.run_sensitivity(P0_options, influx, time_horizons, decision_steps)
+    PathwayDiversity.sensitivity(P0_options, influx, time_horizons, decision_steps, timestamp)
 end
 
 function distance_basin_threshold()

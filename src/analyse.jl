@@ -62,6 +62,25 @@ function distance_basin_threshold(
     _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons, timestamp, peaks_idx)
 end
 
+function sensitivity(
+        P0_options::Vector{Float64},
+        influx::Float64,
+        time_horizon::Float64,
+        decision_step::Vector{Float64},
+        timestamp::String
+    )
+    s = readdlm("../output/$(timestamp)_sensitivity_s.csv", ',')
+    s = NamedDimsArray{(:P0, :type)}(s)
+
+    number_decision = compute_number_decision(time_horizon, decision_step)
+    push!(number_decision, number_decision[1])
+    s = PathwayDiversity.normalize_pd(s, number_decision)
+
+    threshold = PathwayDiversity.get_root(1.3, influx)
+    distance_threshold = threshold .- P0_options
+    _plot_sensitivity(s, distance_threshold, timestamp)
+end
+
 function states_distribution(P0_options::Vector{Float64}, time_horizon::Float64, decision_step::Float64,
         timestamp::String
 )

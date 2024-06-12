@@ -30,10 +30,17 @@ function _entropy(
         number_decision::Int64,
         prob::Float64 = 1.0;
         deterministic::Bool = true,
-        max_options::Int64 = 10
+        max_options::Int64 = 10,
+        method::String = "equal_probability"
 )::Float64
     possible_a_vec = _possible_influx(P0, max_options)
-    step_prob = _influx_probability(possible_a_vec)
+    if method == "equal_probability"
+        step_prob = _influx_probability(possible_a_vec)
+    elseif method == "closer_more_likely"
+        step_prob = _influx_probability(possible_a_vec, I)
+    else
+        error("invalid method in entropy")
+    end
 
     final_prob = prob * step_prob
     if number_decision == 1
@@ -58,6 +65,19 @@ function _influx_probability(possible_influx::Vector{Float64})::Vector{Float64}
     return fill(prob, length(possible_influx))
 end
 
+function _influx_probability(possible_influx::Vector{Float64}, past_influx::Float64)::Vector{Float64}
+    past_influx_idx = findfirst(x -> past_influx <= x, possible_influx)
+    if past_influx_idx == nothing
+        past_influx_idx = length(possible_influx)
+    end
+
+    result = zeros(length(possible_influx))
+    for idx in 1:length(possible_influx)
+        result[idx] = _weight_probability(idx, past_influx_idx)
+    end
+
+    return result / sum(result)
+end
 
 function _evolve_step(P0::Float64, I::Float64, step::Float64, deterministic::Bool)::Float64
     if deterministic
@@ -89,6 +109,21 @@ function _evolve_step_stochastic(
     return sol.u[end]
 end
 
+function _weight_probability(idx::Int64, reference::Int64)::Int64
+    difference = abs(idx - reference)
+    if difference == 0
+        return 10
+    elseif difference == 1
+        return 6
+    elseif difference == 2
+        return 3
+    elseif difference == 3
+        return 1
+    else
+        return 0
+    end
+end
+
 function _f(
     P::Float64,
     influx::Float64,
@@ -100,6 +135,12 @@ function _f(
     return influx - 0.65 * P + 2.5 * (P^2) / ((1.95)^2 + P^2)
 end
 
+function _causal_entropy(prob::Float64)::Float64
+    if prob == 0
+        return 0
+    end
+    return - (prob * log(prob))
+end
+
 _f_root(P, I) = _f(P, I, 0.0)
 _g(P, I=nothing, time=nothing) = 1
-_causal_entropy(prob) = - (prob * log(prob))

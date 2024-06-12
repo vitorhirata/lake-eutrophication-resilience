@@ -77,7 +77,8 @@ function _plot_states_distribution(P0_options, n_decision, timestamp)
     for (idx, P0) in enumerate(P0_options)
         states = readdlm("../output/$(timestamp)_state_distribution_$(idx).csv", ',')
         states = [_clean_vector(row) for row in eachrow(states)]
-        plt1 = violin(labels, states[2:end], label=false, title="Initial State $(P0)", ylabel="State", color=idx)
+        plt1 = violin(labels, states[2:end], label=false, title="Initial State $(P0)", ylabel="State", color=idx,
+                      ylim=(0.0, 2.5))
         push!(plot_array,plt1)
     end
     plot(plot_array..., layout=(length(P0_options), 1), size=(800,200*length(P0_options)), guidefontsize=12)

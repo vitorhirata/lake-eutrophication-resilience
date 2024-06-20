@@ -1,6 +1,7 @@
-# Resilience metrics comparison
+# Lake Eutrophication Resilience
 
-Project comparing resilience metrics from different models.
+This project compares standard resilience metrics from ecology with pathway diversity. We use a lake eutrophication
+model to implement this metrics.
 
 ## Setup
 Install julia up and download the latest version of julia:

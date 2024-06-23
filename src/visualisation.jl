@@ -73,8 +73,8 @@ end
 function _plot_sensitivity(s, distance_threshold, timestamp)
     plot(distance_threshold, s[type=1], label="Default", xflip = true, legend=:topright,
          ylabel="Pathway diversity", left_margin = 10Plots.mm, size=(1000,600), guidefontsize=12)
-    plot!(distance_threshold, s[type=2], label="Less decisions")
-    plot!(distance_threshold, s[type=3], label="Near influx")
+    plot!(distance_threshold, s[type=2], label="Reduced decisions")
+    plot!(distance_threshold, s[type=3], label="Minimal change")
     vline!([0.0], label=false, color="black", xlabel="Distance to threshold")
     savefig("../output/$(timestamp)_sensitivity.png")
 end

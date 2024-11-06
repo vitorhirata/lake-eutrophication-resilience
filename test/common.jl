@@ -139,4 +139,6 @@ end
                                             deterministic=deterministic, max_options=max_options, method=method)
         @test entropy ≈ (1/20)*log(20)+(3/20)*log(20/3)+(3/10)*log(10/3)+(1/2)*log(2) rtol=1e-5
     end
+
+    # TODO: Add tests of max_options, minimum_influx and maximun_influx
 end

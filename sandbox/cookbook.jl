@@ -77,7 +77,7 @@ function sensitivity()
     P0_options = collect(0:0.05:3)
     time_horizons = 30.0
     influx = 0.1
-    decision_steps = [5.0, 15.0]
+    decision_steps = [5.0, 15.0, 5.0, 5.0]
 
     timestamp = PathwayDiversity.run_sensitivity(P0_options, influx, time_horizons, decision_steps)
     PathwayDiversity.sensitivity(P0_options, influx, time_horizons, decision_steps, timestamp)

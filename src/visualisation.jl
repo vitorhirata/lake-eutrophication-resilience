@@ -70,12 +70,12 @@ function _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons, 
     savefig("../output/$(timestamp)_distance_threshold_derivative.png")
 end
 
-function _plot_sensitivity(s, distance_threshold, timestamp)
-    plot(distance_threshold, s[type=1], label="Default", xflip = true, legend=:topright,
+function _plot_sensitivity(s, distance_threshold, timestamp, scenarios)
+    plot(distance_threshold, s[type=1], label="$(scenarios[1][:name])", xflip = true, legend=:topright,
          ylabel="Pathway diversity", left_margin = 10Plots.mm, size=(1000,600), guidefontsize=12)
-    plot!(distance_threshold, s[type=2], label="Reduced decisions")
-    plot!(distance_threshold, s[type=3], label="Minimal change")
-    plot!(distance_threshold, s[type=4], label="Adds restrictive option")
+    for (idx_scenario, scenario) in enumerate(scenarios[2:end])
+        plot!(distance_threshold, s[type=idx_scenario+1], label="$(scenario[:name])", color=idx_scenario+1)
+    end
     vline!([0.0], label=false, color="black", xlabel="Distance to threshold")
     savefig("../output/$(timestamp)_sensitivity.png")
 end

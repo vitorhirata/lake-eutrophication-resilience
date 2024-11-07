@@ -77,10 +77,15 @@ function sensitivity()
     P0_options = collect(0:0.05:3)
     time_horizons = 30.0
     influx = 0.1
-    decision_steps = [5.0, 15.0, 5.0, 5.0]
+    scenarios = [
+        Dict(:name => "Default", :decision_step => 5.0, :method => "equal_probability", :minimum_influx => 0.04),
+        #Dict(:name => "Reduced decisions", :decision_step => 15.0, :method => "equal_probability", :minimum_influx => 0.04),
+        #Dict(:name => "Minimal change", :decision_step => 5.0, :method => "closer_more_likely", :minimum_influx => 0.04),
+        Dict(:name => "Restrictive option", :decision_step => 5.0, :method => "equal_probability", :minimum_influx => 0.0)
+    ]
 
-    timestamp = PathwayDiversity.run_sensitivity(P0_options, influx, time_horizons, decision_steps)
-    PathwayDiversity.sensitivity(P0_options, influx, time_horizons, decision_steps, timestamp)
+    timestamp = PathwayDiversity.run_sensitivity(P0_options, influx, time_horizons, scenarios)
+    PathwayDiversity.sensitivity(P0_options, influx, time_horizons, scenarios, timestamp)
 end
 
 function distance_basin_threshold()

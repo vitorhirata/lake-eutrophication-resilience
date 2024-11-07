@@ -164,6 +164,13 @@ function run_sensitivity(
     end
     println("Change probability")
 
+    ## Adds restrictive option
+    number_decision = compute_number_decision(time_horizon, decision_step[1])
+    for (idx_P0, P0) in enumerate(P0_options)
+        s[idx_P0, 4] = _entropy(P0, influx, decision_step[1], number_decision, minimum_influx=0.0)
+    end
+    println("Finished adds restrictive option")
+
     timestamp = @sprintf("%.0f", time())
     base_filename = "../output/$(timestamp)_sensitivity_"
     writedlm("$(base_filename)s.csv",  s, ',')

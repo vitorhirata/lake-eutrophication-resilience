@@ -74,6 +74,7 @@ function sensitivity(
 
     number_decision = compute_number_decision(time_horizon, decision_step)
     push!(number_decision, number_decision[1])
+    push!(number_decision, number_decision[1])
     s = PathwayDiversity.normalize_pd(s, number_decision)
 
     threshold = PathwayDiversity.get_root(1.3, influx)

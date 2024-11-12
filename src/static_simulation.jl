@@ -51,9 +51,9 @@ function run_entropy(
 )::String
     s = NamedDimsArray{(:decision_step, :time_horizon)}(zeros(length(decision_steps), length(time_horizons)))
 
-    for (idx_step, step) in enumerate(decision_steps), (idx_time_horizon, time_horizon) in enumerate(time_horizons)
+    for (idx_decision, decision_step) in enumerate(decision_steps), (idx_time, time_horizon) in enumerate(time_horizons)
         number_decision = compute_number_decision(time_horizon, decision_step)
-        s[idx_step, idx_time_horizon] = _entropy(P0, influx, step, number_decision)
+        s[idx_decision, idx_time] = _entropy(P0, influx, decision_step, number_decision)
         time_horizon == time_horizons[end] && println("Finished model for P0=$(P0)")
     end
 

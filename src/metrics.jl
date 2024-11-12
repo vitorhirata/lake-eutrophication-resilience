@@ -37,9 +37,9 @@ function find_peaks(time_series::NamedDimsArray, time::Vector{Float64})::Vector{
     return peaks_idx
 end
 
-function normalize_pd(time_series::NamedDimsArray)::NamedDimsArray
-    for index_time_horizon in 1:1:size(time_series, :time_horizon)
-        time_series[time_horizon=index_time_horizon] /= maximum(time_series[time_horizon=index_time_horizon])
+function normalize_pd(time_series::NamedDimsArray, dim::Symbol)::NamedDimsArray
+    for index_dim in 1:1:size(time_series, dim)
+        eval(:( $time_series[$dim = $index_dim] /= maximum($time_series[$dim = $index_dim]) ))
     end
 
     return time_series

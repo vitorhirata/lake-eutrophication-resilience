@@ -76,7 +76,7 @@ end
 function sensitivity()
     P0_options = collect(0:0.05:2.85)
     time_horizons = 30.0
-    influx = 0.1
+    influx = 0.12
     scenarios = [
         Dict(:name => "Default", :decision_step => 5.0, :method => "equal_probability", :minimum_influx => 0.04),
         Dict(:name => "Reduced decisions", :decision_step => 15.0, :method => "equal_probability", :minimum_influx => 0.04),
@@ -91,7 +91,7 @@ end
 function distance_basin_threshold()
     influx = 0.1
     decision_step = 5.0
-    P_init_options = collect(0:0.05:3)
+    P_init_options = collect(0:0.05:2.85)
     time_horizons = [1, 2, 4, 7] * decision_step
 
     timestamp = PathwayDiversity.run_entropy(P_init_options, influx, decision_step, time_horizons)

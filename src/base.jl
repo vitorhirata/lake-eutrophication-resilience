@@ -32,10 +32,10 @@ function _entropy(
         deterministic::Bool = true,
         max_options::Int64 = 10,
         minimum_influx::Float64 = 0.04,
-        maximun_influx::Float64 = 0.36,
+        maximum_influx::Float64 = 0.36,
         method::String = "equal_probability"
 )::Float64
-    possible_a_vec = _possible_influx(P0, minimum_influx, maximun_influx, max_options)
+    possible_a_vec = _possible_influx(P0, max_options, minimum_influx, maximum_influx)
     if method == "equal_probability"
         step_prob = _influx_probability(possible_a_vec)
     elseif method == "closer_more_likely"
@@ -58,9 +58,9 @@ function _entropy(
 end
 
 function _possible_influx(
-        P::Float64, minimum_influx::Float64, maximun_influx::Float64, max_number_options::Int64
+        P::Float64, max_number_options::Int64, minimum_influx::Float64 = 0.04, maximum_influx::Float64 = 0.36,
 )::Vector{Float64}
-    total_possible_influx = range(minimum_influx, maximun_influx, max_number_options)
+    total_possible_influx = range(minimum_influx, maximum_influx, max_number_options)
     return collect(total_possible_influx[1:number_possible_influx(P, max_number_options)])
 end
 

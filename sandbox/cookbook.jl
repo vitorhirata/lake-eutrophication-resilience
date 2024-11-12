@@ -74,13 +74,13 @@ function states_distribution()
 end
 
 function sensitivity()
-    P0_options = collect(0:0.05:3)
+    P0_options = collect(0:0.05:2.85)
     time_horizons = 30.0
     influx = 0.1
     scenarios = [
         Dict(:name => "Default", :decision_step => 5.0, :method => "equal_probability", :minimum_influx => 0.04),
-        #Dict(:name => "Reduced decisions", :decision_step => 15.0, :method => "equal_probability", :minimum_influx => 0.04),
-        #Dict(:name => "Minimal change", :decision_step => 5.0, :method => "closer_more_likely", :minimum_influx => 0.04),
+        Dict(:name => "Reduced decisions", :decision_step => 15.0, :method => "equal_probability", :minimum_influx => 0.04),
+        Dict(:name => "Minimal change", :decision_step => 5.0, :method => "closer_more_likely", :minimum_influx => 0.04),
         Dict(:name => "Restrictive option", :decision_step => 5.0, :method => "equal_probability", :minimum_influx => 0.0)
     ]
 

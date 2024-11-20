@@ -12,6 +12,7 @@ using DelimitedFiles
 using Plots
 using StatsPlots
 using Peaks
+using Random
 
 include("auxiliary.jl")
 include("base.jl")

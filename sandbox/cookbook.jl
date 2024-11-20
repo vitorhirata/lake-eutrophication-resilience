@@ -81,7 +81,7 @@ function sensitivity()
         Dict(:name => "Default", :decision_step => 5.0),
         Dict(:name => "Reduced decisions", :decision_step => 15.0),
         Dict(:name => "Minimal change", :decision_step => 5.0, :method => "closer_more_likely"),
-        Dict(:name => "Restrictive option", :decision_step => 5.0, :minimum_influx => 0.02, :maximum_influx => 0.38)
+        Dict(:name => "Restrictive option", :decision_step => 5.0, :minimum_influx => 0.02, :maximum_influx => 0.32)
     ]
 
     timestamp = PathwayDiversity.run_sensitivity(P0_options, influx, time_horizons, scenarios)

@@ -13,11 +13,13 @@ using Plots
 using StatsPlots
 using Peaks
 using Random
+using LinearAlgebra
 
 include("auxiliary.jl")
 include("base.jl")
 include("time_series_simulation.jl")
 include("static_simulation.jl")
+include("new_method.jl")
 include("metrics.jl")
 include("analyse.jl")
 include("visualisation.jl")

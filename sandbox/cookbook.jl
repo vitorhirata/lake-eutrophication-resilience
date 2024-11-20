@@ -13,6 +13,7 @@ function all()
     sensitivity()
     distance_basin_threshold()
     early_warning_signals()
+    new_pathway_diversity_computation()
 end
 
 function bifurcation()
@@ -109,4 +110,16 @@ function early_warning_signals()
     )
     timestamp = PathwayDiversity.run_scenario(; parameters...)
     PathwayDiversity.early_warning_signals(timestamp; parameters...)
+end
+
+function new_pathway_diversity_computation()
+    influx = 0.15
+    decision_step = 5.0
+    P0 = 0.5
+    number_decision = 2
+
+    old_entropy = PathwayDiversity._entropy(P0, influx, decision_step, number_decision)
+    new_entropy = PathwayDiversity._new_entropy(P0, influx, decision_step, number_decision)
+
+    print("Old method: $(old_entropy) \nNew method: $(new_entropy)")
 end

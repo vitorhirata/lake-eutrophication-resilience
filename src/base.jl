@@ -35,24 +35,18 @@ function _entropy(
         maximum_influx::Float64 = 0.30,
         method::String = "equal_probability"
 )::Float64
-    possible_a_vec = _possible_influx(P0, max_options, minimum_influx, maximum_influx)
-    if method == "equal_probability"
-        step_prob = _influx_probability(possible_a_vec)
-    elseif method == "closer_more_likely"
-        step_prob = _influx_probability(possible_a_vec, I)
-    else
-        error("invalid method in entropy")
-    end
+    possible_influx = _possible_influx(P0, max_options, minimum_influx, maximum_influx)
+    step_prob = _influx_probability(possible_influx, I, method)
 
     final_prob = prob * step_prob
     if number_decision == 1
         return mapreduce(_causal_entropy, +, final_prob)
     end
 
-    P_final = map(new_I -> _evolve_step(P0, new_I, decision_step, deterministic), possible_a_vec)
+    P_final = map(new_I -> _evolve_step(P0, new_I, decision_step, deterministic), possible_influx)
     results = map(input -> _entropy(input[1], input[2], decision_step, number_decision-1, input[3];
                                     deterministic=deterministic, max_options=max_options),
-                  zip(P_final, possible_a_vec, final_prob))
+                  zip(P_final, possible_influx, final_prob))
 
     return sum(results)
 end
@@ -64,12 +58,23 @@ function _possible_influx(
     return collect(total_possible_influx[1:number_possible_influx(P, max_number_options)])
 end
 
-function _influx_probability(possible_influx::Vector{Float64})::Vector{Float64}
+function _influx_probability(possible_influx::Vector{Float64}, influx::Float64, method::String)::Vector{Float64}
+    if method == "equal_probability"
+        step_prob = _influx_probability_simple(possible_influx)
+    elseif method == "closer_more_likely"
+        step_prob = _influx_probability_closer(possible_influx, influx)
+    else
+        error("invalid method in entropy")
+    end
+    return step_prob
+end
+
+function _influx_probability_simple(possible_influx::Vector{Float64})::Vector{Float64}
     prob = 1.0 / length(possible_influx)
     return fill(prob, length(possible_influx))
 end
 
-function _influx_probability(possible_influx::Vector{Float64}, past_influx::Float64)::Vector{Float64}
+function _influx_probability_closer(possible_influx::Vector{Float64}, past_influx::Float64)::Vector{Float64}
     past_influx_idx = findfirst(x -> past_influx <= x, possible_influx)
     if past_influx_idx == nothing
         past_influx_idx = length(possible_influx)
@@ -77,7 +82,7 @@ function _influx_probability(possible_influx::Vector{Float64}, past_influx::Floa
 
     result = zeros(length(possible_influx))
     for idx in 1:length(possible_influx)
-        result[idx] = _weight_probability(idx, past_influx_idx)
+        result[idx] = _weight_probability_closer(idx, past_influx_idx)
     end
 
     return result / sum(result)
@@ -113,7 +118,7 @@ function _evolve_step_stochastic(
     return sol.u[end]
 end
 
-function _weight_probability(idx::Int64, reference::Int64)::Int64
+function _weight_probability_closer(idx::Int64, reference::Int64)::Int64
     difference = abs(idx - reference)
     if difference == 0
         return 10

@@ -93,19 +93,13 @@ function _state_transition_matrix(
 )::Matrix{Float64}
     matrix = zeros(length(possible_x), length(possible_x))
     for (idx_begin_state, begin_state) in enumerate(possible_x)
-        possible_a_vec = PathwayDiversity._possible_influx(begin_state, max_option)
+        possible_influx = PathwayDiversity._possible_influx(begin_state, max_option)
 
-        !(influx in possible_a_vec) && continue
+        !(influx in possible_influx) && continue
 
-        if method == "equal_probability"
-            probabilities = _influx_probability(possible_a_vec)
-        elseif method == "closer_more_likely"
-            probabilities = _influx_probability(possible_a_vec, influx)
-        else
-            error("invalid method in entropy")
-        end
+        probabilities = PathwayDiversity._influx_probability(possible_influx, influx, method)
 
-        idx_prob = findfirst(isequal(influx), possible_a_vec)
+        idx_prob = findfirst(isequal(influx), possible_influx)
         probability = probabilities[idx_prob]
         end_state = PathwayDiversity._evolve_step(begin_state, influx, decision_step, deterministic)
         end_bin = searchsortedfirst(possible_x, end_state) - 1

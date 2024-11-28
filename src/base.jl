@@ -63,6 +63,8 @@ function _influx_probability(possible_influx::Vector{Float64}, influx::Float64, 
         step_prob = _influx_probability_simple(possible_influx)
     elseif method == "closer_more_likely"
         step_prob = _influx_probability_closer(possible_influx, influx)
+    elseif method == "further_more_likely"
+        step_prob = _influx_probability_further(possible_influx, influx)
     else
         error("invalid method in entropy")
     end
@@ -83,6 +85,21 @@ function _influx_probability_closer(possible_influx::Vector{Float64}, past_influ
     result = zeros(length(possible_influx))
     for idx in 1:length(possible_influx)
         result[idx] = _weight_probability_closer(idx, past_influx_idx)
+    end
+
+    return result / sum(result)
+end
+
+function _influx_probability_further(possible_influx::Vector{Float64}, past_influx::Float64)::Vector{Float64}
+    past_influx_idx = findfirst(x -> past_influx <= x, possible_influx)
+    if past_influx_idx == nothing
+        past_influx_idx = length(possible_influx)
+    end
+    max_difference = maximum(abs.(collect(1:length(possible_influx)) .- past_influx_idx))
+
+    result = zeros(length(possible_influx))
+    for idx in 1:length(possible_influx)
+        result[idx] = _weight_probability_further(idx, past_influx_idx, max_difference)
     end
 
     return result / sum(result)
@@ -127,6 +144,25 @@ function _weight_probability_closer(idx::Int64, reference::Int64)::Int64
     elseif difference == 2
         return 3
     elseif difference == 3
+        return 1
+    else
+        return 0
+    end
+end
+
+function _weight_probability_further(idx::Int64, reference::Int64, max_difference::Int64)::Int64
+    difference = abs(idx - reference)
+    if difference == max_difference
+        return 16
+    elseif difference == max_difference - 1
+        return 13
+    elseif difference == max_difference - 2
+        return 10
+    elseif difference == max_difference - 3
+        return 7
+    elseif difference == max_difference - 4
+        return 4
+    elseif difference == max_difference - 5
         return 1
     else
         return 0

@@ -183,3 +183,52 @@ end
         @test entropy ≈ (1/20)*log(20)+(3/20)*log(20/3)+(3/10)*log(10/3)+(1/2)*log(2) rtol=1e-5
     end
 end
+
+@testset "#_entropy further_more_likely" begin
+    @testset "Low P0, low influx and number of decisions one" begin
+        P0 = 0.5
+        I = 0.1
+        decision_step = 5.0
+        number_decision = 1
+        method = "further_more_likely"
+
+        entropy = PathwayDiversity._entropy(P0, I, decision_step, number_decision; method=method)
+
+        @test entropy ≈ log(63)-(2*7*log(7)+2*4*log(4)+2*1*log(1)+10*log(10)+13*log(13)+16*log(16))/63 rtol=1e-5
+    end
+
+    @testset "Low P0, high influx and number of decisions one" begin
+        P0 = 0.5
+        I = 0.38
+        decision_step = 5.0
+        number_decision = 1
+        method = "further_more_likely"
+
+        entropy = PathwayDiversity._entropy(P0, I, decision_step, number_decision; method=method)
+
+        @test entropy ≈ log(51)-(16*log(16)+13*log(13)+10*log(10)+7*log(7)+4*log(4)+1*log(1))/51 rtol=1e-5
+    end
+
+    @testset "High P0, low influx and number of decisions one" begin
+        P0 = 2.0
+        I = 0.06
+        decision_step = 5.0
+        number_decision = 1
+        method = "further_more_likely"
+
+        entropy = PathwayDiversity._entropy(P0, I, decision_step, number_decision; method=method)
+
+        @test entropy ≈ log(52)-(16*log(16)+2*13*log(13)+10*log(10))/52 rtol=1e-5
+    end
+
+    @testset "High P0, high influx and number of decisions one" begin
+        P0 = 2.0
+        I = 0.38
+        decision_step = 5.0
+        number_decision = 1
+        method = "further_more_likely"
+
+        entropy = PathwayDiversity._entropy(P0, I, decision_step, number_decision; method=method)
+        @test entropy ≈ log(46)-(16*log(16)+13*log(13)+10*log(10)+7*log(7))/46 rtol=1e-5
+    end
+end

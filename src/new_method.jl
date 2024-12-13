@@ -66,18 +66,6 @@ function _iterate_state_matrix(past_state::Matrix{Float64}, matrices::Vector{Mat
 end
 
 function _full_state_transition_matrix(
-    max_options::Int64 = 10, minimum_influx::Float64 = 0.04, maximum_influx::Float64 = 0.30,
-    decision_step::Float64 = 5.0, deterministic::Bool=true, method::String = "equal_probability",
-    possible_states::StepRangeLen{Float64} = 0:0.05:4,
-)::Vector{Matrix{Float64}}
-    possible_influx = range(minimum_influx, maximum_influx, max_options)
-    matrices = map(possible_influx) do influx
-        _state_transition_matrix(possible_states, influx, length(possible_influx), decision_step, deterministic, method)
-    end
-    return matrices
-end
-
-function _full_state_transition_matrix(
     possible_influx::StepRangeLen{Float64} = range(0.04, 0.30, 10), possible_states::StepRangeLen{Float64} = 0:0.05:4,
     decision_step::Float64 = 5.0, deterministic::Bool=true, method::String = "equal_probability"
 )::Vector{Matrix{Float64}}

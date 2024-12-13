@@ -45,7 +45,9 @@ function _entropy(
 
     P_final = map(new_I -> _evolve_step(P0, new_I, decision_step, deterministic), possible_influx)
     results = map(input -> _entropy(input[1], input[2], decision_step, number_decision-1, input[3];
-                                    deterministic=deterministic, max_options=max_options),
+                                    deterministic=deterministic, max_options=max_options,
+                                    minimum_influx=minimum_influx, maximum_influx=maximum_influx,
+                                    method=method),
                   zip(P_final, possible_influx, final_prob))
 
     return sum(results)

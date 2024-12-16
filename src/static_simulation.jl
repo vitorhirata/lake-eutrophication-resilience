@@ -70,7 +70,7 @@ function run_number_options_simulation(
     max_number_options::Int64 = 20,
     decision_step::Float64 = 5.0,
     deterministic::Bool = true
-)
+)::NamedDimsArray
     result = NamedDimsArray{(:P0, :influx)}(zeros(length(P0_options), length(influx_options)))
 
     for (idx_P0, P0) in enumerate(P0_options), (idx_influx, influx) in enumerate(influx_options)
@@ -85,7 +85,7 @@ function run_range_states_simulation(
     max_number_options::Int64 = 10,
     decision_step::Float64 = 5.0,
     deterministic::Bool = true
-)
+)::NamedDimsArray
     result = NamedDimsArray{(:P0, :new_P)}(zeros(length(P0_options), 2))
 
     for (idx, P0) in enumerate(P0_options)
@@ -121,7 +121,7 @@ function _states_distribution(
     decision_step::Float64,
     max_number_options::Int64 = 10,
     deterministic::Bool = true
-)Vector{Vector{Float64}}
+)::Vector{Vector{Float64}}
 
     states_distribution = Vector{Vector{Float64}}()
     number_decision = compute_number_decision(time_horizon, decision_step)

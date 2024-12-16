@@ -72,11 +72,12 @@ end
 
 function _plot_sensitivity(s, distance_threshold, timestamp, scenarios)
     plot(distance_threshold, s[type=1], label="$(scenarios[1][:name])", xflip = true, legend=:topright,
-         ylabel="Pathway diversity", left_margin = 10Plots.mm, size=(1000,600), guidefontsize=12)
-    for (idx_scenario, scenario) in enumerate(scenarios[2:end])
-        plot!(distance_threshold, s[type=idx_scenario+1], label="$(scenario[:name])", color=idx_scenario+1)
-    end
+         ylabel="Pathway diversity", left_margin = 10Plots.mm, size=(1000,600), guidefontsize=12, lw=1.5,
+         color="black", alpha=0.9)
     vline!([0.0], label=false, color="black", xlabel="Distance to threshold")
+    for (idx_scenario, scenario) in enumerate(scenarios[2:end])
+        plot!(distance_threshold, s[type=idx_scenario+1], label="$(scenario[:name])", color=idx_scenario, alpha=0.9)
+    end
     savefig("../output/$(timestamp)_sensitivity.png")
 end
 

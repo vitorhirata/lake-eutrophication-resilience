@@ -33,10 +33,11 @@ function _entropy(
         max_options::Int64 = 10,
         minimum_influx::Float64 = 0.04,
         maximum_influx::Float64 = 0.30,
+        past_P::Float64 = P0,
         method::String = "equal_probability"
 )::Float64
     possible_influx = _possible_influx(P0, max_options, minimum_influx, maximum_influx)
-    step_prob = _influx_probability(possible_influx, I, method)
+    step_prob = _influx_probability(possible_influx, I, method, P0-past_P)
 
     final_prob = prob * step_prob
     if number_decision == 1
@@ -47,7 +48,7 @@ function _entropy(
     results = map(input -> _entropy(input[1], input[2], decision_step, number_decision-1, input[3];
                                     deterministic=deterministic, max_options=max_options,
                                     minimum_influx=minimum_influx, maximum_influx=maximum_influx,
-                                    method=method),
+                                    past_P=P0, method=method),
                   zip(P_final, possible_influx, final_prob))
 
     return sum(results)
@@ -57,16 +58,21 @@ function _possible_influx(
         P::Float64, max_number_options::Int64, minimum_influx::Float64 = 0.04, maximum_influx::Float64 = 0.30,
 )::Vector{Float64}
     total_possible_influx = range(minimum_influx, maximum_influx, max_number_options)
+
     return collect(total_possible_influx[1:number_possible_influx(P, max_number_options)])
 end
 
-function _influx_probability(possible_influx::Vector{Float64}, influx::Float64, method::String)::Vector{Float64}
+function _influx_probability(
+        possible_influx::Vector{Float64}, influx::Float64, method::String, state_change::Float64
+)::Vector{Float64}
     if method == "equal_probability"
         step_prob = _influx_probability_simple(possible_influx)
     elseif method == "closer_more_likely"
         step_prob = _influx_probability_closer(possible_influx, influx)
     elseif method == "further_more_likely"
         step_prob = _influx_probability_further(possible_influx, influx)
+    elseif method == "state_change"
+        step_prob = _influx_probability_change(possible_influx, state_change)
     else
         error("invalid method in entropy")
     end
@@ -105,6 +111,20 @@ function _influx_probability_further(possible_influx::Vector{Float64}, past_infl
     end
 
     return result / sum(result)
+end
+
+function _influx_probability_change(possible_influx::Vector{Float64}, state_change::Float64)::Vector{Float64}
+    result::Vector{Float64} = []
+    if state_change < -0.2
+        result = range(1, step=4.0, length=length(possible_influx))
+    elseif state_change < 0.2
+        result = range(1, step=0.0, length=length(possible_influx))
+    elseif state_change < 0.8
+        result = reverse(range(1, step=4.0, length=length(possible_influx)))
+    else
+        result = reverse(range(1, step=10.0, length=length(possible_influx)))
+    end
+    return normalize(collect(result), 1)
 end
 
 function _evolve_step(P0::Float64, I::Float64, step::Float64, deterministic::Bool)::Float64

@@ -85,7 +85,7 @@ function _state_transition_matrix(
 
         !(influx in possible_influx) && continue
 
-        probabilities = PathwayDiversity._influx_probability(possible_influx, influx, method)
+        probabilities = PathwayDiversity._influx_probability(possible_influx, influx, method, -1.0)
 
         idx_prob = findfirst(isequal(influx), possible_influx)
         probability = probabilities[idx_prob]

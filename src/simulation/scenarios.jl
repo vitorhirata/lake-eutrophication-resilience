@@ -7,7 +7,7 @@ function run_sensitivity(
         number_decision = compute_number_decision(time_horizon, scenario[:decision_step])
         for (idx_P0, P0) in enumerate(P0_options)
             keyword_args = filter(((k,v),) -> !(k in [:name, :decision_step]), scenario)
-            s[idx_P0, idx_scenario] = _entropy(P0, influx, scenario[:decision_step], number_decision; keyword_args...)
+            s[idx_P0, idx_scenario] = entropy(P0, influx, scenario[:decision_step], number_decision; keyword_args...)
         end
         println("Finished $(scenario[:name])")
     end

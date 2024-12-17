@@ -120,8 +120,8 @@ function new_pathway_diversity_computation()
     P0 = 0.5
     number_decision = 2
 
-    old_entropy = PathwayDiversity._entropy(P0, influx, decision_step, number_decision)
-    new_entropy = PathwayDiversity._new_entropy(P0, influx, decision_step, number_decision)
+    old_entropy = PathwayDiversity.entropy(P0, influx, decision_step, number_decision)
+    new_entropy = PathwayDiversity.new_entropy(P0, influx, decision_step, number_decision)
 
     print("Old method: $(old_entropy) \nNew method: $(new_entropy)")
 end

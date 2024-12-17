@@ -1,4 +1,4 @@
-function _entropy(
+function entropy(
         P0::Float64,
         I::Float64,
         decision_step::Float64,
@@ -20,7 +20,7 @@ function _entropy(
     end
 
     P_final = map(new_I -> _evolve_step(P0, new_I, decision_step, deterministic), possible_influx)
-    results = map(input -> _entropy(input[1], input[2], decision_step, number_decision-1, input[3];
+    results = map(input -> entropy(input[1], input[2], decision_step, number_decision-1, input[3];
                                     deterministic=deterministic, max_options=max_options,
                                     minimum_influx=minimum_influx, maximum_influx=maximum_influx,
                                     past_P=P0, method=method),

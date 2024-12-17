@@ -1,4 +1,4 @@
-function _new_entropy(
+function new_entropy(
         P0::Float64,
         influx::Float64,
         decision_step::Float64,

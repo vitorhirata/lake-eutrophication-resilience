@@ -17,7 +17,7 @@ function run_time_series(;
         influx_ts[index_t] = influx
 
         for (index_h, time_horizon) in enumerate(time_horizons)
-            s[index_t, index_h] = _entropy(P_init, influx, decision_step, number_decision[index_h]; deterministic=false)
+            s[index_t, index_h] = entropy(P_init, influx, decision_step, number_decision[index_h]; deterministic=false)
         end
 
         P_init = _evolve_step(P_init, influx, step(times), false)

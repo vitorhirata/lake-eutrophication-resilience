@@ -110,7 +110,7 @@ function early_warning_signals()
         :influx => 0.03,
         :influx_tax => 0.001,
     )
-    timestamp = PathwayDiversity.run_scenario(; parameters...)
+    timestamp = PathwayDiversity.run_time_series(; parameters...)
     PathwayDiversity.early_warning_signals(timestamp; parameters...)
 end
 

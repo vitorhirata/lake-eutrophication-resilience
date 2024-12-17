@@ -16,12 +16,19 @@ using Random
 using LinearAlgebra
 
 include("auxiliary.jl")
-include("base.jl")
-include("time_series_simulation.jl")
-include("static_simulation.jl")
-include("new_method.jl")
-include("metrics.jl")
-include("analyse.jl")
-include("visualisation.jl")
+
+include("core/simulate_equation.jl")
+include("core/scenarios.jl")
+include("core/core.jl")
+include("core/new_method.jl")
+
+include("simulation/time_series.jl")
+include("simulation/static.jl")
+include("simulation/scenarios.jl")
+include("simulation/internal_dynamics.jl")
+
+include("analysis/metrics.jl")
+include("analysis/analyse.jl")
+include("analysis/visualisation.jl")
 
 end

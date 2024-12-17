@@ -1,4 +1,4 @@
-function run_scenario(;
+function run_time_series(;
         P_init::Float64,
         influx::Float64,
         influx_tax::Float64,

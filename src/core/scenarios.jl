@@ -14,7 +14,7 @@ function _influx_probability_closer(possible_influx::Vector{Float64}, past_influ
         result[idx] = _weight_probability_closer(idx, past_influx_idx)
     end
 
-    return result / sum(result)
+    return normalize(result, 1)
 end
 
 function _influx_probability_further(possible_influx::Vector{Float64}, past_influx::Float64)::Vector{Float64}
@@ -29,7 +29,19 @@ function _influx_probability_further(possible_influx::Vector{Float64}, past_infl
         result[idx] = _weight_probability_further(idx, past_influx_idx, max_difference)
     end
 
-    return result / sum(result)
+    return normalize(result, 1)
+end
+
+function _influx_probability_positive(possible_influx::Vector{Float64})::Vector{Float64}
+    result = reverse(range(1, step=4.0, length=length(possible_influx)))
+
+    return normalize(collect(result), 1)
+end
+
+function _influx_probability_negative(possible_influx::Vector{Float64})::Vector{Float64}
+    result = range(1, step=4.0, length=length(possible_influx))
+
+    return normalize(collect(result), 1)
 end
 
 function _influx_probability_change(possible_influx::Vector{Float64}, state_change::Float64)::Vector{Float64}

@@ -67,6 +67,10 @@ function _influx_probability(
         step_prob = _influx_probability_further(possible_influx, influx)
     elseif method == "state_change"
         step_prob = _influx_probability_change(possible_influx, state_change)
+    elseif method == "favor_positive"
+        step_prob = _influx_probability_positive(possible_influx)
+    elseif method == "favor_negative"
+        step_prob = _influx_probability_negative(possible_influx)
     else
         error("invalid method in entropy")
     end

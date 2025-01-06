@@ -67,7 +67,8 @@ function sensitivity(
         influx::Float64,
         time_horizon::Float64,
         scenarios::Vector{Dict{Symbol, Any}},
-        timestamp::String
+        timestamp::String,
+        relative::Bool = false
     )
     s = readdlm("../output/$(timestamp)_sensitivity_s.csv", ',')
     s = NamedDimsArray{(:P0, :type)}(s)
@@ -75,10 +76,14 @@ function sensitivity(
     decision_step = broadcast(scenario -> scenario[:decision_step], scenarios)
     number_decision = compute_number_decision(time_horizon, decision_step)
     s = PathwayDiversity.normalize_pd(s, number_decision)
+    if relative
+        s = PathwayDiversity.relative_pd(s)
+    end
 
     threshold = PathwayDiversity.get_root(1.3, influx)
     distance_threshold = threshold .- P0_options
-    _plot_sensitivity(s, distance_threshold, timestamp, scenarios)
+
+    _plot_sensitivity(s, distance_threshold, timestamp, scenarios, relative)
 end
 
 function states_distribution(P0_options::Vector{Float64}, time_horizon::Float64, decision_step::Float64,

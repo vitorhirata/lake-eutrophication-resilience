@@ -70,13 +70,24 @@ function _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons, 
     savefig("../output/$(timestamp)_distance_threshold_derivative.png")
 end
 
-function _plot_sensitivity(s, distance_threshold, timestamp, scenarios)
-    plot(distance_threshold, s[type=1], label="$(scenarios[1][:name])", xflip = true, legend=:topright,
-         ylabel="Pathway diversity", left_margin = 10Plots.mm, size=(1000,600), guidefontsize=12, lw=1.5,
-         color="black", alpha=0.9)
-    vline!([0.0], label=false, color="black", xlabel="Distance to threshold")
-    for (idx_scenario, scenario) in enumerate(scenarios[2:end])
-        plot!(distance_threshold, s[type=idx_scenario+1], label="$(scenario[:name])", color=idx_scenario, alpha=0.9)
+function _plot_sensitivity(s, distance_threshold, timestamp, scenarios, relative = false)
+    if relative
+        first_idx = 2
+        plot(distance_threshold, s[type=first_idx], label="$(scenarios[first_idx][:name])", legend=:topright,
+             ylabel="Pathway diversity", left_margin = 10Plots.mm, size=(1000,600),
+             alpha=0.9, guidefontsize=12, xflip = true, xlabel="Distance to threshold", ylims=[0.67, 1.3])
+        hline!([1.0], label=false, color="black")
+    else
+        first_idx = 1
+        plot(distance_threshold, s[type=first_idx], label="$(scenarios[first_idx][:name])", legend=:topright,
+             ylabel="Pathway diversity", left_margin = 10Plots.mm, size=(1000,600), color="black", lw=1.5,
+             alpha=0.9, guidefontsize=12, xflip = true, xlabel="Distance to threshold")
+    end
+
+    vline!([0.0], label=false, color="black")
+    for (idx_scenario, scenario) in enumerate(scenarios[first_idx+1:end])
+        plot!(distance_threshold, s[type=idx_scenario+first_idx], label="$(scenario[:name])",
+              color=idx_scenario+first_idx-1, alpha=0.9)
     end
     savefig("../output/$(timestamp)_sensitivity.png")
 end

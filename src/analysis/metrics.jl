@@ -55,6 +55,14 @@ function normalize_pd(
     return time_series
 end
 
+function relative_pd(time_series::NamedDimsArray)::NamedDimsArray
+    for index_dim in 2:1:size(time_series, :type)
+        time_series[type = index_dim] = time_series[type = index_dim] ./ time_series[type = 1]
+    end
+
+    return time_series
+end
+
 function compute_variance(time_series::NamedDimsArray, variance_step::Int64)::NamedDimsArray
     variance_ts = NamedDimsArray{(:time, )}(zeros(length(time_series)))
 

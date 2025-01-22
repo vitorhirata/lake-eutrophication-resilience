@@ -1,13 +1,9 @@
 function _plot_early_warning_signals(timestamp, s, variance_ts, autocorr_ts, distance_thresholds,
-    time_horizons, times, variance_time_step, autocorr_time_step, tipping_points)
+    time_horizons, times, tipping_points)
+
     label = reshape(map(time_horizon -> "Time horizon = $(time_horizon)", time_horizons), (1, size(s, :time_horizon)))
     xticks = 0:25:length(times)
     xlims = (0, times[end]+1)
-
-    variance_idx_step::Int64 = variance_time_step ÷ step(times)
-    autocorr_idx_step::Int64 = autocorr_time_step ÷ step(times)
-    variance = variance_ts[(variance_idx_step+1):end]
-    autocorr = autocorr_ts[(autocorr_idx_step+1):end]
 
     plt1 = plot(collect(times), distance_thresholds, label=false, ylabel="Distance to threshold")
     vline!([times[tipping_points[:p]]], label="Threshold", color="black", lw=2, xticks=xticks, xlims=xlims)
@@ -19,13 +15,15 @@ function _plot_early_warning_signals(timestamp, s, variance_ts, autocorr_ts, dis
                  label=false, markerstrokewidth=0, color=horizon)
     end
 
-    plt3 = plot(collect((variance_time_step+1):step(times):times[end]), variance, label=false, ylabel="Variance")
-    scatter!([times[tipping_points[:var]]], [variance[tipping_points[:var]-(variance_idx_step+1)]],
+    new_time = times[1 + length(times) - length(variance_ts):end]
+    plt3 = plot(collect(new_time), variance_ts, label=false, ylabel="Variance")
+    scatter!([new_time[tipping_points[:var]]], [variance_ts[tipping_points[:var]]],
              label="Kendall-τ > 0.56", markerstrokewidth=0, color=1)
     vline!([times[tipping_points[:p]]], label=false, color="black", lw=2, xticks=xticks, xlims=xlims)
 
-    plt4 = plot(collect((autocorr_time_step+1):step(times):times[end]), autocorr, label=false, ylabel="Autocorrelation")
-    scatter!([times[tipping_points[:autocorr]]], [autocorr[tipping_points[:autocorr]-(autocorr_idx_step+1)]],
+    new_time = times[1 + length(times) - length(autocorr_ts):end]
+    plt4 = plot(collect(new_time), autocorr_ts, label=false, ylabel="Autocorrelation")
+    scatter!([new_time[tipping_points[:autocorr]]], [autocorr_ts[tipping_points[:autocorr]]],
              label=false, markerstrokewidth=0, color=1, xlabel="Time (year)")
     vline!([times[tipping_points[:p]]], label=false, color="black", lw=2, xticks=xticks, xlims=xlims)
 

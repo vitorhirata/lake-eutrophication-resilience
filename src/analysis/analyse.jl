@@ -38,7 +38,7 @@ function early_warning_signals(
                                                                     influx, influx_tax)
 
     _plot_early_warning_signals(timestamp, s_ts, variance_ts, autocorr_ts, distance_thresholds,
-                                time_horizons, times, variance_time_step, autocorr_time_step, tipping_points)
+                                time_horizons, times, tipping_points)
 end
 
 function distance_basin_threshold(

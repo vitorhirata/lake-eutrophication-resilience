@@ -70,7 +70,7 @@ function compute_variance(time_series::NamedDimsArray, variance_step::Int64)::Na
         variance_ts[index_time] = var(time_series[(index_time-variance_step):index_time])
     end
 
-    return variance_ts
+    return variance_ts[(variance_step+1):end]
 end
 
 function compute_autocorrelation(time_series::NamedDimsArray, autocor_step::Int64)::NamedDimsArray
@@ -82,7 +82,7 @@ function compute_autocorrelation(time_series::NamedDimsArray, autocor_step::Int6
             time_series[(index_time-autocor_step+1):(index_time)])
     end
 
-    return autocor_ts
+    return autocor_ts[(autocor_step+1):end]
 end
 
 function detrend(time_series::NamedDimsArray, times::StepRangeLen{Float64}, type::String)::NamedDimsArray

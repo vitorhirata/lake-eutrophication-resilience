@@ -29,17 +29,16 @@ function early_warning_signals(
     autocorr_ts = PathwayDiversity.compute_autocorrelation(residuals, autocorr_idx_step)
 
     # Compute distance to threshold
-    thresholds = NamedDimsArray{(:time,)}(zeros(length(p_ts)))
+    distance_thresholds = NamedDimsArray{(:time,)}(zeros(length(p_ts)))
     for (idx, infl) in enumerate(influx_ts)
-        thresholds[idx] = p_ts[idx] - PathwayDiversity.get_root(1.3, infl)
+        distance_thresholds[idx] = p_ts[idx] - PathwayDiversity.get_root(1.3, infl)
     end
 
     tipping_points, kendall_tau = PathwayDiversity.threshold_points(p_ts,s_ts, times, variance_ts, autocorr_ts,
                                                                     influx, influx_tax)
 
-    _plot_early_warning_signals(timestamp, p_ts,s_ts, residuals, variance_ts, autocorr_ts, influx_ts, thresholds,
-                                time_horizons, times, variance_time_step, autocorr_time_step, tipping_points,
-                                kendall_tau)
+    _plot_early_warning_signals(timestamp, s_ts, variance_ts, autocorr_ts, distance_thresholds,
+                                time_horizons, times, variance_time_step, autocorr_time_step, tipping_points)
 end
 
 function distance_basin_threshold(

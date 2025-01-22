@@ -88,10 +88,13 @@ function sensitivity(
 end
 
 function states_distribution(P0_options::Vector{Float64}, time_horizon::Float64, decision_step::Float64,
-        timestamp::String
+        timestamp::String, influx::Float64 = 0.1
 )
     number_decision = compute_number_decision(time_horizon, decision_step)
-    _plot_states_distribution(P0_options, number_decision, timestamp)
+    threshold = PathwayDiversity.get_root(1.3, influx)
+    distance_threshold = threshold .- P0_options
+
+    _plot_states_distribution(distance_threshold, number_decision, timestamp)
 end
 
 function decision_scales(decision_steps::Vector{Float64}, time_horizons::Vector{Float64}, timestamp::String)

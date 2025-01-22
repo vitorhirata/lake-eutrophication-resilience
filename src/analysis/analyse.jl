@@ -46,7 +46,8 @@ function distance_basin_threshold(
         influx::Float64,
         time_horizons::Vector{Float64},
         decision_step::Float64,
-        timestamp::String
+        timestamp::String,
+        one_plot::Bool=true
 )
     s = readdlm("../output/$(timestamp)_distance_basin_s.csv", ',')
     s = NamedDimsArray{(:P0, :time_horizon)}(s)
@@ -59,7 +60,7 @@ function distance_basin_threshold(
     distance_threshold = threshold .- P_init_options
     peaks_idx = PathwayDiversity.find_peaks(s_diff, distance_threshold[2:end])
 
-    _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons, timestamp, peaks_idx)
+    _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons, timestamp, peaks_idx, one_plot)
 end
 
 function sensitivity(

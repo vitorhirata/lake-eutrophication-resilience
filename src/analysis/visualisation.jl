@@ -31,26 +31,33 @@ function _plot_early_warning_signals(timestamp, s, variance_ts, autocorr_ts, dis
     savefig("../output/$(timestamp)_early_warning_signal.png")
 end
 
-function _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons, timestamp, peaks_idx)
-    label = map(t_horizon -> "Time horizon = $(t_horizon)", time_horizons)
-    selected_index = [1, 2, 3, 4]
-
-    s = s[time_horizon=selected_index]
-    s_diff = s_diff[time_horizon=selected_index]
-    label = [label[i] for i in selected_index]
-    label = reshape(label, (1,length(selected_index)))
+function _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons, timestamp, peaks_idx, one_plot)
+    label = reshape(map(t_horizon -> "Time horizon = $(t_horizon)", time_horizons), (1,size(s, :time_horizon)))
     peak_values = [s_diff[P0=peak_idx, time_horizon=idx] for (idx,peak_idx) in enumerate(peaks_idx)]
+    xlims = (distance_threshold[end] - 0.1, distance_threshold[begin] + 0.1)
 
-    plot(distance_threshold, s, label=label, legend=:left, xflip = true,
-         ylabel="Pathway diversity", left_margin = 10Plots.mm, size=(1000,600), guidefontsize=12)
-    vline!([0.0], label=false, color="black", xlabel="Distance to threshold")
-    savefig("../output/$(timestamp)_distance_threshold.png")
+    if one_plot
+        plt1 = plot(distance_threshold, s, label=label, legend=:left)
+        vline!([0.0], label=false, color="black", xflip = true, ylabel="Pathway diversity", xlims=xlims)
 
-    plot(distance_threshold[2:end], s_diff, label=label, legend=:left, color=[1 2 3 4], xflip = true,
-          ylabel="Pathway diversity derivative", xlabel="Distance to threshold", left_margin = 10Plots.mm)
-    scatter!(distance_threshold[2:end][peaks_idx], peak_values, label=false, markerstrokewidth=0, color=[1, 2, 3, 4])
-    vline!([0.0], label=false, color="black", size=(1000,600), guidefontsize=12)
-    savefig("../output/$(timestamp)_distance_threshold_derivative.png")
+        plt2 = plot(distance_threshold[2:end], s_diff, label=label, legend=:topleft, xlabel="Distance to threshold")
+        scatter!(distance_threshold[2:end][peaks_idx], peak_values, label=false, markerstrokewidth=0, color=[1,2,3,4])
+        vline!([0.0], label=false, color="black", xflip = true, ylabel="Pathway diversity derivative", xlims=xlims)
+
+        plot(plt1, plt2, layout=(2,1), size=(1000,1200), guidefontsize=12, left_margin = 10Plots.mm)
+        savefig("../output/$(timestamp)_distance_threshold.png")
+    else
+        plot(distance_threshold, s, label=label, legend=:left, xlabel="Distance to threshold")
+        vline!([0.0], label=false, color="black", xflip = true, ylabel="Pathway diversity",
+               guidefontsize=12, left_margin = 10Plots.mm, size=(1000,600), xlims=xlims)
+        savefig("../output/$(timestamp)_distance_threshold.png")
+
+        plot(distance_threshold[2:end], s_diff, label=label, legend=:topleft, xlabel="Distance to threshold")
+        scatter!(distance_threshold[2:end][peaks_idx], peak_values, label=false, markerstrokewidth=0, color=[1,2,3,4])
+        vline!([0.0], label=false, color="black", xflip = true, ylabel="Pathway diversity derivative",
+               guidefontsize=12, left_margin = 10Plots.mm, size=(1000,600), xlims=xlims)
+        savefig("../output/$(timestamp)_distance_threshold_derivative.png")
+    end
 end
 
 function _plot_sensitivity(s, distance_threshold, timestamp, scenarios, relative = false)

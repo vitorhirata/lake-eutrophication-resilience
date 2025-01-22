@@ -25,13 +25,11 @@ function threshold_points(p::NamedDimsArray, s::NamedDimsArray, times::StepRange
 end
 
 function find_peaks(time_series::NamedDimsArray, time::Vector{Float64})::Vector{Int64}
-    smooth = NamedDimsArray{(:P0, :time_horizon)}(zeros(size(time_series, :P0), size(time_series, :time_horizon)))
     peaks_idx = zeros(Int64, size(time_series, :time_horizon))
+    peak_prominance = [0.001, 0.01, 0.01, 0.01]
 
     for horizon_idx in 1:size(time_series, :time_horizon)
-        model = loess(time, parent(time_series[time_horizon=horizon_idx]), span=0.5)
-        smooth[time_horizon=horizon_idx] = predict(model, time)
-        pks = findmaxima(smooth[time_horizon=horizon_idx])
+        pks = findmaxima(time_series[time_horizon=horizon_idx]) |> peakproms!(; min=peak_prominance[horizon_idx])
         peaks_idx[horizon_idx] = pks[:indices][1]
     end
     return peaks_idx
@@ -89,10 +87,19 @@ function detrend(time_series::NamedDimsArray, times::StepRangeLen{Float64}, type
     if type == "linear"
         return linear_detrend(time_series, times)
     elseif type == "loess"
-        return loess_detrend(time_series, times)
+        return loess_detrend(time_series, collect(times), :time, true)
     else
         throw(ArgumentError("Invalid type of detrend"))
     end
+end
+
+function detrend(time_series::NamedDimsArray, times::Vector{Float64})::NamedDimsArray
+    result = NamedDimsArray{(:P0, :time_horizon)}(zeros(size(time_series, :P0), size(time_series, :time_horizon)))
+
+    for idx_horizon in 1:size(time_series, :time_horizon)
+        result[time_horizon=idx_horizon] = loess_detrend(time_series[time_horizon=idx_horizon], times, :P0, false)
+    end
+    return result
 end
 
 function linear_detrend(time_series::NamedDimsArray, times::StepRangeLen{Float64})::NamedDimsArray
@@ -108,13 +115,12 @@ function linear_detrend(time_series::NamedDimsArray, times::StepRangeLen{Float64
     return result
 end
 
-function loess_detrend(time_series::NamedDimsArray, times::StepRangeLen{Float64})::NamedDimsArray
-    result = NamedDimsArray{(:time, )}(zeros(length(time_series)))
-    times = collect(times)
+function loess_detrend(time_series::NamedDimsArray, times::Vector{Float64}, dim::Symbol, residual::Bool)::NamedDimsArray
+    result = NamedDimsArray{(dim, )}(zeros(length(time_series)))
 
     model = loess(times, parent(time_series), span=0.5)
     smooth_function = predict(model, times)
-    result = time_series - smooth_function
+    result = residual ? time_series - smooth_function : NamedDimsArray{(dim, )}(smooth_function)
     return result
 end
 
@@ -138,7 +144,7 @@ function _max_kendall_tau(
     idx_threshold = findfirst(x -> x > kendall_threshold, abs.(kendall))
 
     if idx_threshold == nothing
-        return length(times), round(kendall[end]; digits=2)
+        return length(time_series), round(kendall[end]; digits=2)
     end
     return kendall_range[idx_threshold], round(kendall[idx_threshold]; digits=2)
 end

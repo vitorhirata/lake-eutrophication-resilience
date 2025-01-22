@@ -52,7 +52,8 @@ function distance_basin_threshold(
     s = NamedDimsArray{(:P0, :time_horizon)}(s)
     number_decision = compute_number_decision(time_horizons, decision_step)
     s = PathwayDiversity.normalize_pd(s, number_decision)
-    s_diff = PathwayDiversity.finite_difference(s, 0.05)
+    s_detrended = PathwayDiversity.detrend(s, P_init_options)
+    s_diff = PathwayDiversity.finite_difference(s_detrended, P_init_options[2]-P_init_options[1])
 
     threshold = PathwayDiversity.get_root(1.3, influx)
     distance_threshold = threshold .- P_init_options

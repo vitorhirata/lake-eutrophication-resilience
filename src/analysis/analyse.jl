@@ -10,8 +10,6 @@ function early_warning_signals(
 
     p_ts = readdlm("../output/$(timestamp)_ews_p.csv", ',')
     p_ts = NamedDimsArray{(:time,)}(vec(p_ts))
-    influx_ts = readdlm("../output/$(timestamp)_ews_influx.csv", ',')
-    influx_ts = NamedDimsArray{(:time,)}(vec(influx_ts))
     s_ts = readdlm("../output/$(timestamp)_ews_s.csv", ',')
     s_ts = NamedDimsArray{(:time, :time_horizon)}(s_ts)
 
@@ -28,17 +26,10 @@ function early_warning_signals(
     autocorr_idx_step::Int64 = autocorr_time_step ÷ step(times)
     autocorr_ts = PathwayDiversity.compute_autocorrelation(residuals, autocorr_idx_step)
 
-    # Compute distance to threshold
-    distance_thresholds = NamedDimsArray{(:time,)}(zeros(length(p_ts)))
-    for (idx, infl) in enumerate(influx_ts)
-        distance_thresholds[idx] = p_ts[idx] - PathwayDiversity.get_root(1.3, infl)
-    end
-
-    tipping_points, kendall_tau = PathwayDiversity.threshold_points(p_ts,s_ts, times, variance_ts, autocorr_ts,
+    # Compute kendall_tau
+    tipping_points, kendall_tau = PathwayDiversity.threshold_points(p_ts, s_ts, times, variance_ts, autocorr_ts,
                                                                     influx, influx_tax)
-
-    _plot_early_warning_signals(timestamp, s_ts, variance_ts, autocorr_ts, distance_thresholds,
-                                time_horizons, times, tipping_points)
+    _plot_early_warning_signals(timestamp, p_ts, s_ts, variance_ts, autocorr_ts, time_horizons, times, tipping_points)
 end
 
 function distance_basin_threshold(
@@ -55,12 +46,9 @@ function distance_basin_threshold(
     s = PathwayDiversity.normalize_pd(s, number_decision)
     s_detrended = PathwayDiversity.detrend(s, P_init_options)
     s_diff = PathwayDiversity.finite_difference(s_detrended, P_init_options[2]-P_init_options[1])
+    peaks_idx = PathwayDiversity.find_peaks(s_diff, P_init_options[2:end])
 
-    threshold = PathwayDiversity.get_root(1.3, influx)
-    distance_threshold = threshold .- P_init_options
-    peaks_idx = PathwayDiversity.find_peaks(s_diff, distance_threshold[2:end])
-
-    _plot_distance_threshold(s, s_diff, distance_threshold, time_horizons, timestamp, peaks_idx, one_plot)
+    _plot_distance_threshold(s, s_diff, P_init_options, time_horizons, timestamp, peaks_idx, one_plot)
 end
 
 function sensitivity(
@@ -81,20 +69,14 @@ function sensitivity(
         s = PathwayDiversity.relative_pd(s)
     end
 
-    threshold = PathwayDiversity.get_root(1.3, influx)
-    distance_threshold = threshold .- P0_options
-
-    _plot_sensitivity(s, distance_threshold, timestamp, scenarios, relative)
+    _plot_sensitivity(s, P0_options, timestamp, scenarios, relative)
 end
 
 function states_distribution(P0_options::Vector{Float64}, time_horizon::Float64, decision_step::Float64,
         timestamp::String, influx::Float64 = 0.1
 )
     number_decision = compute_number_decision(time_horizon, decision_step)
-    threshold = PathwayDiversity.get_root(1.3, influx)
-    distance_threshold = threshold .- P0_options
-
-    _plot_states_distribution(distance_threshold, number_decision, timestamp)
+    _plot_states_distribution(P0_options, number_decision, timestamp)
 end
 
 function decision_scales(decision_steps::Vector{Float64}, time_horizons::Vector{Float64}, timestamp::String)

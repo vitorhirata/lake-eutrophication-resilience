@@ -120,9 +120,9 @@ function _plot_decision_scales(s, time_horizons, decision_steps, timestamp)
 end
 
 
-function _plot_scaling(s, P_init_options, number_options, timestamp)
-    label = map(P_init -> "Initial condition = $(P_init)", P_init_options)
-    label = reshape(label, (1,length(P_init_options)))
+function _plot_scaling(s, P0_options, number_options, timestamp)
+    label = map(P0 -> "Initial condition = $(P0)", P0_options)
+    label = reshape(label, (1,length(P0_options)))
 
     plot(number_options, s, label=label, left_margin = 5Plots.mm, legend=:outerbottomright,
          size=(952,560), ylabel = "Pathway diversity", xlabel = "Maximum number of options")

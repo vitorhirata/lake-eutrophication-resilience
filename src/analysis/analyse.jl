@@ -1,6 +1,6 @@
 function early_warning_signals(
         timestamp::String;
-        P_init::Float64,
+        P0::Float64,
         influx::Float64,
         influx_tax::Float64,
         times::StepRangeLen{Float64},
@@ -33,7 +33,7 @@ function early_warning_signals(
 end
 
 function distance_basin_threshold(
-        P_init_options::Vector{Float64},
+        P0_options::Vector{Float64},
         influx::Float64,
         time_horizons::Vector{Float64},
         decision_step::Float64,
@@ -44,11 +44,11 @@ function distance_basin_threshold(
     s = NamedDimsArray{(:P0, :time_horizon)}(s)
     number_decision = compute_number_decision(time_horizons, decision_step)
     s = PathwayDiversity.normalize_pd(s, number_decision)
-    s_detrended = PathwayDiversity.detrend(s, P_init_options)
-    s_diff = PathwayDiversity.finite_difference(s_detrended, P_init_options[2]-P_init_options[1])
-    peaks_idx = PathwayDiversity.find_peaks(s_diff, P_init_options[2:end])
+    s_detrended = PathwayDiversity.detrend(s, P0_options)
+    s_diff = PathwayDiversity.finite_difference(s_detrended, P0_options[2]-P0_options[1])
+    peaks_idx = PathwayDiversity.find_peaks(s_diff, P0_options[2:end])
 
-    _plot_distance_threshold(s, s_diff, P_init_options, time_horizons, timestamp, peaks_idx, one_plot)
+    _plot_distance_threshold(s, s_diff, P0_options, time_horizons, timestamp, peaks_idx, one_plot)
 end
 
 function sensitivity(
@@ -85,10 +85,10 @@ function decision_scales(decision_steps::Vector{Float64}, time_horizons::Vector{
     _plot_decision_scales(s, time_horizons, decision_steps, timestamp)
 end
 
-function scaling(P_init_options::Vector{Float64}, number_options::Vector{Int64}, timestamp::String)
+function scaling(P0_options::Vector{Float64}, number_options::Vector{Int64}, timestamp::String)
     s = readdlm("../output/$(timestamp)_scale_initial_s.csv", ',')
     s = NamedDimsArray{(:number_options, :P0)}(s)
-    _plot_scaling(s, P_init_options, number_options, timestamp)
+    _plot_scaling(s, P0_options, number_options, timestamp)
 end
 
 function number_options_simulation(

@@ -48,20 +48,20 @@ function scaling()
     influx = 0.1
     decision_step = 5.0
     time_horizon = 20.0
-    P_init_options = collect(0:0.5:3)
+    P0_options = collect(0:0.5:3)
     number_options = collect(10:20:80)
 
-    timestamp = PathwayDiversity.run_entropy(P_init_options, influx, decision_step, time_horizon, number_options)
-    PathwayDiversity.scaling(P_init_options, number_options, timestamp)
+    timestamp = PathwayDiversity.run_entropy(P0_options, influx, decision_step, time_horizon, number_options)
+    PathwayDiversity.scaling(P0_options, number_options, timestamp)
 end
 
 function decision_scales()
-    P_init = 0.1
+    P0 = 0.1
     influx = 0.1
     decision_steps = [4.0, 6.0, 8.0]
     time_horizons = [8.0, 18.0, 24.0]
 
-    timestamp = PathwayDiversity.run_entropy(P_init, influx, decision_steps, time_horizons)
+    timestamp = PathwayDiversity.run_entropy(P0, influx, decision_steps, time_horizons)
     PathwayDiversity.decision_scales(time_horizons, decision_steps, timestamp)
 end
 
@@ -96,16 +96,16 @@ end
 function distance_basin_threshold()
     influx = 0.1
     decision_step = 5.0
-    P_init_options = collect(0:0.05:2.85)
+    P0_options = collect(0:0.05:2.85)
     time_horizons = [1, 2, 4, 7] * decision_step
 
-    timestamp = PathwayDiversity.run_entropy(P_init_options, influx, decision_step, time_horizons)
-    PathwayDiversity.distance_basin_threshold(P_init_options, influx, time_horizons, decision_step, timestamp)
+    timestamp = PathwayDiversity.run_entropy(P0_options, influx, decision_step, time_horizons)
+    PathwayDiversity.distance_basin_threshold(P0_options, influx, time_horizons, decision_step, timestamp)
 end
 
 function early_warning_signals()
     parameters = Dict(
-        :P_init => 0.27,
+        :P0 => 0.27,
         :times => 1:0.125:80,
         :time_horizons => [5.0, 10.0, 20.0],
         :decision_step => 5.0,

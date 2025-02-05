@@ -31,7 +31,12 @@ function _plot_early_warning_signals(timestamp, p, s, variance_ts, autocorr_ts, 
 end
 
 function _plot_distance_threshold(s, s_diff, P0_options, time_horizons, timestamp, peaks_idx, one_plot)
-    label = reshape(map(t_horizon -> "Time horizon = $(t_horizon)", time_horizons), (1,size(s, :time_horizon)))
+    if size(s, :time_horizon) == 1
+        label = false
+    else
+        label = reshape(map(t_horizon -> "Time horizon = $(t_horizon)", time_horizons), (1,size(s, :time_horizon)))
+    end
+
     peak_values = [s_diff[P0=peak_idx, time_horizon=idx] for (idx,peak_idx) in enumerate(peaks_idx)]
     xlims = (0, P0_options[end] + 0.1)
 
@@ -42,7 +47,7 @@ function _plot_distance_threshold(s, s_diff, P0_options, time_horizons, timestam
         annotate!([(0.3,0.16,"Clean basin\n of attraction"), (2.5,0.16,"Eutrophicated\n basin of attraction"),
                    (1.0,0.14,"Threshold\nregion")], fontsize=10)
 
-        plt2 = plot(P0_options[2:end], s_diff, label=label, legend=:topleft, xlabel="Amount of Phosphorus")
+        plt2 = plot(P0_options[2:end], s_diff, label=label, legend=:topright, xlabel="Amount of Phosphorus")
         scatter!(P0_options[2:end][peaks_idx], peak_values, label=false, markerstrokewidth=0, color=[1,2,3,4])
         vspan!([0.64, 1.86], linecolor = :grey, fillcolor = :grey, alpha = 0.35, label = false)
         vline!([1.25], label="Median threshold", color="black", ylabel="Pathway Diversity Derivative", xlims=xlims)

@@ -26,7 +26,11 @@ end
 
 function find_peaks(time_series::NamedDimsArray, time::Vector{Float64})::Vector{Int64}
     peaks_idx = zeros(Int64, size(time_series, :time_horizon))
-    peak_prominance = [0.001, 0.01, 0.01, 0.01]
+    if size(time_series, :time_horizon) == 1
+        peak_prominance = [0.01] # [0.001, 0.01, 0.01, 0.01]
+    else
+        peak_prominance = [0.001, 0.01, 0.01, 0.01]
+    end
 
     for horizon_idx in 1:size(time_series, :time_horizon)
         pks = findmaxima(time_series[time_horizon=horizon_idx]) |> peakproms!(; min=peak_prominance[horizon_idx])

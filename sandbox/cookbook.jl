@@ -66,7 +66,7 @@ function decision_scales()
 end
 
 function states_distribution()
-    P0_options = [0.663, 0.913, 1.413, 1.663]
+    P0_options = [0.5, 1.0, 1.5, 2.0]
     time_horizons = 35.0
     decision_steps = 5.0
 

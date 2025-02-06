@@ -28,7 +28,9 @@ include("simulation/scenarios.jl")
 include("simulation/internal_dynamics.jl")
 
 include("analysis/metrics.jl")
-include("analysis/analyse.jl")
+include("analysis/basic_model_information_analysis.jl")
+include("analysis/main_simulations_analysis.jl")
+include("analysis/secondary_simulations_analysis.jl")
 include("analysis/visualisation.jl")
 
 end

@@ -14,7 +14,8 @@ function early_warning_signals(
     s_ts = NamedDimsArray{(:time, :time_horizon)}(s_ts)
 
     residuals = PathwayDiversity.detrend(p_ts,times, "loess")
-    s_ts = PathwayDiversity.normalize_pd(s_ts, :time_horizon)
+    number_decision = compute_number_decision(time_horizons, decision_step)
+    s_ts = PathwayDiversity.normalize_pd(s_ts, number_decision)
 
     # Compute variance
     variance_time_step = 30

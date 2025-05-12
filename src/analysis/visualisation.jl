@@ -6,6 +6,7 @@ function _plot_early_warning_signals(timestamp, p, s, variance_ts, autocorr_ts, 
 
     plt1 = plot(collect(times), p, label=false, ylabel="Amount of Phosphorus")
     vline!([times[tipping_points[:p]]], label="Threshold", color="black", lw=2, xticks=xticks, xlims=xlims)
+    label1 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"a)"))
 
     plt2 = plot(collect(times), s, label=label, ylabel="Pathway Diversity", legend=:bottomleft)
     vline!([times[tipping_points[:p]]], label=false, color="black", lw=2, xticks=xticks, xlims=xlims)
@@ -13,20 +14,24 @@ function _plot_early_warning_signals(timestamp, p, s, variance_ts, autocorr_ts, 
         scatter!([times[tipping_points[:s][horizon]]], [s[time=tipping_points[:s][horizon], time_horizon=horizon]],
                  label=false, markerstrokewidth=0, color=horizon)
     end
+    label2 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"b)"))
 
     new_time = times[1 + length(times) - length(variance_ts):end]
     plt3 = plot(collect(new_time), variance_ts, label=false, ylabel="Variance")
     scatter!([new_time[tipping_points[:var]]], [variance_ts[tipping_points[:var]]],
              label="Kendall-τ > 0.56", markerstrokewidth=0, color=1)
     vline!([times[tipping_points[:p]]], label=false, color="black", lw=2, xticks=xticks, xlims=xlims)
+    label3 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"c)"))
 
     new_time = times[1 + length(times) - length(autocorr_ts):end]
     plt4 = plot(collect(new_time), autocorr_ts, label=false, ylabel="Autocorrelation")
     scatter!([new_time[tipping_points[:autocorr]]], [autocorr_ts[tipping_points[:autocorr]]],
              label=false, markerstrokewidth=0, color=1, xlabel="Time (year)")
     vline!([times[tipping_points[:p]]], label=false, color="black", lw=2, xticks=xticks, xlims=xlims)
+    label4 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"d)"))
 
-    plot(plt1, plt2, plt3, plt4, layout=(4,1), size=(1000,1000), guidefontsize=12, left_margin = 10Plots.mm)
+    plot(label1, label2, label3, label4, plt1, plt2, plt3, plt4, layout=@layout([grid(4,1){0.005w} grid(4,1)]),
+         size=(1000,1000), guidefontsize=12)
     savefig("../output/$(timestamp)_early_warning_signal.png")
 end
 
@@ -41,18 +46,21 @@ function _plot_distance_threshold(s, s_diff, P0_options, time_horizons, timestam
     xlims = (0, P0_options[end] + 0.1)
 
     if one_plot
-        plt1 = plot(P0_options, s, label=label, legend=:topright)
+        plt1 = plot(P0_options, s, label=label, legend=:topright, xlabel="Initial Amount of Phosphorus")
         vspan!([0.64, 1.86], linecolor = :grey, fillcolor = :grey, alpha = 0.35, label = false)
         vline!([1.25], label="Median threshold", color="black", ylabel="Pathway Diversity", xlims=xlims)
         annotate!([(0.3,0.16,"Clean basin\n of attraction"), (2.5,0.16,"Eutrophicated\n basin of attraction"),
                    (1.0,0.14,"Threshold\nregion")], fontsize=10)
+        label1 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"a)"))
 
-        plt2 = plot(P0_options[2:end], s_diff, label=label, legend=:topright, xlabel="Amount of Phosphorus")
+        plt2 = plot(P0_options[2:end], s_diff, label=label, xlabel="Initial Amount of Phosphorus", legend=:topright)
         scatter!(P0_options[2:end][peaks_idx], peak_values, label=false, markerstrokewidth=0, color=[1,2,3,4])
         vspan!([0.64, 1.86], linecolor = :grey, fillcolor = :grey, alpha = 0.35, label = false)
         vline!([1.25], label="Median threshold", color="black", ylabel="Pathway Diversity Derivative", xlims=xlims)
+        label2 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"b)"))
 
-        plot(plt1, plt2, layout=(2,1), size=(1000,1200), guidefontsize=14, left_margin = 10Plots.mm)
+        plot(label1, label2, plt1, plt2, layout=@layout([grid(2,1){0.03w} grid(2,1)]), size=(1000,1200),
+             guidefontsize=14)
         savefig("../output/$(timestamp)_distance_threshold.png")
     else
         plot(P0_options, s, label=label, legend=:topright, xlabel="Amount of Phosphorus")
@@ -77,7 +85,7 @@ function _plot_sensitivity(s, P0_options, timestamp, scenarios, relative = false
         first_idx = 2
         plot(P0_options, s[type=first_idx], label="$(scenarios[first_idx][:name])", legend=:bottom,
              ylabel="Relative Pathway Diversity", left_margin = 10Plots.mm, size=(1000,600),
-             alpha=0.9, guidefontsize=14, xlabel="Amount of Phosphorus", ylims=[0.67, 1.3])
+             alpha=0.9, guidefontsize=14, xlabel="Initial Amount of Phosphorus", ylims=[0.67, 1.3])
         vspan!([0.64, 1.86], linecolor = :grey, fillcolor = :grey, alpha = 0.35, label = false)
         annotate!([(0.3,1.2,"Clean basin\n of attraction"), (2.5,1.2,"Eutrophicated\n basin of attraction"),
                    (1.0,1.2,"Threshold\nregion")], fontsize=10)
@@ -86,7 +94,7 @@ function _plot_sensitivity(s, P0_options, timestamp, scenarios, relative = false
         first_idx = 1
         plot(P0_options, s[type=first_idx], label="$(scenarios[first_idx][:name])", legend=:topright,
              ylabel="Pathway Diversity", left_margin = 10Plots.mm, size=(1000,600), color="black", lw=1.5,
-             alpha=0.9, guidefontsize=14, xlabel="Amount of Phosphorus")
+             alpha=0.9, guidefontsize=14, xlabel="Initial Amount of Phosphorus")
         vspan!([0.64, 1.86], linecolor = :grey, fillcolor = :grey, alpha = 0.35, label = false)
         annotate!([(0.3,0.12,"Clean basin\n of attraction"), (2.5,0.16,"Eutrophicated\n basin of attraction"),
                    (1.0,0.12,"Threshold\nregion")], fontsize=10)
@@ -103,12 +111,13 @@ end
 function _plot_states_distribution(P0_options, n_decision, timestamp)
     plot_array = Plots.Plot[]
     labels = reshape(map(decision -> "Decision $(decision)", 1:n_decision), 1, n_decision)
+    letters = ["a) Very low", "b) Low", "c) High", "d) Very high"]
 
     for (idx, P0) in enumerate(P0_options)
         states = readdlm("../output/$(timestamp)_state_distribution_$(idx).csv", ',')
         states = [_clean_vector(row) for row in eachrow(states)]
-        plt1 = violin(labels, states[2:end], label=false, title="Amount of Phosphorus: $(round(P0, digits=2))",
-                      ylim=(0.0, 2.5), ylabel="State", color=idx)
+        plt1 = violin(labels, states[2:end], ylim=(0.0, 2.5), ylabel="State", color=idx, label=false,
+                      title="$(letters[idx]) initial condition (x=$(round(P0, digits=2)))")
         push!(plot_array,plt1)
     end
     plot(plot_array..., layout=(length(P0_options), 1), size=(800,200*length(P0_options)), guidefontsize=12)

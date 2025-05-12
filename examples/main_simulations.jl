@@ -39,10 +39,10 @@ function sensitivity()
     scenarios = [
         Dict(:name => "Default", :decision_step => 5.0),
         Dict(:name => "1. Reduced decisions", :decision_step => 15.0),
-        Dict(:name => "2. Restrictive option", :decision_step => 5.0, :minimum_influx => 0.02, :maximum_influx => 0.32),
+        Dict(:name => "2. Allow restrictive option", :decision_step => 5.0, :minimum_influx => 0.02, :maximum_influx => 0.32),
         Dict(:name => "3. Probability based on change", :decision_step => 5.0, :method => "state_change"),
         Dict(:name => "4. Minimal change", :decision_step => 5.0, :method => "closer_more_likely"),
-        Dict(:name => "5. Favor positive", :decision_step => 5.0, :method => "favor_positive"),
+        Dict(:name => "5. Favour lower influx", :decision_step => 5.0, :method => "favor_positive"),
         #Dict(:name => "Unstable decisions", :decision_step => 5.0, :method => "further_more_likely"),
         #Dict(:name => "Favor negative", :decision_step => 5.0, :method => "favor_negative"),
     ]

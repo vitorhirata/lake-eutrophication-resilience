@@ -61,6 +61,7 @@ function early_warning_signals(
 
     _plot_early_warning_signals(timestamp, p_ts, s_ts, variance_ts, autocorr_ts, time_horizons, times,
                                 threshold_idx, kendall_tau)
+    #_plot_early_warning_residuals(timestamp, p_ts, residuals, times, threshold_idx)
 end
 
 function sensitivity(

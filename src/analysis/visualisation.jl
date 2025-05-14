@@ -120,6 +120,23 @@ function _plot_states_distribution(P0_options, n_decision, timestamp)
     savefig("../output/$(timestamp)_state_distribution.png")
 end
 
+function _plot_early_warning_residuals(timestamp, p, residuals, times, threshold_idx)
+    xticks = 0:5:length(times)
+    xlims = (0, times[end]+1)
+
+    plt1 = plot(collect(times), p, label=false, ylabel="Amount of Phosphorus")
+    vline!([times[threshold_idx]], label="Threshold", color="black", lw=2, xticks=xticks, xlims=xlims)
+    label1 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"a)"))
+
+    plt2 = plot(collect(times), residuals, label=false, ylabel="Residual")
+    vline!([times[threshold_idx]], label=false, color="black", lw=2, xticks=xticks, xlims=xlims)
+    label2 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"b)"))
+
+    plot(label1, label2, plt1, plt2, layout=@layout([grid(2,1){0.01w} grid(2,1)]),
+         size=(1000,500), guidefontsize=12)
+    savefig("../output/$(timestamp)_early_warning_signal_residuals.png")
+end
+
 function _plot_decision_scales(s, time_horizons, decision_steps, timestamp)
     label = map(decision_step -> "Time horizon = $(decision_step)", time_horizons)
     label = reshape(label, (1,length(time_horizons)))

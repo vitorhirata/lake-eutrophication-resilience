@@ -1,33 +1,29 @@
-function _plot_early_warning_signals(timestamp, p, s, variance_ts, autocorr_ts, time_horizons, times, tipping_points)
+function _plot_early_warning_signals(timestamp, p, s, variance_ts, autocorr_ts, time_horizons, times,
+                                     threshold_idx, kendall_tau)
 
-    label = reshape(map(time_horizon -> "Time horizon = $(time_horizon)", time_horizons), (1, size(s, :time_horizon)))
+    pd_label = map(idx -> "Time horizon = $(time_horizons[idx]). Kendall-τ = $(kendall_tau[Symbol(:s_, idx)])",
+                   1:length(time_horizons)
+                  )
+    pd_label = reshape(pd_label, (1, size(s, :time_horizon)))
     xticks = 0:25:length(times)
     xlims = (0, times[end]+1)
 
     plt1 = plot(collect(times), p, label=false, ylabel="Amount of Phosphorus")
-    vline!([times[tipping_points[:p]]], label="Threshold", color="black", lw=2, xticks=xticks, xlims=xlims)
+    vline!([times[threshold_idx]], label="Threshold", color="black", lw=2, xticks=xticks, xlims=xlims)
     label1 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"a)"))
 
-    plt2 = plot(collect(times), s, label=label, ylabel="Pathway Diversity", legend=:bottomleft)
-    vline!([times[tipping_points[:p]]], label=false, color="black", lw=2, xticks=xticks, xlims=xlims)
-    for horizon in 1:size(s, :time_horizon)
-        scatter!([times[tipping_points[:s][horizon]]], [s[time=tipping_points[:s][horizon], time_horizon=horizon]],
-                 label=false, markerstrokewidth=0, color=horizon)
-    end
+    plt2 = plot(collect(times), s, label=pd_label, ylabel="Pathway Diversity", legend=:bottomleft)
+    vline!([times[threshold_idx]], label=false, color="black", lw=2, xticks=xticks, xlims=xlims)
     label2 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"b)"))
 
     new_time = times[1 + length(times) - length(variance_ts):end]
-    plt3 = plot(collect(new_time), variance_ts, label=false, ylabel="Variance")
-    scatter!([new_time[tipping_points[:var]]], [variance_ts[tipping_points[:var]]],
-             label="Kendall-τ > 0.56", markerstrokewidth=0, color=1)
-    vline!([times[tipping_points[:p]]], label=false, color="black", lw=2, xticks=xticks, xlims=xlims)
+    plt3 = plot(collect(new_time), variance_ts, label=label="Kendall-τ=$(kendall_tau[:var])", ylabel="Variance")
+    vline!([times[threshold_idx]], label=false, color="black", lw=2, xticks=xticks, xlims=xlims)
     label3 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"c)"))
 
     new_time = times[1 + length(times) - length(autocorr_ts):end]
-    plt4 = plot(collect(new_time), autocorr_ts, label=false, ylabel="Autocorrelation")
-    scatter!([new_time[tipping_points[:autocorr]]], [autocorr_ts[tipping_points[:autocorr]]],
-             label=false, markerstrokewidth=0, color=1, xlabel="Time (year)")
-    vline!([times[tipping_points[:p]]], label=false, color="black", lw=2, xticks=xticks, xlims=xlims)
+    plt4 = plot(collect(new_time), autocorr_ts, label="Kendall-τ=$(kendall_tau[:autocorr])", ylabel="Autocorrelation")
+    vline!([times[threshold_idx]], label=false, color="black", lw=2, xticks=xticks, xlims=xlims, xlabel = "Time (year)")
     label4 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"d)"))
 
     plot(label1, label2, label3, label4, plt1, plt2, plt3, plt4, layout=@layout([grid(4,1){0.005w} grid(4,1)]),

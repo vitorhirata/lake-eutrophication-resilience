@@ -53,10 +53,14 @@ function early_warning_signals(
     autocorr_idx_step::Int64 = autocorr_time_step ÷ step(times)
     autocorr_ts = PathwayDiversity.compute_autocorrelation(residuals, autocorr_idx_step)
 
+    # Compute threshold
+    threshold_idx = PathwayDiversity.cross_threshold(p_ts, times, influx, influx_tax)
+
     # Compute kendall_tau
-    tipping_points, kendall_tau = PathwayDiversity.threshold_points(p_ts, s_ts, times, variance_ts, autocorr_ts,
-                                                                    influx, influx_tax)
-    _plot_early_warning_signals(timestamp, p_ts, s_ts, variance_ts, autocorr_ts, time_horizons, times, tipping_points)
+    kendall_tau = PathwayDiversity.kendall_tau(s_ts, variance_ts, autocorr_ts, times, threshold_idx)
+
+    _plot_early_warning_signals(timestamp, p_ts, s_ts, variance_ts, autocorr_ts, time_horizons, times,
+                                threshold_idx, kendall_tau)
 end
 
 function sensitivity(

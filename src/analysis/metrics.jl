@@ -6,22 +6,29 @@ function finite_difference(time_series::NamedDimsArray, interval::Float64)::Name
     return result
 end
 
-function threshold_points(p::NamedDimsArray, s::NamedDimsArray, times::StepRangeLen{Float64},
-        variance::NamedDimsArray, autocorrelation::NamedDimsArray,
-        base_influx::Float64, influx_tax::Float64, I_step::Float64 = 1.0
-)::Tuple{Dict, Dict}
-    points = Dict()
-    kendall_tau = Dict()
+function kendall_tau(s::NamedDimsArray, variance::NamedDimsArray, autocorrelation::NamedDimsArray,
+        times::StepRangeLen{Float64}, threshold_idx::Int64
+)::Dict{Symbol, Float64}
+    result = Dict{Symbol, Float64}()
 
-    points[:p] = _cross_threshold(p, times, base_influx, influx_tax, I_step)
-    points[:var], kendall_tau[:var] = _max_kendall_tau(variance, times)
-    points[:autocorr], kendall_tau[:autocorr] = _max_kendall_tau(autocorrelation, times)
-
-    points[:s], kendall_tau[:s] = zeros(Int64, size(s, :time_horizon)), zeros(size(s, :time_horizon))
+    result[:var] = kendall_tau(variance, times, threshold_idx)
+    result[:autocorr] = kendall_tau(autocorrelation, times, threshold_idx)
     for idx in 1:size(s, :time_horizon)
-        points[:s][idx], kendall_tau[:s][idx] = _max_kendall_tau(s[time_horizon=idx], times)
+        result[Symbol(:s_, idx)] = kendall_tau(s[time_horizon=idx], times, threshold_idx)
     end
-    return points, kendall_tau
+    return result
+end
+
+function kendall_tau(time_series::NamedDimsArray, times::StepRangeLen{Float64},
+                     threshold_idx::Int64, kendall_tau_time_offset = 6
+)::Float64
+    delta_kendall_tau_idx = length(times) - threshold_idx + Int64(kendall_tau_time_offset / step(times))
+    initial_time_idx = length(times) - length(time_series) + 1
+    analysis_times = collect(times[initial_time_idx:(length(times) - delta_kendall_tau_idx)])
+    analysis_time_series = parent(time_series[1:length(time_series) - delta_kendall_tau_idx])
+
+    result = corkendall(analysis_times, analysis_time_series)
+    return round(result; digits=2)
 end
 
 function find_peaks(time_series::NamedDimsArray, time::Vector{Float64})::Vector{Int64}
@@ -128,7 +135,7 @@ function loess_detrend(time_series::NamedDimsArray, times::Vector{Float64}, dim:
     return result
 end
 
-function _cross_threshold(time_series::NamedDimsArray, times::StepRangeLen{Float64},
+function cross_threshold(time_series::NamedDimsArray, times::StepRangeLen{Float64},
     base_influx::Float64, influx_tax::Float64, I_step::Float64 = 1.0
 )
     influx_ts = [base_influx + influx_tax * (time ÷ I_step) for time in times]
@@ -137,30 +144,3 @@ function _cross_threshold(time_series::NamedDimsArray, times::StepRangeLen{Float
     return first_cross
 end
 
-function _max_kendall_tau(
-    time_series::NamedDimsArray, times::StepRangeLen{Float64}, kendall_threshold::Float64 = 0.55
-)::Tuple{Int64, Float64}
-    begin_point, kendall_range = _kendall_range(time_series, times)
-    times = collect(times)
-    time_series = parent(time_series)
-
-    kendall = [corkendall(times[begin_point:idx], time_series[begin_point:idx]) for idx in kendall_range]
-    idx_threshold = findfirst(x -> x > kendall_threshold, abs.(kendall))
-
-    if idx_threshold == nothing
-        return length(time_series), round(kendall[end]; digits=2)
-    end
-    return kendall_range[idx_threshold], round(kendall[idx_threshold]; digits=2)
-end
-#    max_kendall = findmax(abs.(kendall))
-#    return kendall_range[max_kendall[2]], round(max_kendall[1]; digits=2)
-
-function _kendall_range(
-    time_series::NamedDimsArray, times::StepRangeLen{Float64}, kendell_shift::Int64 = 20
-)::Tuple{Int64, StepRangeLen{Int64}}
-    step_kendall::Int64 = (1 / step(times))
-    begin_point::Int64 = findfirst(x -> x != 0, time_series)
-    begin_kendall::Int64 = begin_point + kendell_shift * step_kendall
-    end_kendall::Int64 = length(time_series) - 2 * step_kendall
-    return begin_point, begin_kendall:step_kendall:end_kendall
-end

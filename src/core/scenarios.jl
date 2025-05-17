@@ -61,11 +61,11 @@ end
 function _weight_probability_closer(idx::Int64, reference::Int64)::Int64
     difference = abs(idx - reference)
     if difference == 0
-        return 10
+        return 13
     elseif difference == 1
-        return 6
+        return 9
     elseif difference == 2
-        return 3
+        return 5
     elseif difference == 3
         return 1
     else

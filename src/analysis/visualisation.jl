@@ -128,12 +128,13 @@ function _plot_early_warning_residuals(timestamp, p, residuals, times, threshold
     vline!([times[threshold_idx]], label="Threshold", color="black", lw=2, xticks=xticks, xlims=xlims)
     label1 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"a)"))
 
-    plt2 = plot(collect(times), residuals, label=false, ylabel="Residual")
+    plt2 = plot(collect(times), residuals, label=false, ylabel="Residual", xlabel="Time (year)")
     vline!([times[threshold_idx]], label=false, color="black", lw=2, xticks=xticks, xlims=xlims)
+    hline!([0.0], label=false, color="black", lw=1)
     label2 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"b)"))
 
     plot(label1, label2, plt1, plt2, layout=@layout([grid(2,1){0.01w} grid(2,1)]),
-         size=(1000,500), guidefontsize=12)
+         size=(1000,500), guidefontsize=12, bottom_margin = 5Plots.mm)
     savefig("../output/$(timestamp)_early_warning_signal_residuals.png")
 end
 

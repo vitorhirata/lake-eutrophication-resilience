@@ -10,21 +10,21 @@ function _plot_early_warning_signals(timestamp, p, s, variance_ts, autocorr_ts, 
 
     plt1 = plot(collect(times), p, label=false, ylabel="Amount of Phosphorus")
     vline!([times[threshold_idx]], label="Threshold", color="black", lw=2, xticks=xticks, xlims=xlims)
-    label1 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"a)"))
+    label1 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"(a)"))
 
     plt2 = plot(collect(times), s, label=pd_label, ylabel="Pathway Diversity", legend=:bottomleft)
     vline!([times[threshold_idx]], label=false, color="black", lw=2, xticks=xticks, xlims=xlims)
-    label2 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"b)"))
+    label2 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"(b)"))
 
     new_time = times[1 + length(times) - length(variance_ts):end]
     plt3 = plot(collect(new_time), variance_ts, label=label="Kendall-τ=$(kendall_tau[:var])", ylabel="Variance")
     vline!([times[threshold_idx]], label=false, color="black", lw=2, xticks=xticks, xlims=xlims)
-    label3 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"c)"))
+    label3 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"(c)"))
 
     new_time = times[1 + length(times) - length(autocorr_ts):end]
     plt4 = plot(collect(new_time), autocorr_ts, label="Kendall-τ=$(kendall_tau[:autocorr])", ylabel="Autocorrelation")
     vline!([times[threshold_idx]], label=false, color="black", lw=2, xticks=xticks, xlims=xlims, xlabel = "Time (year)")
-    label4 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"d)"))
+    label4 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"(d)"))
 
     plot(label1, label2, label3, label4, plt1, plt2, plt3, plt4, layout=@layout([grid(4,1){0.005w} grid(4,1)]),
          size=(1000,1000), guidefontsize=12)
@@ -47,13 +47,13 @@ function _plot_distance_threshold(s, s_diff, P0_options, time_horizons, timestam
         vline!([1.25], label="Median threshold", color="black", ylabel="Pathway Diversity", xlims=xlims)
         annotate!([(0.3,0.16,"Clean basin\n of attraction"), (2.5,0.16,"Eutrophicated\n basin of attraction"),
                    (1.0,0.14,"Threshold\nregion")], fontsize=10)
-        label1 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"a)"))
+        label1 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"(a)"))
 
         plt2 = plot(P0_options[2:end], s_diff, label=label, xlabel="Initial Amount of Phosphorus", legend=:topright)
         scatter!(P0_options[2:end][peaks_idx], peak_values, label=false, markerstrokewidth=0, color=[1,2,3,4])
         vspan!([0.64, 1.86], linecolor = :grey, fillcolor = :grey, alpha = 0.35, label = false)
         vline!([1.25], label="Median threshold", color="black", ylabel="Pathway Diversity Derivative", xlims=xlims)
-        label2 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"b)"))
+        label2 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"(b)"))
 
         plot(label1, label2, plt1, plt2, layout=@layout([grid(2,1){0.03w} grid(2,1)]), size=(1000,1200),
              guidefontsize=14)
@@ -107,7 +107,7 @@ end
 function _plot_states_distribution(P0_options, n_decision, timestamp)
     plot_array = Plots.Plot[]
     labels = reshape(map(decision -> "Decision $(decision)", 1:n_decision), 1, n_decision)
-    letters = ["a) Very low", "b) Low", "c) High", "d) Very high"]
+    letters = ["(a) Very low", "(b) Low", "(c) High", "(d) Very high"]
 
     for (idx, P0) in enumerate(P0_options)
         states = readdlm("../output/$(timestamp)_state_distribution_$(idx).csv", ',')
@@ -126,12 +126,12 @@ function _plot_early_warning_residuals(timestamp, p, residuals, times, threshold
 
     plt1 = plot(collect(times), p, label=false, ylabel="Amount of Phosphorus")
     vline!([times[threshold_idx]], label="Threshold", color="black", lw=2, xticks=xticks, xlims=xlims)
-    label1 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"a)"))
+    label1 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"(a)"))
 
     plt2 = plot(collect(times), residuals, label=false, ylabel="Residual", xlabel="Time (year)")
     vline!([times[threshold_idx]], label=false, color="black", lw=2, xticks=xticks, xlims=xlims)
     hline!([0.0], label=false, color="black", lw=1)
-    label2 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"b)"))
+    label2 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"(b)"))
 
     plot(label1, label2, plt1, plt2, layout=@layout([grid(2,1){0.01w} grid(2,1)]),
          size=(1000,500), guidefontsize=12, bottom_margin = 5Plots.mm)

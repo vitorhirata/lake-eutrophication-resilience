@@ -45,7 +45,7 @@ function _plot_distance_threshold(s, s_diff, P0_options, time_horizons, timestam
         plt1 = plot(P0_options, s, label=label, legend=:topright, xlabel="Initial Amount of Phosphorus")
         vspan!([0.64, 1.86], linecolor = :grey, fillcolor = :grey, alpha = 0.35, label = false)
         vline!([1.25], label="Median threshold", color="black", ylabel="Pathway Diversity", xlims=xlims)
-        annotate!([(0.3,0.16,"Clean basin\n of attraction"), (2.5,0.16,"Eutrophicated\n basin of attraction"),
+        annotate!([(0.3,0.16,"Oligotrophic \nbasin of \nattraction"), (2.5,0.16,"Eutrophic \nbasin of attraction"),
                    (1.0,0.14,"Threshold\nregion")], fontsize=10)
         label1 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"(a)"))
 
@@ -63,7 +63,7 @@ function _plot_distance_threshold(s, s_diff, P0_options, time_horizons, timestam
         vspan!([0.64, 1.86], linecolor = :grey, fillcolor = :grey, alpha = 0.35, label = false)
         vline!([1.25], label="Median threshold", color="black", ylabel="Pathway Diversity",
                guidefontsize=14, left_margin = 10Plots.mm, size=(1000,600), xlims=xlims)
-        annotate!([(0.3,0.16,"Clean basin\n of attraction"), (2.5,0.16,"Eutrophicated\n basin of attraction"),
+        annotate!([(0.3,0.16,"Oligotrophic \nbasin of \nattraction"), (2.5,0.16,"Eutrophic\nbasin of attraction"),
                    (1.0,0.14,"Threshold\nregion")], fontsize=10)
         savefig("../output/$(timestamp)_distance_threshold.png")
 
@@ -83,7 +83,7 @@ function _plot_sensitivity(s, P0_options, timestamp, scenarios, relative = false
              ylabel="Relative Pathway Diversity", left_margin = 10Plots.mm, size=(1000,600),
              alpha=0.9, guidefontsize=14, xlabel="Initial Amount of Phosphorus", ylims=[0.67, 1.3])
         vspan!([0.64, 1.86], linecolor = :grey, fillcolor = :grey, alpha = 0.35, label = false)
-        annotate!([(0.3,1.2,"Clean basin\n of attraction"), (2.5,1.2,"Eutrophicated\n basin of attraction"),
+        annotate!([(0.3,1.2,"Oligotrophic basin\n of attraction"), (2.5,1.2,"Eutrophic\n basin of attraction"),
                    (1.0,1.2,"Threshold\nregion")], fontsize=10)
         hline!([1.0], label=false, color="black")
     else
@@ -92,7 +92,7 @@ function _plot_sensitivity(s, P0_options, timestamp, scenarios, relative = false
              ylabel="Pathway Diversity", left_margin = 10Plots.mm, size=(1000,600), color="black", lw=1.5,
              alpha=0.9, guidefontsize=14, xlabel="Initial Amount of Phosphorus")
         vspan!([0.64, 1.86], linecolor = :grey, fillcolor = :grey, alpha = 0.35, label = false)
-        annotate!([(0.3,0.12,"Clean basin\n of attraction"), (2.5,0.16,"Eutrophicated\n basin of attraction"),
+        annotate!([(0.3,0.12,"Oligotrophic basin\n of attraction"), (2.5,0.16,"Eutrophic\n basin of attraction"),
                    (1.0,0.12,"Threshold\nregion")], fontsize=10)
     end
 
@@ -183,9 +183,9 @@ end
 function _plot_bifurcation(roots, influx_options_root)
     lim1 = 19
     lim2 = 174
-    plot(influx_options_root[lim1:end], roots[3, lim1:end], label="Eutrophicated stable state")
+    plot(influx_options_root[lim1:end], roots[3, lim1:end], label="Eutrophic stable state")
     plot!(influx_options_root[lim1:lim2], roots[2, lim1:lim2], label="Instable state")
-    plot!(influx_options_root[1:lim2], roots[1, 1:lim2], label="Clean stable state", left_margin = 10Plots.mm,
+    plot!(influx_options_root[1:lim2], roots[1, 1:lim2], label="Oligotrophic stable state", left_margin = 10Plots.mm,
           ylabel = "Fixed points (P*)", xlabel = "Influx (I)", legend=:bottomright, size=(952,560))
     savefig("../output/bifurcation.png")
 end

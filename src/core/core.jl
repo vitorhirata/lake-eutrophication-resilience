@@ -38,15 +38,19 @@ function number_possible_influx(
     max_options::Int64,
     P_threshold::Float64 = 0.4,
     options_in_threshold::Int64 = max_options,
-    final_P::Float64 = 3.0
+    intermediate_P::Float64 = 2.0,
+    final_P::Float64 = 3.5,
+    final_options::Int64 = 8
 )::Int64
 
     if P < P_threshold
         result = max_options + ((options_in_threshold - max_options) / P_threshold) * P
-    elseif P < final_P
+    elseif P < intermediate_P
         result = options_in_threshold + ((1 - options_in_threshold) / (final_P - P_threshold)) * (P - P_threshold)
+    elseif P < final_P
+        result = 4 + ((final_options-4)/final_P) * P
     else
-        result = 1
+        result = final_options
     end
 
     return round(Int64, result)

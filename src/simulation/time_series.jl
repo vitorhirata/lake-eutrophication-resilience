@@ -1,3 +1,5 @@
+# Simulate phosphorus and pathway diversity under a step-wise increasing influx.
+# Saves phosphorus and entropy time series to timestamped CSVs; returns timestamp.
 function run_time_series(;
         P0::Float64,
         influx::Float64,

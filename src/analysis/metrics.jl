@@ -1,3 +1,4 @@
+# Compute absolute finite differences of entropy along P0, normalized by interval.
 function finite_difference(time_series::NamedDimsArray, interval::Float64)::NamedDimsArray
     result = NamedDimsArray{(:P0, :time_horizon)}(zeros(size(time_series, :P0)-1, size(time_series, :time_horizon)))
     for horizon_idx in 1:size(time_series, :time_horizon)
@@ -6,6 +7,7 @@ function finite_difference(time_series::NamedDimsArray, interval::Float64)::Name
     return result
 end
 
+# Compute Kendall τ trend statistics for pathway diversity, variance, and autocorrelation.
 function kendall_tau(s::NamedDimsArray, variance::NamedDimsArray, autocorrelation::NamedDimsArray,
         times::StepRangeLen{Float64}, threshold_idx::Int64
 )::Dict{Symbol, Float64}
@@ -19,6 +21,7 @@ function kendall_tau(s::NamedDimsArray, variance::NamedDimsArray, autocorrelatio
     return result
 end
 
+# Compute Kendall τ rank correlation between a scalar metric and time before bifurcation.
 function kendall_tau(time_series::NamedDimsArray, times::StepRangeLen{Float64},
                      threshold_idx::Int64, kendall_tau_time_offset = 6
 )::Float64
@@ -31,6 +34,7 @@ function kendall_tau(time_series::NamedDimsArray, times::StepRangeLen{Float64},
     return round(result; digits=2)
 end
 
+# Find the first P0 index of the entropy gradient peak per time horizon.
 function find_peaks(time_series::NamedDimsArray, time::Vector{Float64})::Vector{Int64}
     peaks_idx = zeros(Int64, size(time_series, :time_horizon))
     if size(time_series, :time_horizon) == 1
@@ -46,6 +50,7 @@ function find_peaks(time_series::NamedDimsArray, time::Vector{Float64})::Vector{
     return peaks_idx
 end
 
+# Normalize pathway diversity in-place to [0, 1] by its maximum along a given dimension.
 function normalize_pd(time_series::NamedDimsArray, dim::Symbol)::NamedDimsArray
     for index_dim in 1:1:size(time_series, dim)
         eval(:( $time_series[$dim = $index_dim] /= maximum($time_series[$dim = $index_dim]) ))
@@ -54,6 +59,7 @@ function normalize_pd(time_series::NamedDimsArray, dim::Symbol)::NamedDimsArray
     return time_series
 end
 
+# Normalize entropy in-place by number_decision × max_options per time horizon.
 function normalize_pd(
         time_series::NamedDimsArray, number_decision::Vector{Int64}, max_options::Int64 = 10
 )::NamedDimsArray
@@ -64,6 +70,7 @@ function normalize_pd(
     return time_series
 end
 
+# Express each scenario's entropy relative to the first (baseline) scenario.
 function relative_pd(time_series::NamedDimsArray)::NamedDimsArray
     for index_dim in 2:1:size(time_series, :type)
         time_series[type = index_dim] = time_series[type = index_dim] ./ time_series[type = 1]
@@ -72,6 +79,7 @@ function relative_pd(time_series::NamedDimsArray)::NamedDimsArray
     return time_series
 end
 
+# Compute rolling variance of a time series over a sliding window of variance_step steps.
 function compute_variance(time_series::NamedDimsArray, variance_step::Int64)::NamedDimsArray
     variance_ts = NamedDimsArray{(:time, )}(zeros(length(time_series)))
 
@@ -82,6 +90,7 @@ function compute_variance(time_series::NamedDimsArray, variance_step::Int64)::Na
     return variance_ts[(variance_step+1):end]
 end
 
+# Compute rolling lag-1 autocorrelation over a sliding window of autocor_step steps.
 function compute_autocorrelation(time_series::NamedDimsArray, autocor_step::Int64)::NamedDimsArray
     autocor_ts = NamedDimsArray{(:time, )}(zeros(length(time_series)))
 
@@ -94,6 +103,7 @@ function compute_autocorrelation(time_series::NamedDimsArray, autocor_step::Int6
     return autocor_ts[(autocor_step+1):end]
 end
 
+# Detrend a phosphorus time series using linear regression or LOESS smoothing.
 function detrend(time_series::NamedDimsArray, times::StepRangeLen{Float64}, type::String)::NamedDimsArray
     if type == "linear"
         return linear_detrend(time_series, times)
@@ -104,6 +114,7 @@ function detrend(time_series::NamedDimsArray, times::StepRangeLen{Float64}, type
     end
 end
 
+# Detrend pathway diversity along P0 using LOESS smoothing per time horizon.
 function detrend(time_series::NamedDimsArray, times::Vector{Float64})::NamedDimsArray
     result = NamedDimsArray{(:P0, :time_horizon)}(zeros(size(time_series, :P0), size(time_series, :time_horizon)))
 
@@ -113,6 +124,7 @@ function detrend(time_series::NamedDimsArray, times::Vector{Float64})::NamedDims
     return result
 end
 
+# Legacy: detrend a time series by removing a linear fit over time.
 function linear_detrend(time_series::NamedDimsArray, times::StepRangeLen{Float64})::NamedDimsArray
     result = NamedDimsArray{(:time, )}(zeros(length(time_series)))
     times = collect(times)
@@ -126,6 +138,7 @@ function linear_detrend(time_series::NamedDimsArray, times::StepRangeLen{Float64
     return result
 end
 
+# Apply LOESS smoothing; return residuals if residual=true, else the smooth curve.
 function loess_detrend(time_series::NamedDimsArray, times::Vector{Float64}, dim::Symbol, residual::Bool)::NamedDimsArray
     result = NamedDimsArray{(dim, )}(zeros(length(time_series)))
 
@@ -135,6 +148,7 @@ function loess_detrend(time_series::NamedDimsArray, times::Vector{Float64}, dim:
     return result
 end
 
+# Find the first time step where the lake state crosses the bifurcation threshold.
 function cross_threshold(time_series::NamedDimsArray, times::StepRangeLen{Float64},
     base_influx::Float64, influx_tax::Float64, I_step::Float64 = 1.0
 )

@@ -1,3 +1,5 @@
+# Experimental matrix-based pathway diversity entropy (not yet validated).
+# Precomputes state transition matrices to avoid redundant ODE calls across decisions.
 function new_entropy(
         P0::Float64,
         influx::Float64,

@@ -1,5 +1,7 @@
 using PathwayDiversity
 
+# Run entropy and plot pathway diversity vs. bifurcation distance.
+# Uses a 7-step time horizon at decision_step=5 and influx=0.1.
 function distance_basin_threshold()
     influx = 0.1
     decision_step = 5.0
@@ -10,6 +12,8 @@ function distance_basin_threshold()
     PathwayDiversity.distance_basin_threshold(P0_options, influx, time_horizons, decision_step, timestamp)
 end
 
+# Simulate and plot state distributions for four initial P0 values.
+# Time horizon of 35 years with 5-year decision steps.
 function states_distribution()
     P0_options = [0.5, 1.0, 1.5, 2.0]
     time_horizons = 35.0
@@ -19,6 +23,8 @@ function states_distribution()
     PathwayDiversity.states_distribution(P0_options, time_horizons, decision_steps, timestamp)
 end
 
+# Run time series and plot EWS metrics alongside pathway diversity.
+# Uses time horizons [5, 10, 20] years under linearly increasing influx.
 function early_warning_signals()
     parameters = Dict(
         :P0 => 0.27,
@@ -32,6 +38,8 @@ function early_warning_signals()
     PathwayDiversity.early_warning_signals(timestamp; parameters...)
 end
 
+# Run entropy across six scenarios and plot relative pathway diversity.
+# Compares decision frequency, influx range, and probability weighting.
 function sensitivity()
     P0_options = collect(0:0.05:2.85)
     time_horizons = 30.0

@@ -1,4 +1,4 @@
-# Compute the evolution of the state probability distribution over time for different initial conditions
+# Simulate and save the state distribution over a time horizon for each initial P0.
 function run_state_distribution(
     P0_options::Vector{Float64},
     time_horizon::Float64,
@@ -15,7 +15,7 @@ function run_state_distribution(
     return timestamp
 end
 
-# Evolve one time step and compute the number of options available for each P0 and influx.
+# Return the number of available influx options after one step per (P0, influx) pair.
 function run_number_options_simulation(
     P0_options::Vector{Float64},
     influx_options::Vector{Float64},
@@ -32,7 +32,7 @@ function run_number_options_simulation(
     return result
 end
 
-# Compute the range of states reachable from initial states
+# Return the min/max reachable phosphorus states after one decision step per P0.
 function run_range_states_simulation(
     P0_options::Vector{Float64},
     max_number_options::Int64 = 10,

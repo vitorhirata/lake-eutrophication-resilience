@@ -1,5 +1,7 @@
 using PathwayDiversity
 
+# Run entropy with varying option counts and plot how scaling behaves.
+# Shows how normalized pathway diversity scales with max option count.
 function scaling()
     influx = 0.1
     decision_step = 5.0
@@ -11,6 +13,8 @@ function scaling()
     PathwayDiversity.scaling(P0_options, number_options, timestamp)
 end
 
+# Run entropy over a decision step / time horizon grid and plot results.
+# Shows how pathway diversity depends on decision temporal resolution.
 function decision_scales()
     P0 = 0.1
     influx = 0.1
@@ -21,6 +25,8 @@ function decision_scales()
     PathwayDiversity.decision_scales(time_horizons, decision_steps, timestamp)
 end
 
+# Compare recursive and matrix-based entropy for a single state.
+# Prints both values to validate the experimental new_entropy method.
 function new_pathway_diversity_computation()
     influx = 0.15
     decision_step = 5.0

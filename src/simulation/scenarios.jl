@@ -1,3 +1,5 @@
+# Run entropy under multiple parameterization scenarios for sensitivity analysis.
+# Saves results to a timestamped CSV and returns the timestamp.
 function run_sensitivity(
         P0_options::Vector{Float64}, influx::Float64, time_horizon::Float64, scenarios::Vector{Dict{Symbol, Any}}
 )::String

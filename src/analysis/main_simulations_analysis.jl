@@ -1,3 +1,5 @@
+# Load entropy data and plot pathway diversity vs. distance to the bifurcation threshold.
+# Applies normalization, LOESS detrending, and finite-difference peak detection.
 function distance_basin_threshold(
         P0_options::Vector{Float64},
         influx::Float64,
@@ -17,6 +19,7 @@ function distance_basin_threshold(
     _plot_distance_threshold(s, s_diff, P0_options, time_horizons, timestamp, peaks_idx, one_plot)
 end
 
+# Load and plot the state distribution at each decision step for given initial conditions.
 function states_distribution(P0_options::Vector{Float64}, time_horizon::Float64, decision_step::Float64,
         timestamp::String, influx::Float64 = 0.1
 )
@@ -24,6 +27,8 @@ function states_distribution(P0_options::Vector{Float64}, time_horizon::Float64,
     _plot_states_distribution(P0_options, number_decision, timestamp)
 end
 
+# Load time series, compute EWS (variance, autocorrelation) and pathway diversity.
+# Plots all metrics and Kendall τ trend statistics relative to the bifurcation event.
 function early_warning_signals(
         timestamp::String;
         P0::Float64,
@@ -64,6 +69,7 @@ function early_warning_signals(
     _plot_early_warning_residuals(timestamp, p_ts, residuals, times, threshold_idx)
 end
 
+# Load entropy data, normalize it, and plot sensitivity to parameterization scenarios.
 function sensitivity(
         P0_options::Vector{Float64},
         influx::Float64,

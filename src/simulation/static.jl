@@ -1,4 +1,4 @@
-# run entropy for different initial conditions and time horizon. Used in distance to basin threshold analysis
+# Compute entropy over a grid of initial states and time horizons; save to CSV.
 function run_entropy(
     P0_options::Vector{Float64},
     influx::Float64,
@@ -19,7 +19,7 @@ function run_entropy(
     return timestamp
 end
 
-# run entropy for different decision step and time horizon. Used in scalling analysis
+# Compute log-normalized entropy across varying option counts; save to CSV.
 function run_entropy(
     P0_options::Vector{Float64},
     influx::Float64,
@@ -42,7 +42,7 @@ function run_entropy(
     return timestamp
 end
 
-# run entropy for different initial conditions and maximum number of options. Used in decision scale analysis
+# Compute entropy over a grid of decision step sizes and time horizons; save to CSV.
 function run_entropy(
     P0::Float64,
     influx::Float64,

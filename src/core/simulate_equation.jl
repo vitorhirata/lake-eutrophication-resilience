@@ -28,6 +28,7 @@ function _evolve_step_stochastic(
     return sol.u[end]
 end
 
+# Find the equilibrium phosphorus state for a given influx via Newton's method.
 function get_root(root, parameter)
     Z = ZeroProblem(_f_root, root)
     sol = solve(Z, Order1(), p=parameter)

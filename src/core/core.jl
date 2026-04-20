@@ -1,3 +1,5 @@
+# Recursively compute pathway diversity entropy across number_decision future steps.
+# Each step branches over up to max_options influx actions and accumulates causal entropy.
 function entropy(
         P0::Float64,
         I::Float64,
@@ -29,6 +31,8 @@ function entropy(
     return sum(results)
 end
 
+# Return the number of influx options available to a manager at phosphorus level P.
+# Options decrease linearly from max_options in clean water to 1 in the eutrophic regime.
 function number_possible_influx(
     P::Float64,
     max_options::Int64,

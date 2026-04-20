@@ -1,7 +1,8 @@
-# Lake Eutrophication Resilience
+# Pathway Diversity in a Lake Eutrophication Model
 
-This project compares standard resilience metrics from ecology with pathway diversity. We use a lake eutrophication
-model to implement this metrics.
+Project implementing pathway diversity in a lake eutrophication model. The model includes comparissons of pathway
+diversity with other resilience metrics, such as distance to the basin treshold and early-warning signals, and
+scenarios to show pathway diversity can capture change in agency related to the policy decision-making context.
 
 ## Setup
 Install julia up and download the julia version mentioned on the manifest
@@ -14,17 +15,18 @@ Open julia inside the root with:
 julia --project=.
 ```
 
-## Example of analysis - distance to the basin threshold
-In this analysis we compute pathway diversity for multiple initial condition (and therefore the distance to the basin
-threshold) and time-horizons. To run the analysis follow this steps:
+## Example of analysis
+Please check the folder examples to see functions that produce results similar to the ones showed in the paper.
+For example, below we show how to compute pathway diversity for multiple initial condition (and therefore the distance
+to the basin threshold) and time-horizons. To run the analysis follow this steps:
 ```
 using PathwayDiversity
 
 # Define the model parameters
-influx = 0.1
-decision_step = 5.0
-P0_options = collect(0:0.05:2.85)
-time_horizons = [1, 2, 4, 7] * decision_step # The number in the array indicates the number of decision steps
+influx = 0.1 # Initial influx
+decision_step = 5.0 # Decision step of 5 years
+P0_options = collect(0:0.05:2.85) # Initial conditions
+time_horizons = [1, 2, 4, 7] * decision_step # How long the simulation will run
 
 # Run the simulation. This will save the result as a csv in the ./output folder
 timestamp = PathwayDiversity.run_entropy(P0_options, influx, decision_step, time_horizons)

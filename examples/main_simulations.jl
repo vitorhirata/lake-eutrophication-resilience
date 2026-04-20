@@ -1,12 +1,12 @@
 using PathwayDiversity
 
 # Run entropy and plot pathway diversity vs. bifurcation distance.
-# Uses a 7-step time horizon at decision_step=5 and influx=0.1.
+# Uses a four time horizons, decision_step=5 and influx=0.1.
 function distance_basin_threshold()
     influx = 0.1
     decision_step = 5.0
     P0_options = collect(0:0.05:2.85)
-    time_horizons = [7] * decision_step # [1, 2, 4, 7]
+    time_horizons = [1, 2, 4, 7] * decision_step
 
     timestamp = PathwayDiversity.run_entropy(P0_options, influx, decision_step, time_horizons)
     PathwayDiversity.distance_basin_threshold(P0_options, influx, time_horizons, decision_step, timestamp)

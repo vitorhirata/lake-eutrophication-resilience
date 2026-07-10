@@ -7,7 +7,9 @@ function bifurcation(influx_options_root::Vector{Float64})
         roots[2, index] = PathwayDiversity.get_root(1.3, influx)
         roots[3, index] = PathwayDiversity.get_root(2.7, influx)
     end
-    _plot_bifurcation(roots, influx_options_root)
+    # The middle (unstable) branch only exists between the two saddle-node folds.
+    lower_fold, upper_fold = PathwayDiversity.fold_influxes()
+    _plot_bifurcation(roots, influx_options_root, lower_fold, upper_fold)
 end
 
 # Plot the number of available influx options as a function of phosphorus level.
@@ -28,4 +30,10 @@ end
 function range_states_simulation(P0_options::Vector{Float64}, max_number_options::Int64)
     range_states = PathwayDiversity.run_range_states_simulation(P0_options, max_number_options)
     _plot_range_states(P0_options, range_states)
+end
+
+# Influx values of the two folds that bound the bistable region, sorted ascending.
+function fold_influxes()
+    fold_states = find_zeros(_dinflux_dstate, 0.0, 5.0)
+    return sort(_influx_of_state.(fold_states))
 end

@@ -48,3 +48,10 @@ end
 
 _f_root(P, I) = _f(P, I, 0.0)
 _g(P, I=nothing, time=nothing) = 1
+
+# Influx required for state P to be an equilibrium: solve _f(P, I, ·) = 0 for I.
+_influx_of_state(P) = 0.65 * P - 2.5 * (P^2) / ((1.95)^2 + P^2)
+
+# d(influx)/dP. Its zeros are the saddle-node (fold) bifurcation points, where two
+# equilibria collide.
+_dinflux_dstate(P) = 0.65 - 2.5 * 2 * P * (1.95)^2 / (((1.95)^2 + P^2)^2)

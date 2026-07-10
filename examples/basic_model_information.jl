@@ -3,7 +3,7 @@ using PathwayDiversity
 # Plot the bifurcation diagram over influx values from 0.00 to 0.30.
 # Shows stable and unstable equilibria as a function of influx.
 function bifurcation()
-    influx_options_root = collect(range(0.00, 0.3,  step = 0.001))
+    influx_options_root = collect(range(0.00, 0.25,  step = 0.001))
 
     PathwayDiversity.bifurcation(influx_options_root)
 end

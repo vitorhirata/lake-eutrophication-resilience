@@ -180,13 +180,20 @@ function _plot_number_option(n_possible_influx, P_options)
 
 end
 
-function _plot_bifurcation(roots, influx_options_root)
-    lim1 = 19
-    lim2 = 174
-    plot(influx_options_root[lim1:end], roots[3, lim1:end], label="Eutrophic stable state")
-    plot!(influx_options_root[lim1:lim2], roots[2, lim1:lim2], label="Instable state")
-    plot!(influx_options_root[1:lim2], roots[1, 1:lim2], label="Oligotrophic stable state", left_margin = 10Plots.mm,
-          ylabel = "Fixed points (P*)", xlabel = "Influx (I)", legend=:bottomright, size=(952,560))
+function _plot_bifurcation(roots, influx_options_root, lower_fold, upper_fold)
+    # Each branch exists only on part of the influx range, bounded by the folds:
+    # upper-stable above lower_fold, unstable between the folds, lower-stable below
+    # upper_fold. Mask by influx value so it is independent of the sampling step.
+    upper_branch  = influx_options_root .>= lower_fold
+    middle_branch = lower_fold .<= influx_options_root .<= upper_fold
+    lower_branch  = influx_options_root .<= upper_fold
+    plot(influx_options_root[upper_branch], roots[3, upper_branch], label="Eutrophic stable state")
+    plot!(influx_options_root[middle_branch], roots[2, middle_branch], label="Instable state")
+
+    plot!(influx_options_root[lower_branch], roots[1, lower_branch], label="Oligotrophic stable state",
+          bottom_margin = 5Plots.mm, left_margin = 10Plots.mm,
+          ylabel = "Amount of phosphorus (x)", xlabel = "Influx (I)",
+          legend=:bottomright, size=(952,560))
     savefig("../output/bifurcation.png")
 end
 

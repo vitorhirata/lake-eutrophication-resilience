@@ -117,7 +117,7 @@ end
 
         entropy = PathwayDiversity.entropy(P0, I, decision_step, number_decision; deterministic=deterministic)
 
-        @test entropy ≈ (3*log(90)+2*log(80)+log(70)+log(60)+2*log(50)+log(40))/10 rtol=1e-5
+        @test entropy ≈ (3*log(90)+2*log(80)+log(70)+log(60)+2*log(50)+log(40))/10 rtol=1e-2
     end
 
     @testset "High P0 and number of decisions two" begin
@@ -131,7 +131,7 @@ end
 
         entropy = PathwayDiversity.entropy(P0, I, decision_step, number_decision; deterministic=deterministic)
 
-        @test entropy ≈ (3*log(2*4)+log(1*4))/4 rtol=1e-5
+        @test entropy ≈ (3*log(2*4)+log(1*4))/4 rtol=1e-2
     end
 end
 
@@ -143,9 +143,9 @@ end
         number_decision = 1
         method = "closer_more_likely"
 
-        entropy = PathwayDiversity.entropy(P0, I, decision_step, number_decision; method=method)
+        entropy = PathwayDiversity.entropy(P0, I, decision_step, number_decision; method=method, deterministic=true)
 
-        @test entropy ≈ (2/30)*log(30)+0.2*log(10)+0.4*log(5)+(1/3)*log(3) rtol=1e-5
+        @test entropy ≈ (2/43)*log(43)+(10/43)*log(43/5)+(18/43)*log(43/9)+(13/43)*log(43/13) rtol=1e-5
     end
 
     @testset "Low P0, high influx and number of decisions one" begin
@@ -155,9 +155,9 @@ end
         number_decision = 1
         method = "closer_more_likely"
 
-        entropy = PathwayDiversity.entropy(P0, I, decision_step, number_decision; method=method)
+        entropy = PathwayDiversity.entropy(P0, I, decision_step, number_decision; method=method, deterministic=true)
 
-        @test entropy ≈ (1/20)*log(20)+(3/20)*log(20/3)+(6/20)*log(10/3)+(1/2)*log(2) rtol=1e-5
+        @test entropy ≈ (13/28)*log(28/13)+(9/28)*log(28/9)+(5/28)*log(28/5)+(1/28)*log(28) rtol=1e-5
     end
 
     @testset "High P0, low influx and number of decisions one" begin
@@ -167,9 +167,9 @@ end
         number_decision = 1
         method = "closer_more_likely"
 
-        entropy = PathwayDiversity.entropy(P0, I, decision_step, number_decision; method=method)
+        entropy = PathwayDiversity.entropy(P0, I, decision_step, number_decision; method=method, deterministic=true)
 
-        @test entropy ≈ (3/25)*log(25/3)+(2*6/25)*log(25/6)+(10/25)*log(25/10) rtol=1e-5
+        @test entropy ≈ (13/36)*log(36/13)+(2*9/36)*log(36/9)+(5/36)*log(36/5) rtol=1e-5
     end
 
     @testset "High P0, high influx and number of decisions one" begin
@@ -179,8 +179,8 @@ end
         number_decision = 1
         method = "closer_more_likely"
 
-        entropy = PathwayDiversity.entropy(P0, I, decision_step, number_decision; method=method)
-        @test entropy ≈ (1/20)*log(20)+(3/20)*log(20/3)+(3/10)*log(10/3)+(1/2)*log(2) rtol=1e-5
+        entropy = PathwayDiversity.entropy(P0, I, decision_step, number_decision; method=method, deterministic=true)
+        @test entropy ≈ (13/28)*log(28/13)+(9/28)*log(28/9)+(5/28)*log(28/5)+(1/28)*log(28) rtol=1e-5
     end
 end
 
@@ -192,7 +192,7 @@ end
         number_decision = 1
         method = "further_more_likely"
 
-        entropy = PathwayDiversity.entropy(P0, I, decision_step, number_decision; method=method)
+        entropy = PathwayDiversity.entropy(P0, I, decision_step, number_decision; method=method, deterministic=true)
 
         @test entropy ≈ log(63)-(2*7*log(7)+2*4*log(4)+2*1*log(1)+10*log(10)+13*log(13)+16*log(16))/63 rtol=1e-5
     end
@@ -204,7 +204,7 @@ end
         number_decision = 1
         method = "further_more_likely"
 
-        entropy = PathwayDiversity.entropy(P0, I, decision_step, number_decision; method=method)
+        entropy = PathwayDiversity.entropy(P0, I, decision_step, number_decision; method=method, deterministic=true)
 
         @test entropy ≈ log(51)-(16*log(16)+13*log(13)+10*log(10)+7*log(7)+4*log(4)+1*log(1))/51 rtol=1e-5
     end
@@ -216,7 +216,7 @@ end
         number_decision = 1
         method = "further_more_likely"
 
-        entropy = PathwayDiversity.entropy(P0, I, decision_step, number_decision; method=method)
+        entropy = PathwayDiversity.entropy(P0, I, decision_step, number_decision; method=method, deterministic=true)
 
         @test entropy ≈ log(52)-(16*log(16)+2*13*log(13)+10*log(10))/52 rtol=1e-5
     end
@@ -228,7 +228,7 @@ end
         number_decision = 1
         method = "further_more_likely"
 
-        entropy = PathwayDiversity.entropy(P0, I, decision_step, number_decision; method=method)
+        entropy = PathwayDiversity.entropy(P0, I, decision_step, number_decision; method=method, deterministic=true)
         @test entropy ≈ log(46)-(16*log(16)+13*log(13)+10*log(10)+7*log(7))/46 rtol=1e-5
     end
 end

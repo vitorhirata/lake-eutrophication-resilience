@@ -1,3 +1,28 @@
+# --- Publication figure settings --------------------------------------------
+# Target journal requirements:
+#   * vector PDF, 300-600 dpi (a vector PDF has effectively unlimited resolution)
+#   * single-column width 8.5 cm when possible; absolute max 18 cm wide x 22 cm tall
+#   * all text between 6 and 10 pt at publication size
+#
+# The GR backend writes PDF with 1 `size` unit = 1 PostScript point (1 pt = 1/72"),
+# and font sizes are absolute points, independent of the figure size (`dpi` only
+# affects raster output). So figure sizes are given directly in points, derived
+# from the physical dimensions below, and every font size is kept within 6-10 pt.
+const _PT_PER_CM = 72 / 2.54       # ≈ 28.35 pt per cm
+_cm(x) = round(Int, x * _PT_PER_CM)
+const _MAX_W = _cm(18)             # 510 pt — absolute maximum width  (18 cm)
+const _MAX_H = _cm(22)             # 624 pt — absolute maximum height (22 cm)
+const _COL_W = _cm(8.5)            # 241 pt — single-column width     (8.5 cm)
+
+Plots.default(
+    guidefontsize      = 8,
+    tickfontsize       = 7,
+    legendfontsize     = 6,
+    titlefontsize      = 9,
+    annotationfontsize = 8,
+    dpi                = 600,
+)
+
 function _plot_early_warning_signals(timestamp, p, s, variance_ts, autocorr_ts, time_horizons, times,
                                      threshold_idx, kendall_tau)
 
@@ -27,8 +52,8 @@ function _plot_early_warning_signals(timestamp, p, s, variance_ts, autocorr_ts, 
     label4 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"(d)"))
 
     plot(label1, label2, label3, label4, plt1, plt2, plt3, plt4, layout=@layout([grid(4,1){0.005w} grid(4,1)]),
-         size=(1000,1000), guidefontsize=12)
-    savefig("../output/$(timestamp)_early_warning_signal.png")
+         size=(_MAX_W, _cm(21)), top_margin = 7Plots.mm)
+    savefig("../output/$(timestamp)_early_warning_signal.pdf")
 end
 
 function _plot_distance_threshold(s, s_diff, P0_options, time_horizons, timestamp, peaks_idx, one_plot)
@@ -45,8 +70,8 @@ function _plot_distance_threshold(s, s_diff, P0_options, time_horizons, timestam
         plt1 = plot(P0_options, s, label=label, legend=:topright, xlabel="Initial Amount of Phosphorus")
         vspan!([0.64, 1.86], linecolor = :grey, fillcolor = :grey, alpha = 0.35, label = false)
         vline!([1.25], label="Median threshold", color="black", ylabel="Pathway Diversity", xlims=xlims)
-        annotate!([(0.3,0.16,"Oligotrophic \nbasin of \nattraction"), (2.5,0.16,"Eutrophic \nbasin of attraction"),
-                   (1.0,0.14,"Threshold\nregion")], fontsize=10)
+        annotate!([(0.35,0.16,"Oligotrophic \nbasin of \nattraction"), (2.5,0.16,"Eutrophic \nbasin of attraction"),
+                   (0.95,0.14,"Threshold\nregion")])
         label1 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"(a)"))
 
         plt2 = plot(P0_options[2:end], s_diff, label=label, xlabel="Initial Amount of Phosphorus", legend=:topright)
@@ -55,45 +80,44 @@ function _plot_distance_threshold(s, s_diff, P0_options, time_horizons, timestam
         vline!([1.25], label="Median threshold", color="black", ylabel="Pathway Diversity Derivative", xlims=xlims)
         label2 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"(b)"))
 
-        plot(label1, label2, plt1, plt2, layout=@layout([grid(2,1){0.03w} grid(2,1)]), size=(1000,1200),
-             guidefontsize=14)
-        savefig("../output/$(timestamp)_distance_threshold.png")
+        plot(label1, label2, plt1, plt2, layout=@layout([grid(2,1){0.03w} grid(2,1)]), size=(_MAX_W, _cm(20)))
+        savefig("../output/$(timestamp)_distance_threshold.pdf")
     else
         plot(P0_options, s, label=label, legend=:topright, xlabel="Amount of Phosphorus")
         vspan!([0.64, 1.86], linecolor = :grey, fillcolor = :grey, alpha = 0.35, label = false)
         vline!([1.25], label="Median threshold", color="black", ylabel="Pathway Diversity",
-               guidefontsize=14, left_margin = 10Plots.mm, size=(1000,600), xlims=xlims)
+               left_margin = 10Plots.mm, size=(_cm(14), _cm(9)), xlims=xlims)
         annotate!([(0.3,0.16,"Oligotrophic \nbasin of \nattraction"), (2.5,0.16,"Eutrophic\nbasin of attraction"),
-                   (1.0,0.14,"Threshold\nregion")], fontsize=10)
-        savefig("../output/$(timestamp)_distance_threshold.png")
+                   (1.0,0.14,"Threshold\nregion")])
+        savefig("../output/$(timestamp)_distance_threshold.pdf")
 
         plot(P0_options[2:end], s_diff, label=label, legend=:topleft, xlabel="Amount of Phosphorus")
         vspan!([0.64, 1.86], linecolor = :grey, fillcolor = :grey, alpha = 0.35, label = false)
         scatter!(P0_options[2:end][peaks_idx], peak_values, label=false, markerstrokewidth=0, color=[1,2,3,4])
         vline!([1.25], label="Median threshold", color="black", ylabel="Pathway Diversity Derivative",
-               guidefontsize=14, left_margin = 10Plots.mm, size=(1000,600), xlims=xlims)
-        savefig("../output/$(timestamp)_distance_threshold_derivative.png")
+               left_margin = 10Plots.mm, size=(_cm(14), _cm(9)), xlims=xlims)
+        savefig("../output/$(timestamp)_distance_threshold_derivative.pdf")
     end
 end
 
 function _plot_sensitivity(s, P0_options, timestamp, scenarios, relative = false)
     if relative
         first_idx = 2
-        plot(P0_options, s[type=first_idx], label="$(scenarios[first_idx][:name])", legend=:bottom,
-             ylabel="Relative Pathway Diversity", left_margin = 10Plots.mm, size=(1000,600),
-             alpha=0.9, guidefontsize=14, xlabel="Initial Amount of Phosphorus", ylims=[0.67, 1.3])
+        plot(P0_options, s[type=first_idx], label="$(scenarios[first_idx][:name])", legend=:topright,
+             ylabel="Relative Pathway Diversity", left_margin = 10Plots.mm, size=(_MAX_W, _cm(12)),
+             alpha=0.9, xlabel="Initial Amount of Phosphorus", ylims=[0.67, 1.3])
         vspan!([0.64, 1.86], linecolor = :grey, fillcolor = :grey, alpha = 0.35, label = false)
-        annotate!([(0.3,1.2,"Oligotrophic basin\n of attraction"), (2.5,1.2,"Eutrophic\n basin of attraction"),
-                   (1.0,1.2,"Threshold\nregion")], fontsize=10)
+        annotate!([(0.3,0.85,"Oligotrophic\n basin of\nattraction"), (2.5,0.75,"Eutrophic\n basin of attraction"),
+                   (1.0,0.75,"Threshold\nregion")])
         hline!([1.0], label=false, color="black")
     else
         first_idx = 1
         plot(P0_options, s[type=first_idx], label="$(scenarios[first_idx][:name])", legend=:topright,
-             ylabel="Pathway Diversity", left_margin = 10Plots.mm, size=(1000,600), color="black", lw=1.5,
-             alpha=0.9, guidefontsize=14, xlabel="Initial Amount of Phosphorus")
+             ylabel="Pathway Diversity", left_margin = 10Plots.mm, size=(_MAX_W, _cm(12)), color="black", lw=1.5,
+             alpha=0.9, xlabel="Initial Amount of Phosphorus")
         vspan!([0.64, 1.86], linecolor = :grey, fillcolor = :grey, alpha = 0.35, label = false)
         annotate!([(0.3,0.12,"Oligotrophic basin\n of attraction"), (2.5,0.16,"Eutrophic\n basin of attraction"),
-                   (1.0,0.12,"Threshold\nregion")], fontsize=10)
+                   (1.0,0.12,"Threshold\nregion")])
     end
 
     for (idx_scenario, scenario) in enumerate(scenarios[first_idx+1:end])
@@ -101,7 +125,7 @@ function _plot_sensitivity(s, P0_options, timestamp, scenarios, relative = false
               color=idx_scenario+first_idx-1, alpha=0.9)
     end
     vline!([1.25], label="Median threshold", color="black")
-    savefig("../output/$(timestamp)_sensitivity.png")
+    savefig("../output/$(timestamp)_sensitivity.pdf")
 end
 
 function _plot_states_distribution(P0_options, n_decision, timestamp)
@@ -113,11 +137,12 @@ function _plot_states_distribution(P0_options, n_decision, timestamp)
         states = readdlm("../output/$(timestamp)_state_distribution_$(idx).csv", ',')
         states = [_clean_vector(row) for row in eachrow(states)]
         plt1 = violin(labels, states[2:end], ylim=(0.0, 2.5), ylabel="State", color=idx, label=false,
-                      title="$(letters[idx]) initial condition (x=$(round(P0, digits=2)))")
+                      linewidth=0.5, title="$(letters[idx]) initial condition (x=$(round(P0, digits=2)))")
         push!(plot_array,plt1)
     end
-    plot(plot_array..., layout=(length(P0_options), 1), size=(800,200*length(P0_options)), guidefontsize=12)
-    savefig("../output/$(timestamp)_state_distribution.png")
+    plot(plot_array..., layout=(length(P0_options), 1),
+         size=(_cm(17), min(_MAX_H, _cm(5)*length(P0_options))))
+    savefig("../output/$(timestamp)_state_distribution.pdf")
 end
 
 function _plot_early_warning_residuals(timestamp, p, residuals, times, threshold_idx)
@@ -134,17 +159,17 @@ function _plot_early_warning_residuals(timestamp, p, residuals, times, threshold
     label2 = plot(grid = false, showaxis = false, annotation=(0.1,0.5,"(b)"))
 
     plot(label1, label2, plt1, plt2, layout=@layout([grid(2,1){0.01w} grid(2,1)]),
-         size=(1000,500), guidefontsize=12, bottom_margin = 5Plots.mm)
-    savefig("../output/$(timestamp)_early_warning_signal_residuals.png")
+         size=(_MAX_W, _cm(10)), bottom_margin = 5Plots.mm)
+    savefig("../output/$(timestamp)_early_warning_signal_residuals.pdf")
 end
 
 function _plot_decision_scales(s, time_horizons, decision_steps, timestamp)
     label = map(decision_step -> "Time horizon = $(decision_step)", time_horizons)
     label = reshape(label, (1,length(time_horizons)))
 
-    plot(decision_steps, s, label = label, legend=:topright, size=(952,560),
-         ylabel = "Pathway diversity", xlabel = "Decision step", guidefontsize=12, left_margin = 10Plots.mm)
-    savefig("../output/$(timestamp)_decision_scales.png")
+    plot(decision_steps, s, label = label, legend=:topright, size=(_cm(12), _cm(8)),
+         ylabel = "Pathway diversity", xlabel = "Decision step", left_margin = 10Plots.mm)
+    savefig("../output/$(timestamp)_decision_scales.pdf")
 end
 
 
@@ -153,29 +178,29 @@ function _plot_scaling(s, P0_options, number_options, timestamp)
     label = reshape(label, (1,length(P0_options)))
 
     plot(number_options, s, label=label, left_margin = 5Plots.mm, legend=:outerbottomright,
-         size=(952,560), ylabel = "Pathway diversity", xlabel = "Maximum number of options")
-    savefig("../output/$(timestamp)_scaling.png")
+         size=(_cm(14), _cm(9)), ylabel = "Pathway diversity", xlabel = "Maximum number of options")
+    savefig("../output/$(timestamp)_scaling.pdf")
 end
 
 function _plot_number_options_simulation(P0_options, influx_options, n_options)
     heatmap(influx_options, P0_options, n_options, label=false, ylabel="Amount of Phosphorus", xlabel="Influx",
-            guidefontsize=12, colorbar_title="Future number of options", left_margin = 5Plots.mm, size=(952,560))
-    savefig("../output/number_options_simulation.png")
+            colorbar_title="Future number of options", left_margin = 5Plots.mm, size=(_cm(12), _cm(9)))
+    savefig("../output/number_options_simulation.pdf")
 end
 
 function _plot_range_states(P0_options, range_states)
     plot(P0_options, range_states[new_P = 1], label="Lower range", ylabel="New amount of Phosphorus",
-         xlabel="Past amount of Phosphorus", guidefontsize=12, left_margin = 5Plots.mm, size=(952,560))
+         xlabel="Past amount of Phosphorus", left_margin = 5Plots.mm, size=(_cm(12), _cm(8)))
     plot!(P0_options, range_states[new_P = 2], label="Upper range")
     threshold = PathwayDiversity.get_root(1.3, 0.1)
     vline!([threshold], label="Tipping point", color="black", ls=:dash)
     hline!([threshold], label=false, color="black", ls=:dash)
-    savefig("../output/range_states.png")
+    savefig("../output/range_states.pdf")
 end
 
 function _plot_number_option(n_possible_influx, P_options)
     plot(collect(P_options), n_possible_influx, label=false, ylabel="Number of options",
-         xlabel="Amount of Phosphorus (x)", guidefontsize=12)
+         xlabel="Amount of Phosphorus (x)", size=(_cm(12), _cm(8)))
     savefig("../output/number_options.png")
 
 end
@@ -187,14 +212,12 @@ function _plot_bifurcation(roots, influx_options_root, lower_fold, upper_fold)
     upper_branch  = influx_options_root .>= lower_fold
     middle_branch = lower_fold .<= influx_options_root .<= upper_fold
     lower_branch  = influx_options_root .<= upper_fold
-    plot(influx_options_root[upper_branch], roots[3, upper_branch], label="Eutrophic stable state")
-    plot!(influx_options_root[middle_branch], roots[2, middle_branch], label="Instable state")
-
-    plot!(influx_options_root[lower_branch], roots[1, lower_branch], label="Oligotrophic stable state",
+    plot(influx_options_root[upper_branch], roots[3, upper_branch], lw=1.5)
+    plot!(influx_options_root[middle_branch], roots[2, middle_branch], lw=1.5)
+    plot!(influx_options_root[lower_branch], roots[1, lower_branch], lw=1.5,
           bottom_margin = 5Plots.mm, left_margin = 10Plots.mm,
-          ylabel = "Amount of phosphorus (x)", xlabel = "Influx (I)",
-          legend=:bottomright, size=(952,560))
-    savefig("../output/bifurcation.png")
+          legend=false, ylabel = "Amount of phosphorus (x)", xlabel = "Influx (I)", size=(_cm(15), _cm(10)))
+    savefig("../output/bifurcation.pdf")
 end
 
 function _clean_vector(vector)::Vector{Float64}
